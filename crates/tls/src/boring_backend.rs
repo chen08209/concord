@@ -2,9 +2,11 @@ use std::error::Error as _;
 use std::fmt;
 use std::io::{self, Read, Write};
 use std::pin::Pin;
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc, LazyLock, Mutex};
 use std::task::{Context, Poll, Waker};
 
+use boring::error::ErrorStack;
+use boring::ex_data::Index;
 use boring::pkey::PKey;
 use boring::ssl::{
     CertificateCompressionAlgorithm, CertificateCompressor, Ssl, SslAlert, SslContext,
@@ -145,6 +147,19 @@ fn boring_err(what: &str, err: boring::error::ErrorStack) -> TlsError {
     TlsError::Config(format!("boringssl {what}: {err}"))
 }
 
+/// BoringSSL never frees an ex_data index and walks every index ever made each time it frees
+/// an `SSL` (`CRYPTO_free_ex_data`), so these are made once per process, not per connector.
+static VERIFY_SLOT: LazyLock<Result<Index<Ssl, Arc<VerifyCx>>, ErrorStack>> =
+    LazyLock::new(Ssl::new_ex_index);
+static LOG_SLOT: LazyLock<Result<Index<Ssl, LogSlot>, ErrorStack>> =
+    LazyLock::new(Ssl::new_ex_index);
+
+fn slot<U>(slot: &LazyLock<Result<Index<Ssl, U>, ErrorStack>>) -> Result<Index<Ssl, U>, TlsError> {
+    slot.as_ref()
+        .copied()
+        .map_err(|e| boring_err("ex index", e.clone()))
+}
+
 fn alpn_wire(protocols: &[String]) -> Result<Vec<u8>, TlsError> {
     let mut wire = Vec::new();
     for proto in protocols {
@@ -255,12 +270,12 @@ impl BoringConnector {
                 .map_err(|e| boring_err("client key", e))?;
         }
 
-        let index = Ssl::new_ex_index::<Arc<VerifyCx>>().map_err(|e| boring_err("ex index", e))?;
+        let index = slot(&VERIFY_SLOT)?;
         builder.set_custom_verify_callback(SslVerifyMode::PEER, move |ssl| {
             verify(&policy, index, ssl)
         });
         // The callback belongs to the context, so it also sees connections that carry no slot.
-        let log = Ssl::new_ex_index::<LogSlot>().map_err(|e| boring_err("ex index", e))?;
+        let log = slot(&LOG_SLOT)?;
         builder.set_keylog_callback(move |ssl, line| {
             if let Some(slot) = ssl.ex_data(log) {
                 record_secret(slot, line);
@@ -536,5 +551,27 @@ where
             Poll::Ready(Ok(())) if !buf.filled().is_empty() => out.extend_from_slice(buf.filled()),
             _ => break,
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::TlsOptions;
+    use crate::fingerprints::ClientFingerprint;
+    use crate::trust::TrustStore;
+
+    fn connector() -> BoringConnector {
+        let policy =
+            CertPolicy::new(&TlsOptions::default(), TrustStore::new(b"", Vec::new())).unwrap();
+        let spec = ClientFingerprint::Chrome.spec().unwrap();
+        BoringConnector::new(spec, Arc::new(policy), &[], None, None).unwrap()
+    }
+
+    #[test]
+    fn connectors_share_their_ex_data_slots() {
+        let (a, b) = (connector(), connector());
+        assert_eq!(a.index.as_raw(), b.index.as_raw());
+        assert_eq!(a.log.as_raw(), b.log.as_raw());
     }
 }
