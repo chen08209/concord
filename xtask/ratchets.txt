@@ -6,7 +6,7 @@ file-lines crates/config/src/share_link/decode.rs 940
 file-lines crates/proxy/src/vmess/crypto.rs 809
 file-lines crates/rules/src/compile.rs 804
 file-lines crates/tls/src/record.rs 997 raised from 996: the key schedule lock is taken through concord_common::sync, which needs its own import
-file-lines crates/tun/src/stack/driver.rs 827 raised from 809: the driver drains the adopted UDP sessions' replies each round, offers the queue poller to adopted sessions and polls with the waker that drops its own drain's wakes; no split planned yet
+file-lines crates/tun/src/stack/driver.rs 838 raised from 809: the driver drains the adopted UDP sessions' replies each round, offers the queue poller to adopted sessions, polls with the waker that drops its own drain's wakes and ends a round's reads at a byte budget; no split planned yet
 fn-lines crates/config/src/profile.rs::load_raw 204
 fn-lines crates/config/src/profile.rs::resolve_groups 144 raised from 142: a group in `use` and GLOBAL as a member are refused at load, as mihomo does
 fn-lines crates/config/src/rule.rs::build_cond 131 raised from 130: REMATCH-NAME uses the existing metadata list parser; back down when metadata predicates leave build_cond

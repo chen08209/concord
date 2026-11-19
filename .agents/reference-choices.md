@@ -660,6 +660,7 @@ MiB, GiB, ns, µs, ms, s, min, h), or as the source text in backticks; `cfg` var
 | `tun::device::apple::TunDevice::BATCH` | `concord_platform::UTUN_BATCH` | B | Equals concord_platform::UTUN_BATCH = 64, sing-tun goReadBatch = 64 used for utun recvmsg_x batches (`stack_go_profile_default.go:14`, `stack_go_io_darwin.go:135-136`); same value. |
 | `tun::dns::READ_TIMEOUT` | 10 s | B | mihomo DefaultDnsReadTimeout = time.Second * 10 (`component/resolver/relay.go:15`), used by its TUN DNS hijack (`listener/sing_tun/dns.go:33`, `:79`); same value. |
 | `tun::stack::driver::RX_BATCH` | 64 | B | sing-tun goReadBatch = 64 (`stack_go_profile_default.go:14`), the frames one engine burst reads (`stack_go_engine.go:216`, `:641`); same value. |
+| `tun::stack::driver::ROUND_READ_BYTES` | 1 MiB | B | sing-tun goEngineBurstBytes = 1 << 20 (`stack_go_profile_default.go:11`), the bytes one engine burst reads before it dispatches and flushes (`stack_go_engine.go:642-656`); same value. |
 | `tun::stack::driver::RX_BATCH_START` | 8 | B | sing-tun starts its TUN receive batch at goReceiveBatchMin = 8 and halves no lower (`stack_go_profile_default.go:13`, `stack_go_io_darwin.go:138`, `:342`); same value. |
 | `tun::vnet::UDP_RUN_LIMIT` | 32 | B | sing-tun writePacketBatch takes at most goPacketBatchSize = 32 frames (`stack_go_udp.go:22`, `:368`, `stack_go_io_linux.go:535`); same value. |
 | `tunnel::route::DNS_TIMEOUT` | 5 s | B | mihomo DefaultDNSTimeout = time.Second * 5 (`component/resolver/resolver.go:38`), the default DNS request timeout; same value. |

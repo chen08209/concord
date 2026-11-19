@@ -34,6 +34,9 @@ use crate::dns;
 const RX_BATCH: usize = 64;
 const RX_BATCH_START: usize = 8;
 const MAX_ROUNDS: usize = 8;
+/// Bytes a round reads before the stack answers them, as sing-tun ends a read burst: an
+/// upload's ACKs go out while the sender still has window, not after the device runs dry.
+const ROUND_READ_BYTES: usize = 1 << 20;
 const SWEEP_INTERVAL: u64 = 15_000_000;
 const RX_BUFFER: usize = 65_536 + 16;
 const DNS_CONCURRENCY: usize = 256;
@@ -533,10 +536,17 @@ impl<D: Device> Driver<D> {
     fn drain_rx(&mut self, cx: &mut Context<'_>) -> io::Result<bool> {
         let mut buf = std::mem::take(&mut self.rx_buf);
         let mut read = 0;
+        let mut bytes = 0;
         let mut outcome = Ok(());
         loop {
             let mut gather = Gather::default();
-            let again = self.read_into(cx, &mut buf, &mut read, &mut outcome, &mut gather);
+            let again = self.read_into(
+                cx,
+                &mut buf,
+                (&mut read, &mut bytes),
+                &mut outcome,
+                &mut gather,
+            );
             self.tcp.flush(&mut gather);
             if !again {
                 break;
@@ -552,7 +562,7 @@ impl<D: Device> Driver<D> {
         &mut self,
         cx: &mut Context<'_>,
         buf: &'a mut [u8],
-        read: &mut usize,
+        (read, bytes): (&mut usize, &mut usize),
         outcome: &mut io::Result<()>,
         gather: &mut Gather<'a>,
     ) -> bool {
@@ -562,7 +572,7 @@ impl<D: Device> Driver<D> {
         let lens = [0usize; MAX_BATCH];
         let capacity = buf.len();
         let mut free: &'a mut [u8] = buf;
-        while *read < RX_BATCH {
+        while *read < RX_BATCH && *bytes < ROUND_READ_BYTES {
             let want = self.rx_batch.min(RX_BATCH - *read).min(free.len() / stride);
             if want == 0 {
                 return false;
@@ -587,6 +597,7 @@ impl<D: Device> Driver<D> {
                 }
             }
             *read += received.max(1);
+            *bytes += lens.iter().take(received).sum::<usize>();
             self.stats
                 .rx_packets
                 .fetch_add(received as u64, Ordering::Relaxed);
@@ -609,7 +620,7 @@ impl<D: Device> Driver<D> {
                     None => self.stats.count_drop(DropReason::Malformed),
                 }
             }
-            if gather.is_empty() && *read < RX_BATCH {
+            if gather.is_empty() && *read < RX_BATCH && *bytes < ROUND_READ_BYTES {
                 return true;
             }
         }
@@ -1044,6 +1055,30 @@ mod owner_tests {
         assert!(
             reads >= RX_BATCH && writes > 0,
             "{reads} reads and {writes} writes in one pass"
+        );
+    }
+
+    #[tokio::test]
+    async fn a_round_answers_its_reads_after_a_mebibyte() {
+        struct Upload(std::sync::atomic::AtomicUsize);
+        impl Device for Upload {
+            fn poll_recv(&self, _: &mut Context<'_>, buf: &mut [u8]) -> Poll<io::Result<usize>> {
+                self.0.fetch_add(1, Ordering::Relaxed);
+                Poll::Ready(Ok(buf.len()))
+            }
+            fn poll_send(&self, _: &mut Context<'_>, packet: &[u8]) -> Poll<io::Result<usize>> {
+                Poll::Ready(Ok(packet.len()))
+            }
+        }
+        let device = Upload(std::sync::atomic::AtomicUsize::new(0));
+        let mut driver = Driver::new(StackOptions::default(), device, Arc::new(Idle));
+        let mut cx = Context::from_waker(std::task::Waker::noop());
+        assert!(driver.drain_rx(&mut cx).unwrap());
+        let reads = driver.dev.0.load(Ordering::Relaxed);
+        assert!(
+            reads < RX_BATCH && reads * driver.rx_stride >= ROUND_READ_BYTES,
+            "{reads} reads of {} bytes in one round",
+            driver.rx_stride
         );
     }
 
