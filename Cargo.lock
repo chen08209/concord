@@ -488,6 +488,9 @@ dependencies = [
  "hex",
  "hmac 0.12.1",
  "http",
+ "http-body-util",
+ "hyper",
+ "hyper-util",
  "libc",
  "quinn",
  "rand 0.9.5",
@@ -499,6 +502,7 @@ dependencies = [
  "socket2",
  "time",
  "tokio",
+ "tokio-rustls",
  "windows-sys 0.61.2",
 ]
 

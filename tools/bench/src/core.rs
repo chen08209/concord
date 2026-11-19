@@ -255,6 +255,7 @@ pub struct Launch<'a> {
     pub proxy: Option<Value>,
     /// Concord takes the TUN section as an overlay; mihomo reads it from the profile; sing-box gets its own.
     pub tun: Option<Value>,
+    pub mitm: Option<Value>,
     pub mixed: u16,
     pub placement: Placement,
     pub log: PathBuf,
@@ -368,6 +369,9 @@ impl Running {
                 });
                 if let Some(tun) = &launch.tun {
                     overlay["tun"] = tun.clone();
+                }
+                if let Some(mitm) = &launch.mitm {
+                    overlay["mitm"] = mitm.clone();
                 }
                 control
                     .call(

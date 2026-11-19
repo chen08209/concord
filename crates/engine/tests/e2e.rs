@@ -34,6 +34,10 @@ mod modules;
 #[path = "e2e/scripts.rs"]
 mod scripts;
 
+#[cfg(feature = "mitm")]
+#[path = "e2e/script_cost.rs"]
+mod script_cost;
+
 #[path = "e2e/rematch.rs"]
 mod rematch;
 

@@ -23,6 +23,41 @@ pub const ALL: &[Spec] = &[
         true,
         "rematch name and sub-rule routing before DIRECT",
     ),
+    spec(
+        "mitm-off",
+        false,
+        "MITM tier: no mitm section, HTTPS relayed as is",
+    ),
+    spec(
+        "mitm-pass",
+        false,
+        "MITM tier: on, the origin not in hostname, so its connections take the fast path",
+    ),
+    spec(
+        "mitm",
+        false,
+        "MITM tier: the origin decrypted, no rule acting on requests",
+    ),
+    spec(
+        "mitm-route",
+        false,
+        "MITM tier: decrypted, --mitm-rules URL-REGEX routing rules none of which match",
+    ),
+    spec(
+        "mitm-rewrite",
+        false,
+        "MITM tier: decrypted, --mitm-rules url-rewrite lines none of which match",
+    ),
+    spec(
+        "mitm-script",
+        false,
+        "MITM tier: decrypted, an http-request script that changes nothing runs on every request",
+    ),
+    spec(
+        "mitm-modules",
+        false,
+        "MITM tier: decrypted, every module of the config crate's corpus on, their resources refused",
+    ),
     spec("ss-aes128", true, "shadowsocks aes-128-gcm"),
     spec("gost-relay", true, "gost relay with authentication"),
     spec(
@@ -165,6 +200,11 @@ pub const QUICK: &[&str] = &[
 
 const fn spec(name: &'static str, udp: bool, about: &'static str) -> Spec {
     Spec { name, udp, about }
+}
+
+/// A tier of Concord's MITM, served DIRECT; see `mitm.rs`.
+pub fn is_mitm(spec: Spec) -> bool {
+    spec.name.starts_with("mitm")
 }
 
 pub fn find(name: &str) -> Option<Spec> {

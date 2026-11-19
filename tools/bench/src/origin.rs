@@ -8,6 +8,8 @@ use serde::{Deserialize, Serialize};
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::{TcpListener, TcpStream, UdpSocket};
 
+use crate::mitm;
+
 pub const CHUNK: usize = 64 * 1024;
 pub const REPORT_EVERY: Duration = Duration::from_millis(100);
 
@@ -18,6 +20,8 @@ pub struct Ports {
     pub echo: u16,
     pub crr: u16,
     pub udp: u16,
+    pub https: u16,
+    pub http: u16,
 }
 
 impl Ports {
@@ -28,6 +32,8 @@ impl Ports {
             echo: base + 2,
             crr: base + 3,
             udp: base + 4,
+            https: base + 5,
+            http: base + 6,
         }
     }
 }
@@ -66,6 +72,8 @@ pub async fn serve(bind: IpAddr, base: Option<u16>, rate_mbit: Option<f64>) -> s
     let echo = TcpListener::bind((bind, port(2))).await?;
     let crr = TcpListener::bind((bind, port(3))).await?;
     let udp = UdpSocket::bind((bind, port(4))).await?;
+    let https = TcpListener::bind((bind, port(5))).await?;
+    let http = TcpListener::bind((bind, port(6))).await?;
     let _ = socket2::SockRef::from(&udp).set_recv_buffer_size(8 << 20);
     let _ = socket2::SockRef::from(&udp).set_send_buffer_size(8 << 20);
     let ports = Ports {
@@ -74,11 +82,16 @@ pub async fn serve(bind: IpAddr, base: Option<u16>, rate_mbit: Option<f64>) -> s
         echo: echo.local_addr()?.port(),
         crr: crr.local_addr()?.port(),
         udp: udp.local_addr()?.port(),
+        https: https.local_addr()?.port(),
+        http: http.local_addr()?.port(),
     };
-    println!(
-        "{}",
-        serde_json::to_string(&ports).map_err(std::io::Error::other)?
-    );
+    let (authority, tls) = mitm::authority().map_err(std::io::Error::other)?;
+    for line in [
+        serde_json::to_string(&ports),
+        serde_json::to_string(&authority),
+    ] {
+        println!("{}", line.map_err(std::io::Error::other)?);
+    }
 
     tokio::spawn(accept(source, move |s| async move {
         source_flow(s, rate_mbit).await
@@ -87,6 +100,8 @@ pub async fn serve(bind: IpAddr, base: Option<u16>, rate_mbit: Option<f64>) -> s
     tokio::spawn(accept(echo, |s| async move { echo_flow(s).await }));
     tokio::spawn(accept(crr, |s| async move { crr_flow(s).await }));
     tokio::spawn(udp_echo(udp));
+    tokio::spawn(accept(https, move |s| mitm::serve_https(s, tls.clone())));
+    tokio::spawn(accept(http, |s| mitm::serve_http(s, false)));
 
     let mut stdin = tokio::io::stdin();
     let mut buf = [0u8; 64];

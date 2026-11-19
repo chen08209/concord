@@ -230,8 +230,10 @@ pub fn primary(workload: &str) -> &'static [&'static str] {
             "peak_mib",
         ],
         "tcp-multi" => &["gbps", "cpu_s_per_gb", "jain", "peak_mib"],
-        "tcp-rr" => &["tps", "p50_us", "p99_us", "cpu_us_per_tx"],
-        "tcp-crr" => &["cps", "p50_ms", "p99_ms", "cpu_us_per_conn", "error_pct"],
+        "tcp-rr" | "mitm-rr" | "mitm-h2-rr" | "http-rr" => {
+            &["tps", "p50_us", "p99_us", "cpu_us_per_tx"]
+        }
+        "tcp-crr" | "mitm-crr" => &["cps", "p50_ms", "p99_ms", "cpu_us_per_conn", "error_pct"],
         "udp-stream" => &["mbps", "loss_pct", "rtt_p99_us", "cpu_s_per_gb"],
         "udp-rr" => &["rtt_p50_us", "rtt_p99_us", "loss_pct"],
         "idle" => &["kib_per_conn", "retained_kib_per_conn", "open_ms"],

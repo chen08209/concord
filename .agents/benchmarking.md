@@ -57,7 +57,7 @@ Four roles take part, and each one is measured:
 |---|---|
 | core | the core under test: `concord` driven over its control connection (`core.hello`, `core.init`, `config.apply`, `engine.start`), or mihomo with `-d -f` |
 | server | mihomo, or sing-box for Hysteria v1; the serving process is measured for each case |
-| origin | `concord-bench origin`: TCP source, sink, echo and close-first, and UDP echo |
+| origin | `concord-bench origin`: TCP source, sink, echo and close-first, UDP echo, and HTTPS and plain HTTP answering 64 bytes |
 | client | the harness, generating load through the core's SOCKS5 mixed port, or through its TUN device with `--tun` |
 
 For each case, every core starts on its own port and stays up. Rounds run the cores in rotating order (AB, BA, ...), so
@@ -251,10 +251,22 @@ and a drift of at most 1.61%. The same case on the second machine is a separate 
 | `idle` | KiB per held connection, KiB still held after they close, fds per connection, time to open them all |
 | `startup` | spawn to first proxied byte, idle memory, threads, fds, CPU spent starting, time to exit after SIGTERM |
 | `large` | a generated profile (quick tier 5k proxies and 50k rules, full tier 20k and 200k): time to ready, peak and settled memory |
+| `mitm-rr`, `mitm-h2-rr` | `mitm` cases: a 64-byte POST and its answer over one HTTPS connection, HTTP/1.1 or HTTP/2, with `tcp-rr`'s metrics and `decrypted` (1 when the core answered the handshake with its own certificate) |
+| `mitm-crr` | `mitm` cases: TLS connect, one HTTP/1.1 exchange, close, with `tcp-crr`'s metrics |
+| `http-rr` | `mitm` cases: `mitm-rr` over plain HTTP/1.1 |
 
 Upload rates come from the origin's receive counter, which it reports every 100 ms, not from the client's send
 calls, so socket buffers cannot inflate them. `interval_cv` and `interval_p10_gbps` show how steady the 100 ms rates
 were.
+
+The `mitm-*` cases are tiers of Concord's MITM, all DIRECT, for Concord cores only (mihomo has no MITM): `mitm-off`
+(no section), `mitm-pass` (on, the origin not listed), `mitm` (the origin decrypted, no rule acting on requests),
+`mitm-route` and `mitm-rewrite` (`--mitm-rules N`, default 100, URL-REGEX routing rules or url-rewrite lines that never
+match), `mitm-script` (an http-request script that changes nothing on every request) and `mitm-modules` (every module
+in `crates/config/tests/data/modules` on; every connection but the origin's is rejected, so their resources fail at once
+instead of leaving the machine). The origin makes a CA per run and signs its own certificate with it; the core reads it
+from `<home>/mitm`, and the client trusts only it. On these cases `idle` holds HTTPS connections after one exchange.
+Neither tier lists them; name them with `--cases`.
 
 The `quick` tier is the SOCKS part of the representative set (`performance.md` has the rest): `direct`, `ss-aes128`,
 `trojan-tls`, `vmess-grpc-tls` and `hysteria2` with the throughput, latency, UDP and startup workloads, 5 rounds of 3 s

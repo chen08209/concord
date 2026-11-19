@@ -36,6 +36,8 @@ pub struct Plan {
     pub idle_conns: usize,
     pub large_proxies: usize,
     pub large_rules: usize,
+    /// Non-matching rules in `mitm-route` and `mitm-rewrite`.
+    pub mitm_rules: usize,
     pub tun: bool,
     pub tun_stack: String,
     pub tun_mtu: u32,
@@ -72,6 +74,7 @@ impl Plan {
                 idle_conns: 500,
                 large_proxies: 5_000,
                 large_rules: 50_000,
+                mitm_rules: 100,
                 tun: false,
                 tun_stack: "system".into(),
                 tun_mtu: 1500,
@@ -85,10 +88,15 @@ impl Plan {
                 tier,
                 cases: cases::ALL
                     .iter()
-                    .filter(|case| !matches!(case.name, "ss-gost" | "gost-relay"))
+                    .filter(|case| {
+                        !matches!(case.name, "ss-gost" | "gost-relay") && !cases::is_mitm(**case)
+                    })
                     .copied()
                     .collect(),
-                workloads: Workload::ALL.to_vec(),
+                workloads: Workload::ALL
+                    .into_iter()
+                    .filter(|w| !w.needs_mitm())
+                    .collect(),
                 rounds: 5,
                 warmup: Duration::from_secs(1),
                 duration: Duration::from_secs(5),
@@ -101,6 +109,7 @@ impl Plan {
                 idle_conns: 2000,
                 large_proxies: 20_000,
                 large_rules: 200_000,
+                mitm_rules: 100,
                 tun: false,
                 tun_stack: "system".into(),
                 tun_mtu: 1500,
@@ -122,7 +131,7 @@ impl Plan {
                 Workload::Startup => Duration::from_secs(3),
                 Workload::Idle => Duration::from_secs(8),
                 Workload::Large => Duration::from_secs(15),
-                Workload::TcpCrr => Duration::from_secs(3),
+                Workload::TcpCrr | Workload::MitmCrr => Duration::from_secs(3),
                 _ => stream,
             };
             let warmups = match (w.fresh_core(), self.fresh_cores) {

@@ -19,6 +19,7 @@ mod gost;
 mod isolate;
 mod load;
 mod masque;
+mod mitm;
 mod netstat;
 mod origin;
 mod plan;
@@ -126,6 +127,9 @@ struct RunArgs {
     #[arg(help = "Connections each tcp-crr window opens, in place of the tier's count.")]
     #[arg(long)]
     crr_conns: Option<usize>,
+    #[arg(help = "Non-matching rules in the mitm-route and mitm-rewrite cases.")]
+    #[arg(long)]
+    mitm_rules: Option<usize>,
     #[arg(
         help = "Linux: `core=0-1,server=2-3,origin=4,client=5-7`, or `off`. By default the CPUs this process may use are split between the four."
     )]
@@ -429,6 +433,9 @@ fn run(args: RunArgs) -> Result<bool, String> {
         }
         plan.crr_conns = count;
     }
+    if let Some(count) = args.mitm_rules {
+        plan.mitm_rules = count;
+    }
     plan.tun = args.tun;
     plan.tun_stack = args.tun_stack.clone();
     plan.tun_mtu = args.tun_mtu;
@@ -516,7 +523,7 @@ fn run(args: RunArgs) -> Result<bool, String> {
             !matches!(
                 c.name,
                 "direct" | "rematch" | "hysteria-brutal" | "masque-l4"
-            )
+            ) && !cases::is_mitm(*c)
         });
     let mihomo = match mihomo {
         Some(m) => m,

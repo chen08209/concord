@@ -2,6 +2,7 @@
 //! and reads every watched process's counters at the window's two edges.
 
 use std::collections::{BTreeMap, HashMap};
+use std::future::Future;
 use std::net::SocketAddr;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
@@ -10,6 +11,7 @@ use std::time::{Duration, Instant};
 use serde::Serialize;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 
+use crate::mitm::{self, Wire};
 use crate::origin::{CHUNK, Ports};
 use crate::probe::{self, Delta, Window};
 use crate::sockets;
@@ -27,13 +29,17 @@ pub enum Workload {
     TcpCrr,
     UdpStream,
     UdpRr,
+    MitmRr,
+    MitmH2Rr,
+    MitmCrr,
+    HttpRr,
     Idle,
     Startup,
     Large,
 }
 
 impl Workload {
-    pub const ALL: [Workload; 10] = [
+    pub const ALL: [Workload; 14] = [
         Workload::TcpDown,
         Workload::TcpUp,
         Workload::TcpMulti,
@@ -41,6 +47,10 @@ impl Workload {
         Workload::TcpCrr,
         Workload::UdpStream,
         Workload::UdpRr,
+        Workload::MitmRr,
+        Workload::MitmH2Rr,
+        Workload::MitmCrr,
+        Workload::HttpRr,
         Workload::Idle,
         Workload::Startup,
         Workload::Large,
@@ -55,6 +65,10 @@ impl Workload {
             Workload::TcpCrr => "tcp-crr",
             Workload::UdpStream => "udp-stream",
             Workload::UdpRr => "udp-rr",
+            Workload::MitmRr => "mitm-rr",
+            Workload::MitmH2Rr => "mitm-h2-rr",
+            Workload::MitmCrr => "mitm-crr",
+            Workload::HttpRr => "http-rr",
             Workload::Idle => "idle",
             Workload::Startup => "startup",
             Workload::Large => "large",
@@ -70,7 +84,19 @@ impl Workload {
             Workload::TcpCrr => "connect, one byte each way, close: handshake latency and rate",
             Workload::UdpStream => "windowed UDP echo: goodput, loss and RTT",
             Workload::UdpRr => "one UDP ping in flight: RTT and loss",
-            Workload::Idle => "memory per held connection, and what stays after they close",
+            Workload::MitmRr => {
+                "mitm cases: 64-byte HTTP/1.1 POST and answer over one TLS connection"
+            }
+            Workload::MitmH2Rr => {
+                "mitm cases: 64-byte HTTP/2 POST and answer over one TLS connection"
+            }
+            Workload::MitmCrr => "mitm cases: TLS connect, one HTTP/1.1 exchange, close",
+            Workload::HttpRr => {
+                "mitm cases: 64-byte plain HTTP/1.1 POST and answer over one connection"
+            }
+            Workload::Idle => {
+                "memory per held connection, and what stays after they close; on mitm cases each holds a TLS session after one exchange"
+            }
             Workload::Startup => "spawn to first proxied byte, idle memory, threads, exit time",
             Workload::Large => "a large generated profile: time to ready and peak memory",
         }
@@ -82,6 +108,14 @@ impl Workload {
 
     pub fn needs_udp(self) -> bool {
         matches!(self, Workload::UdpStream | Workload::UdpRr)
+    }
+
+    /// Speaks HTTP to the origin's HTTPS or HTTP port, so it runs on the mitm cases only.
+    pub fn needs_mitm(self) -> bool {
+        matches!(
+            self,
+            Workload::MitmRr | Workload::MitmH2Rr | Workload::MitmCrr | Workload::HttpRr
+        )
     }
 
     /// Runs against a fresh core each trial rather than the case's shared one.
@@ -119,6 +153,8 @@ pub struct Ctx {
     pub idle_conns: usize,
     pub net_counters: bool,
     pub far_netns: Option<String>,
+    /// Set on the mitm cases, whose origin gave the CA.
+    pub tls: Option<crate::mitm::Clients>,
 }
 
 impl Ctx {
@@ -128,7 +164,7 @@ impl Ctx {
 }
 
 /// Windows on every process of the trial, the harness included.
-struct Windows {
+pub(crate) struct Windows {
     core: Window,
     server: Option<Window>,
     origin: Option<Window>,
@@ -137,7 +173,7 @@ struct Windows {
     sampler: probe::Sampler,
 }
 
-struct Closed {
+pub(crate) struct Closed {
     core: Delta,
     server: Option<Delta>,
     origin: Option<Delta>,
@@ -146,7 +182,7 @@ struct Closed {
 }
 
 impl Windows {
-    fn open(pids: Pids) -> Windows {
+    pub(crate) fn open(pids: Pids) -> Windows {
         Windows {
             sampler: probe::Sampler::start(pids.core, Duration::from_millis(50)),
             core: Window::open_counting_syscalls(pids.core),
@@ -157,7 +193,7 @@ impl Windows {
         }
     }
 
-    fn close(self) -> Closed {
+    pub(crate) fn close(self) -> Closed {
         let core = self.core.close();
         let server = self.server.map(Window::close);
         let origin = self.origin.map(Window::close);
@@ -326,6 +362,13 @@ pub async fn run(workload: Workload, ctx: &Ctx) -> Io<Metrics> {
         Workload::TcpCrr => crr(ctx).await,
         Workload::UdpStream => udp(ctx, ctx.udp_size, ctx.udp_window).await,
         Workload::UdpRr => udp(ctx, 64, 1).await,
+        Workload::MitmRr => mitm::rr(ctx, Wire::H1).await,
+        Workload::MitmH2Rr => mitm::rr(ctx, Wire::H2).await,
+        Workload::MitmCrr => {
+            let ctx_ = ctx.clone();
+            crr_with(ctx, "mitm-crr", move || mitm::crr_once(ctx_.clone())).await
+        }
+        Workload::HttpRr => mitm::rr(ctx, Wire::Plain).await,
         Workload::Idle | Workload::Startup | Workload::Large => {
             Err(format!("{} runs on a fresh core", workload.name()))
         }
@@ -543,30 +586,43 @@ async fn rr(ctx: &Ctx) -> Io<Metrics> {
         stream.read_exact(&mut reply).await.map_err(io("rr"))?;
         samples.push(sent.elapsed().as_nanos() as u64);
     }
-    let elapsed = started.elapsed().as_secs_f64();
-    let closed = windows.close();
+    let metrics = rr_metrics(started, windows.close(), &mut samples);
     socks::abort(stream);
+    Ok(metrics)
+}
+
+pub(crate) fn rr_metrics(started: Instant, closed: Closed, samples: &mut [u64]) -> Metrics {
+    let elapsed = started.elapsed().as_secs_f64();
     let mut m = Metrics::new();
     let count = samples.len() as f64;
     m.insert("tps".into(), count / elapsed);
-    latency_metrics(&mut m, "", &mut samples, 1e3, "us");
+    latency_metrics(&mut m, "", samples, 1e3, "us");
     costs(&mut m, &closed, None, Some(("cpu_us_per_tx", count, 1e3)));
-    Ok(m)
+    m
 }
 
 async fn crr(ctx: &Ctx) -> Io<Metrics> {
-    let target = ctx.at(ctx.ports.crr);
+    let (entry, target) = (ctx.entry, ctx.at(ctx.ports.crr));
+    crr_with(ctx, "tcp-crr", move || crr_once(entry, target)).await
+}
+
+/// `crr_conns` connections, `crr_concurrency` at a time, each made and timed by `once`.
+async fn crr_with<F, Fut>(ctx: &Ctx, name: &str, once: F) -> Io<Metrics>
+where
+    F: Fn() -> Fut + Clone + Send + 'static,
+    Fut: Future<Output = Result<u64, String>> + Send,
+{
     let run = |count: usize| {
         let next = Arc::new(AtomicU64::new(0));
         let workers: Vec<_> = (0..ctx.crr_concurrency)
             .map(|_| {
                 let next = next.clone();
-                let entry = ctx.entry;
+                let once = once.clone();
                 tokio::spawn(async move {
                     let mut ok = Vec::new();
                     let mut errors = Vec::new();
                     while (next.fetch_add(1, Ordering::Relaxed) as usize) < count {
-                        match crr_once(entry, target).await {
+                        match once().await {
                             Ok(ns) => ok.push(ns),
                             Err(e) => errors.push(e),
                         }
@@ -599,7 +655,7 @@ async fn crr(ctx: &Ctx) -> Io<Metrics> {
     }
     if !errors.is_empty() {
         eprintln!(
-            "  tcp-crr: {} of {} connections failed: {}",
+            "  {name}: {} of {} connections failed: {}",
             errors.len(),
             ctx.crr_conns,
             error_kinds(&errors)
@@ -738,13 +794,39 @@ async fn udp(ctx: &Ctx, size: usize, window: usize) -> Io<Metrics> {
 /// Holds `ctx.idle_conns` connections, each proven end to end, and reads the core
 /// before, while they are held, and after they are closed.
 pub async fn idle(ctx: &Ctx) -> Io<Metrics> {
+    if ctx.tls.is_some() {
+        let held = ctx.clone();
+        return hold(ctx, move || mitm::held(held.clone()), drop).await;
+    }
+    let (entry, target) = (ctx.entry, ctx.at(ctx.ports.echo));
+    let open = move || async move {
+        let mut stream = socks::connect(entry, target)
+            .await
+            .map_err(|e| e.to_string())?;
+        stream.write_all(b"i").await.map_err(|e| e.to_string())?;
+        let mut byte = [0u8; 1];
+        stream
+            .read_exact(&mut byte)
+            .await
+            .map_err(|e| e.to_string())?;
+        Ok(stream)
+    };
+    hold(ctx, open, socks::abort).await
+}
+
+/// Opens `idle_conns` connections with `open`, 64 at a time, and reads what holding them costs.
+async fn hold<T, F, Fut>(ctx: &Ctx, open: F, close: fn(T)) -> Io<Metrics>
+where
+    T: Send + 'static,
+    F: Fn() -> Fut,
+    Fut: Future<Output = Result<T, String>> + Send + 'static,
+{
     let pid = ctx.pids.core;
     tokio::time::sleep(Duration::from_secs(1)).await;
     let before = probe::memory(pid, true).ok_or("read core memory")?;
     let server_before = ctx.pids.server.and_then(|p| probe::memory(p, true));
     let fds_before = probe::open_fds(pid);
     let started = Instant::now();
-    let target = ctx.at(ctx.ports.echo);
     let mut held = Vec::with_capacity(ctx.idle_conns);
     let mut pending = tokio::task::JoinSet::new();
     let mut failures = 0usize;
@@ -762,22 +844,11 @@ pub async fn idle(ctx: &Ctx) -> Io<Metrics> {
                 Err(_) => failures += 1,
             }
         }
-        let entry = ctx.entry;
+        let opening = open();
         pending.spawn(async move {
-            tokio::time::timeout(Duration::from_secs(10), async move {
-                let mut stream = socks::connect(entry, target)
-                    .await
-                    .map_err(|e| e.to_string())?;
-                stream.write_all(b"i").await.map_err(|e| e.to_string())?;
-                let mut byte = [0u8; 1];
-                stream
-                    .read_exact(&mut byte)
-                    .await
-                    .map_err(|e| e.to_string())?;
-                Ok::<_, String>(stream)
-            })
-            .await
-            .map_err(|_| "held connection not proven within 10 s".to_string())?
+            tokio::time::timeout(Duration::from_secs(10), opening)
+                .await
+                .map_err(|_| "held connection not proven within 10 s".to_string())?
         });
     }
     while let Some(done) = pending.join_next().await {
@@ -802,8 +873,8 @@ pub async fn idle(ctx: &Ctx) -> Io<Metrics> {
     let server_loaded = ctx.pids.server.and_then(|p| probe::memory(p, true));
     let fds_loaded = probe::open_fds(pid);
     let count = held.len() as f64;
-    for stream in held.drain(..) {
-        socks::abort(stream);
+    for item in held.drain(..) {
+        close(item);
     }
     tokio::time::sleep(Duration::from_secs(3)).await;
     let after = probe::memory(pid, true).ok_or("read core memory")?;

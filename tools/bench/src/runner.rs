@@ -16,6 +16,7 @@ use crate::cases::{self, Case};
 use crate::core::{CoreSpec, Launch, Running};
 use crate::isolate::{self, CpuPlan, Netns, Placement, Role};
 use crate::load::{self, Ctx, Metrics, Pids, Workload};
+use crate::mitm::{self, Authority, Clients};
 use crate::origin::Ports;
 use crate::plan::Plan;
 use crate::report::{Cell, Results};
@@ -48,6 +49,8 @@ pub struct Rig {
 struct Far {
     ip: IpAddr,
     ports: Ports,
+    authority: Option<Authority>,
+    clients: Option<Clients>,
     origin: Child,
     server: Option<Child>,
     singbox: Option<Child>,
@@ -110,7 +113,8 @@ impl Rig {
 
     async fn start_far(&self) -> Result<Far, String> {
         let ip = self.far_ip();
-        let (ports, _, origin) = self.start_origin(ip).await?;
+        let (ports, _, origin, authority) = self.start_origin(ip).await?;
+        let clients = authority.as_ref().map(Clients::new).transpose()?;
 
         // mihomo reads files only from under its home directory.
         let certs = self.dir.join("server/certs");
@@ -225,6 +229,8 @@ impl Rig {
         Ok(Far {
             ip,
             ports,
+            authority,
+            clients,
             origin,
             server,
             singbox,
@@ -249,8 +255,9 @@ impl Rig {
         let (ip, ports, child) = match origin {
             Some(base) => (base.ip(), Ports::from_base(base.port()), None),
             None => {
-                let far = self.start_origin(IpAddr::V4(Ipv4Addr::LOCALHOST)).await?;
-                (far.1, far.0, Some(far.2))
+                let (ports, ip, child, _) =
+                    self.start_origin(IpAddr::V4(Ipv4Addr::LOCALHOST)).await?;
+                (ip, ports, Some(child))
             }
         };
         let case = "attached";
@@ -305,7 +312,10 @@ impl Rig {
         Ok(())
     }
 
-    async fn start_origin(&self, ip: IpAddr) -> Result<(Ports, IpAddr, Child), String> {
+    async fn start_origin(
+        &self,
+        ip: IpAddr,
+    ) -> Result<(Ports, IpAddr, Child, Option<Authority>), String> {
         let exe = std::env::current_exe().map_err(|e| e.to_string())?;
         let mut origin = isolate::command(&exe, &self.placement(Role::Origin));
         origin
@@ -321,17 +331,32 @@ impl Rig {
         let mut origin = isolate::spawn(&mut origin, &self.placement(Role::Origin))
             .map_err(|e| format!("spawn origin: {e}"))?;
         let stdout = origin.stdout.take().ok_or("origin stdout")?;
+        let mut stdout = tokio::io::BufReader::new(stdout);
         let mut line = String::new();
-        tokio::io::BufReader::new(stdout)
+        stdout
             .read_line(&mut line)
             .await
             .map_err(|e| format!("origin: {e}"))?;
         let ports: Ports =
             serde_json::from_str(line.trim()).map_err(|e| format!("origin said {line:?}: {e}"))?;
-        Ok((ports, ip, origin))
+        line.clear();
+        stdout
+            .read_line(&mut line)
+            .await
+            .map_err(|e| format!("origin: {e}"))?;
+        let authority = serde_json::from_str(line.trim()).ok();
+        Ok((ports, ip, origin, authority))
     }
 
     pub async fn run(&self, results: &mut Results, out: &Path) -> Result<(), String> {
+        if self.plan.cases.iter().any(|c| cases::is_mitm(*c))
+            && self
+                .cores
+                .iter()
+                .any(|c| c.kind != crate::core::Kind::Concord)
+        {
+            return Err("the mitm cases run Concord cores only: the others have no MITM".into());
+        }
         let mut far = self.start_far().await?;
         let tun = self.plan.tun.then(|| self.tun_section());
         let started = Instant::now();
@@ -358,6 +383,7 @@ impl Rig {
                 .iter()
                 .copied()
                 .filter(|w| w.per_case() && (!w.needs_udp() || case.spec.udp))
+                .filter(|w| !w.needs_mitm() || cases::is_mitm(case.spec))
                 .filter(|_| !self.plan.background.is_some_and(Workload::needs_udp) || case.spec.udp)
                 .collect();
             let shared: Vec<Workload> = workloads
@@ -452,7 +478,9 @@ impl Rig {
             },
             origin: far.origin.id(),
         };
-        self.load_ctx(entry, far.ip, far.ports, pids)
+        let mut ctx = self.load_ctx(entry, far.ip, far.ports, pids);
+        ctx.tls = far.clients.clone().filter(|_| cases::is_mitm(case.spec));
+        ctx
     }
 
     fn load_ctx(&self, entry: Entry, origin: IpAddr, ports: Ports, pids: Pids) -> Ctx {
@@ -471,6 +499,7 @@ impl Rig {
             idle_conns: self.plan.idle_conns,
             net_counters: self.plan.net_counters,
             far_netns: self.netns.as_ref().map(|n| n.far.clone()),
+            tls: None,
         }
     }
 
@@ -495,13 +524,22 @@ impl Rig {
         } else {
             Entry::Socks(SocketAddr::new(IpAddr::V4(Ipv4Addr::LOCALHOST), mixed))
         };
-        let profile = profile.unwrap_or_else(|| cases::client_profile(case, mixed, tun));
+        let profile = profile.unwrap_or_else(|| {
+            let base = cases::client_profile(case, mixed, tun);
+            mitm::profile(base, case.name(), far.ip, self.plan.mitm_rules)
+        });
+        if let Some(authority) = far.authority.as_ref().filter(|_| cases::is_mitm(case.spec)) {
+            mitm::provision(&home, authority).map_err(|e| format!("mitm CA: {e}"))?;
+        }
         Running::start(Launch {
             spec,
             home,
             profile: profile.replace("mixed-port: 0\n", &format!("mixed-port: {mixed}\n")),
             proxy: case.proxy.clone(),
             tun: tun.cloned(),
+            mitm: cases::is_mitm(case.spec)
+                .then(|| mitm::section(case.name(), far.ip, far.ports, self.plan.mitm_rules))
+                .flatten(),
             mixed,
             placement: self.placement(Role::Core),
             log: self
