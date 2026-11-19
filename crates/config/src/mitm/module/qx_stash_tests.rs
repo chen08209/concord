@@ -3,8 +3,9 @@ use std::collections::BTreeMap;
 use serde_json::json;
 
 use crate::mitm::module::{
-    Environment, IgnoreReason, ModuleDef, ModuleFormat, ModuleInput, read_module,
+    Environment, IgnoreReason, InlineFile, ModuleDef, ModuleFormat, ModuleInput, read_module,
 };
+use crate::mitm::modules::stored_name;
 use crate::mitm::{BodyActionDef, HeaderEditDef, MapLocalBody, ScriptKind, UrlAction};
 
 fn read(text: &str, values: &[(&str, &str)]) -> ModuleDef {
@@ -222,6 +223,44 @@ tiles:
 "#;
 
 #[test]
+fn a_stash_script_payload_is_written_out_by_its_content() {
+    let def = read(OVERRIDE, &[]);
+    let file = stored_name("inline.js", b"$done();\n");
+    let script = def
+        .lists
+        .script
+        .iter()
+        .find(|line| line.line == 45)
+        .and_then(|line| line.def.as_ref().ok())
+        .unwrap();
+    assert_eq!(script.kind, ScriptKind::HttpRequest);
+    assert_eq!(script.path, file);
+    assert_eq!(
+        def.inline_files,
+        [InlineFile {
+            file,
+            content: "$done();\n".into(),
+        }]
+    );
+    assert!(def.declared_scripts.contains(&45));
+    assert!(
+        def.resources
+            .iter()
+            .all(|resource| resource.url != "inline.js")
+    );
+}
+
+#[test]
+fn a_stash_script_reads_its_attached_file() {
+    let def = read(
+        "name: Local\nhttp:\n  script:\n    - match: ^https://a\\.test/\n      name: own\n      type: response\nscript-providers:\n  own:\n    path: local.js\n",
+        &[],
+    );
+    assert_eq!(ignored(&def), []);
+    assert_eq!(def.lists.script[0].def.as_ref().unwrap().path, "f0.js");
+}
+
+#[test]
 fn a_stash_override_reads_with_its_arguments() {
     let def = read(OVERRIDE, &[("region", "JP")]);
     assert_eq!(def.format, ModuleFormat::Stash);
@@ -229,7 +268,6 @@ fn a_stash_override_reads_with_its_arguments() {
     assert_eq!(
         ignored(&def),
         [
-            (45, IgnoreReason::NoAttachment),
             (48, IgnoreReason::ManagedCa),
             (69, IgnoreReason::RuleType),
             (77, IgnoreReason::AppOnly),
@@ -313,7 +351,7 @@ fn a_stash_override_reads_with_its_arguments() {
         (script(51).kind, script(51).cronexp.as_str()),
         (ScriptKind::Cron, "*/5 * * * *")
     );
-    assert_eq!(def.declared_scripts, [39, 51]);
+    assert_eq!(def.declared_scripts, [39, 45, 51]);
     assert_eq!(def.rules.len(), 2);
     assert_eq!(def.rule_sets.len(), 1);
     let nameserver = def.network.nameserver.as_ref().unwrap();

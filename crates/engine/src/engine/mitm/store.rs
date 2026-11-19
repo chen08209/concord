@@ -191,6 +191,24 @@ impl ModuleResources {
         adopted
     }
 
+    /// Writes the scripts the modules in force carry in their text that the resources
+    /// directory lacks; their names come from their content, so one already there is the same.
+    pub fn write_inline(&self, modules: &[AppliedModule]) {
+        for inline in modules
+            .iter()
+            .filter(|module| module.in_force())
+            .flat_map(|module| &module.def.inline_files)
+        {
+            let path = resource_path(&inline.file);
+            if !plain_name(&inline.file) || self.home.join(&path).is_file() {
+                continue;
+            }
+            if let Err(err) = self.home.write_atomic(&path, inline.content.as_bytes()) {
+                tracing::warn!("[MITM] inline script {}: {err}", inline.file);
+            }
+        }
+    }
+
     /// Fetches `url` and stores what it holds; true when the file in force changed. A URL
     /// already being fetched is left to that fetch.
     pub async fn fetch(&self, url: &str) -> Result<bool, FetchFailure> {

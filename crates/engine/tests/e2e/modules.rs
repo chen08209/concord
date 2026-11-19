@@ -1,4 +1,5 @@
 use concord_common::ResourceKind;
+use concord_config::mitm::modules::{RESOURCES_DIR, stored_name};
 use serde_json::{Value, json};
 use tokio::time::{Instant, sleep};
 
@@ -205,4 +206,30 @@ async fn a_file_that_failed_to_fetch_takes_effect_once_fetched_again() {
         .unwrap();
     until(&rig, "ok").await;
     answered_locally(&rig, origin).await;
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_stash_script_carried_in_the_text_is_written_out_on_apply() {
+    let text = "name: Inline\n\
+                  http:\n  script:\n    - match: ^https://a\\.test/\n      name: inline\n      type: request\n\
+                  script-providers:\n  inline:\n    payload: '$done({})'\n";
+    let indented: String = text
+        .lines()
+        .map(|line| format!("        {line}\n"))
+        .collect();
+    let rig = Rig::new();
+    rig.apply(&format!(
+        "mitm:\n  enable: true\n  modules:\n    - name: inline\n      text: |\n{indented}\
+         rules:\n  - MATCH,DIRECT\n"
+    ))
+    .await
+    .unwrap();
+    let status = module(&rig).await;
+    assert_eq!(status["inForce"], true, "{status}");
+    let file = rig
+        .home
+        .path()
+        .join(RESOURCES_DIR)
+        .join(stored_name("inline.js", b"$done({})"));
+    assert_eq!(std::fs::read_to_string(file).unwrap(), "$done({})");
 }

@@ -2,6 +2,7 @@ use std::collections::BTreeMap;
 use std::sync::Mutex;
 
 use async_trait::async_trait;
+use concord_config::mitm::module::InlineFile;
 use concord_config::mitm::modules::{AppliedModule, ModuleSpec};
 use concord_group::{FetchError, FetchErrorKind, FetchRequest, FetchResponse, Fetcher};
 
@@ -132,6 +133,28 @@ fn a_file_the_host_stored_is_adopted_only_while_it_is_there_and_unindexed() {
     assert!(resources.adopt(&[adopting(URL, "host.js")]));
     assert_eq!(resources.stored(URL).as_deref(), Some("host.js"));
     assert!(!resources.adopt(&[adopting(URL, "host.js")]));
+}
+
+#[test]
+fn a_script_a_module_carries_is_written_under_its_name_once() {
+    let dir = tempfile::tempdir().unwrap();
+    let (_, resources) = store(dir.path());
+    let file = stored_name("inline.js", b"$done();");
+    let mut module = AppliedModule::default();
+    module.def.inline_files = vec![InlineFile {
+        file: file.clone(),
+        content: "$done();".into(),
+    }];
+    resources.write_inline(std::slice::from_ref(&module));
+    assert_eq!(read(dir.path(), &file), b"$done();");
+
+    module.def.inline_files[0].content = "changed".into();
+    resources.write_inline(std::slice::from_ref(&module));
+    assert_eq!(read(dir.path(), &file), b"$done();");
+
+    module.def.inline_files[0].file = "../out.js".into();
+    resources.write_inline(&[module]);
+    assert!(!dir.path().join(MITM_DIR).join("out.js").exists());
 }
 
 #[tokio::test]

@@ -227,3 +227,71 @@ fn a_stored_file_is_named_by_its_content_and_keeps_its_extension() {
     );
     assert_ne!(stored_name("https://cdn.test/b.js", b"other"), name);
 }
+
+#[test]
+fn h2_from_any_module_turns_it_on() {
+    let off = "[MITM]\nh2 = false\n";
+    let both = profile(
+        &format!(
+            "{}{}",
+            inline("off", off),
+            inline("on", "[MITM]\nh2 = true\n")
+        ),
+        BTreeMap::new(),
+    );
+    assert!(!both.mitm.h2);
+    assert!(compose(&both.mitm, &both.modules, |_| None).h2);
+    let alone = profile(&inline("off", off), BTreeMap::new());
+    assert!(!compose(&alone.mitm, &alone.modules, |_| None).h2);
+}
+
+#[test]
+fn an_inline_rule_set_of_one_name_gathers_its_lines_from_every_module() {
+    let modules = format!(
+        "{}{}",
+        inline(
+            "a",
+            "[Ruleset Ads]\nDOMAIN,a.com\n[Rule]\nRULE-SET,Ads,REJECT\n"
+        ),
+        inline("b", "[Ruleset Ads]\nDOMAIN,b.com\n"),
+    );
+    let loaded = profile(&modules, BTreeMap::new());
+    let [provider] = loaded.rule_providers.as_slice() else {
+        panic!("{:?}", loaded.rule_providers);
+    };
+    assert!(provider.name.starts_with("mitm-"), "{}", provider.name);
+    assert_eq!(
+        provider.raw["payload"],
+        json!(["DOMAIN,a.com", "DOMAIN,b.com"])
+    );
+    let rule = format!("RULE-SET,{},REJECT", provider.name);
+    assert_eq!(loaded.rules.iter().next(), Some(rule.as_str()));
+}
+
+#[test]
+fn later_modules_go_over_earlier_ones() {
+    let modules = format!(
+        "{}{}",
+        inline("first", "[General]\ndns-server = 1.1.1.1\nskip-proxy = a\n"),
+        inline(
+            "second",
+            "[General]\ndns-server = 8.8.8.8\nskip-proxy = b\n"
+        ),
+    );
+    let loaded = profile(&modules, BTreeMap::new());
+    let servers: Vec<&str> = loaded
+        .dns
+        .nameserver
+        .iter()
+        .map(|server| server.text.as_str())
+        .collect();
+    assert_eq!(servers, ["8.8.8.8"]);
+    assert_eq!(
+        host_network(&loaded.modules).bypass_domain,
+        Some(ListEdit {
+            replace: true,
+            before: vec!["b".to_string()],
+            after: Vec::new(),
+        })
+    );
+}

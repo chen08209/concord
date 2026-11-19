@@ -22,6 +22,14 @@ pub struct ResourceDef {
     pub lines: Vec<u32>,
 }
 
+/// A script a module carries in its text, which the engine writes into the resources
+/// directory under `file`, the name its content gives, before a line reads it.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct InlineFile {
+    pub file: String,
+    pub content: String,
+}
+
 pub(crate) fn is_url(text: &str) -> bool {
     text.get(..8)
         .is_some_and(|head| head.eq_ignore_ascii_case("https://"))

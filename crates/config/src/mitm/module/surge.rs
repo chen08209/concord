@@ -506,16 +506,17 @@ impl<'a> Reader<'a> {
     }
 
     /// Counted before the arguments are filled in, so a script an argument turns off still
-    /// asks for consent.
+    /// asks for consent, and so does a line an argument may make into any script.
     fn declare_script(&mut self, line: &str, number: u32) {
         if loon::is_new_script(line) {
             self.def.declared_scripts.push(number);
             return;
         }
-        let kind = split_script_line(line)
-            .map(|(_, kind, _)| kind)
-            .unwrap_or_default();
-        if RUNNABLE_SCRIPTS.contains(&kind.as_str()) || kind.contains('{') {
+        let declared = match split_script_line(line) {
+            Ok((_, kind, _)) => RUNNABLE_SCRIPTS.contains(&kind.as_str()) || kind.contains('{'),
+            Err(_) => line.contains('{'),
+        };
+        if declared {
             self.def.declared_scripts.push(number);
         }
     }

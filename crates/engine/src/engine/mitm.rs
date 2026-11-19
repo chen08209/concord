@@ -280,6 +280,7 @@ impl MitmService {
         };
         mitm.set_trust(trust);
         store.resources.adopt(&modules);
+        store.resources.write_inline(&modules);
         let applied = Arc::new(Applied {
             section: section.clone(),
             modules,

@@ -2,7 +2,11 @@ use std::collections::BTreeMap;
 
 use serde_json::json;
 
-use crate::mitm::module::{Environment, IgnoreReason, ModuleDef, ModuleInput, read_module};
+use http::header::{HeaderName, HeaderValue};
+
+use crate::mitm::module::{
+    Environment, IgnoreReason, ListEdit, ModuleDef, ModuleInput, read_module,
+};
 use crate::mitm::{BodyActionDef, HeaderEditDef, MapLocalBody, ScriptKind, UrlAction};
 
 fn read(text: &str, values: &[(&str, &str)]) -> ModuleDef {
@@ -62,6 +66,23 @@ fn the_plugin_pages_script_hands_on_typed_arguments() {
     assert_eq!(def.declared_scripts, [9]);
     let off = read(&text, &[("enabled", "false")]);
     assert_eq!(ignored(&off), [(9, IgnoreReason::Disabled)]);
+}
+
+#[test]
+fn a_request_script_hands_on_the_arguments_it_names() {
+    let text = format!(
+        "{ARGUMENTS}[Script]\nrequest if ${{url}} ~= /^https?:\\/\\/a\\.com\\/c\\?cmd=\\d+/i then script(\"https://a.test/s.js\", {{${{region}}, ${{level}}, ${{note}}}}) with tag=\"Proto\", timeout=10\n"
+    );
+    let def = read(&text, &[("region", "US")]);
+    assert_eq!(ignored(&def), []);
+    let script = def.lists.script[0].def.as_ref().unwrap();
+    assert_eq!(script.kind, ScriptKind::HttpRequest);
+    assert_eq!(script.name, "Proto");
+    assert_eq!(
+        script.argument,
+        Some(json!({"region": "US", "level": 1, "note": null}))
+    );
+    assert_eq!(def.declared_scripts, [9]);
 }
 
 #[test]
@@ -216,4 +237,299 @@ fn a_surge_map_local_reads_json_as_text() {
         (&local.body, local.content_type),
         (&MapLocalBody::Text, "application/json")
     );
+}
+
+const STATUS_200: &str = r"^(?=\S+ 200(?: |\r\n))";
+const POST: &str = "^(?=POST )";
+
+#[test]
+fn mock_request_body_answers_with_its_data() {
+    let def = read(
+        r#"[Rewrite]
+^https?://api\.example\.com/log mock-request-body data-type=json data="{\"a\":1}" status-code=200
+"#,
+        &[],
+    );
+    assert_eq!(ignored(&def), []);
+    assert!(def.lists.map_local.is_empty());
+    let mock = def.lists.request_body_mock[0].def.as_ref().unwrap();
+    assert_eq!(
+        (
+            mock.pattern.as_str(),
+            &mock.body,
+            mock.data.as_str(),
+            mock.request
+        ),
+        (
+            r"^https?://api\.example\.com/log",
+            &MapLocalBody::Text,
+            r#"{"a":1}"#,
+            true
+        )
+    );
+    assert_eq!(
+        mock.header["content-type"].to_str().unwrap(),
+        "application/json"
+    );
+}
+
+#[test]
+fn a_plugin_adds_its_dns_servers_routes_and_real_ip_domains() {
+    let def = read(
+        "[General]\ndns-server = 119.29.29.29\ndoh-server = https://doh.pub/dns-query\nbypass-tun = 10.0.0.0/8\ninclude-tun = 172.16.0.0/12\nreal-ip = *.lan\n\n[Rewrite]\n^https://a\\.com/ad reject\n",
+        &[],
+    );
+    let appended = |items: &[&str]| {
+        Some(ListEdit {
+            after: items.iter().map(|item| item.to_string()).collect(),
+            ..ListEdit::default()
+        })
+    };
+    let network = &def.network;
+    assert_eq!(
+        network.nameserver,
+        appended(&["119.29.29.29", "https://doh.pub/dns-query"])
+    );
+    assert_eq!(network.default_nameserver, None);
+    assert_eq!(network.route_exclude_address, appended(&["10.0.0.0/8"]));
+    assert_eq!(network.route_address, ["172.16.0.0/12"]);
+    assert_eq!(network.fake_ip_filter, appended(&["*.lan"]));
+    assert_eq!(network.lines, [2, 3, 4, 5, 6]);
+    assert_eq!(def.lists.url_rewrite.len(), 1);
+}
+
+#[test]
+fn a_rewrite_tests_the_status_and_both_heads_of_a_response() {
+    let def = read(
+        r#"[Rewrite]
+response if ${url} ~= /^https:\/\/api\.example\.com\/profile$/ && ${response.status} == 200 then response.json.replace("data.vip", true)
+response if ${url} ~= /^https:\/\/a\.com\/c/ && ${response.header['Content-Type']} ~= /json/i && ${request.method} == "POST" then response.json.delete("ads") | response.header.set("Cache-Control", "no-store")
+response if ${url} ~= /^https:\/\/a\.com\/s/ && ${response.status} ~= /^30[12]$/ then response.body.replace(/ad/, "")
+request if ${url} ~= /^https:\/\/a\.com\/q/ && ${response.status} == 200 then request.header.del("X")
+response if ${url} ~= /^https:\/\/a\.com\/m/ && ${response.status} == 200 then response.body.mock("json", "{}")
+response if ${url} ~= /^https:\/\/a\.com\/u/ && ${response.status} == 200 then reject(200)
+"#,
+        &[],
+    );
+    let json_type = r"^(?=[\s\S]*\r\n(?i:Content\-Type): [^\r\n]*?(?:(?i:json))[^\r\n]*\r\n)";
+    let bodies: Vec<_> = def
+        .lists
+        .body_rewrite
+        .iter()
+        .map(|line| {
+            let body = line.def.as_ref().unwrap();
+            (
+                line.line,
+                body.conditions.request.as_deref(),
+                body.conditions.response.as_deref(),
+                body.action.clone(),
+            )
+        })
+        .collect();
+    assert_eq!(
+        bodies,
+        [
+            (
+                2,
+                None,
+                Some(STATUS_200),
+                BodyActionDef::Jq("if .data.vip != null then .data.vip = true else . end".into())
+            ),
+            (
+                3,
+                Some(POST),
+                Some(json_type),
+                BodyActionDef::Jq("del(.ads)".into())
+            ),
+            (
+                4,
+                None,
+                Some(r"^(?=\S+ \d*?(?:(?<= )30[12](?=[ \r]))\d*(?: |\r\n))"),
+                BodyActionDef::Replace(vec![("ad".into(), String::new())])
+            ),
+        ]
+    );
+    let heads: Vec<_> = def
+        .lists
+        .header_rewrite
+        .iter()
+        .map(|line| {
+            let head = line.def.as_ref().unwrap();
+            (
+                line.line,
+                head.response,
+                head.conditions.request.as_deref(),
+                head.conditions.response.as_deref(),
+                head.edit.clone(),
+            )
+        })
+        .collect();
+    let cache = HeaderName::from_static("cache-control");
+    assert_eq!(
+        heads,
+        [
+            (
+                3,
+                true,
+                Some(POST),
+                Some(json_type),
+                HeaderEditDef::Del(cache.clone())
+            ),
+            (
+                3,
+                true,
+                Some(POST),
+                Some(json_type),
+                HeaderEditDef::Add(cache, HeaderValue::from_static("no-store"))
+            ),
+        ]
+    );
+    assert_eq!(
+        ignored(&def),
+        [
+            (5, IgnoreReason::Unreadable),
+            (6, IgnoreReason::Unreadable),
+            (7, IgnoreReason::Condition)
+        ]
+    );
+}
+
+#[test]
+fn scripts_run_by_the_request_and_response_heads() {
+    let def = read(
+        r#"[Rewrite]
+request if ${url} ~= /^https:\/\/a\.com\/s/ && ${request.method} == "POST" then script("https://cdn.test/s.js") with tag="S"
+response if ${url} ~= /^https:\/\/a\.com\/r/ && ${response.status} == 200 then script("https://cdn.test/s.js") with tag="R"
+"#,
+        &[],
+    );
+    assert_eq!(ignored(&def), []);
+    let scripts: Vec<_> = def
+        .lists
+        .script
+        .iter()
+        .map(|line| {
+            let script = line.def.as_ref().unwrap();
+            (
+                script.name.as_str(),
+                script.kind,
+                script.conditions.request.as_deref(),
+                script.conditions.response.as_deref(),
+                script.path.as_str(),
+            )
+        })
+        .collect();
+    assert_eq!(
+        scripts,
+        [
+            (
+                "S",
+                ScriptKind::HttpRequest,
+                Some(POST),
+                None,
+                "https://cdn.test/s.js"
+            ),
+            (
+                "R",
+                ScriptKind::HttpResponse,
+                None,
+                Some(STATUS_200),
+                "https://cdn.test/s.js"
+            ),
+        ]
+    );
+    assert_eq!(def.declared_scripts, [2, 3]);
+}
+
+#[test]
+fn body_mocks_go_by_the_request_head() {
+    let def = read(
+        r#"[Rewrite]
+request if ${url} ~= /^https:\/\/api\.example\.com\/v1\/report/ && ${request.method} == "POST" then request.body.mock("json", `{"events":[]}`)
+request if ${url} ~= /^https:\/\/api\.example\.com\/v1\/upload/ then request.body.mock_file("json", "https://cdn.test/m.json")
+response if ${url} ~= /^https:\/\/api\.example\.com\/ad/ && ${request.header['User-Agent']} ~= /^Example\// then response.body.mock("json", "{}", 200)
+"#,
+        &[],
+    );
+    assert_eq!(ignored(&def), []);
+    let mocks: Vec<_> = def
+        .lists
+        .request_body_mock
+        .iter()
+        .map(|line| {
+            let mock = line.def.as_ref().unwrap();
+            (
+                line.line,
+                mock.conditions.request.as_deref(),
+                mock.body.clone(),
+                mock.data.as_str(),
+            )
+        })
+        .collect();
+    assert_eq!(
+        mocks,
+        [
+            (2, Some(POST), MapLocalBody::Text, r#"{"events":[]}"#),
+            (
+                3,
+                None,
+                MapLocalBody::File { base64: false },
+                "https://cdn.test/m.json"
+            ),
+        ]
+    );
+    let local = def.lists.map_local[0].def.as_ref().unwrap();
+    assert_eq!(
+        (
+            local.conditions.request.as_deref(),
+            local.data.as_str(),
+            local.status.as_u16(),
+            local.request
+        ),
+        (
+            Some(
+                r"^(?=[\s\S]*\r\n(?i:User\-Agent): [^\r\n]*?(?:(?<=\n(?i:User\-Agent): )Example\/)[^\r\n]*\r\n)"
+            ),
+            "{}",
+            200,
+            false
+        )
+    );
+    let urls: Vec<_> = def
+        .resources
+        .iter()
+        .map(|resource| (resource.url.as_str(), resource.lines.clone()))
+        .collect();
+    assert_eq!(urls, [("https://cdn.test/m.json", vec![3])]);
+}
+
+#[test]
+fn a_cron_expression_an_argument_fills_in_keeps_every_field() {
+    for expression in ["{cron}", "\"55 23 * * *\""] {
+        let def = read(
+            &format!(
+                "[Argument]\ncron=input, \"55 23 * * *\", tag=Schedule\n\n[Script]\ncron {expression} script-path=https://cdn.test/sync.js, timeout=900, tag=Sync\n"
+            ),
+            &[],
+        );
+        assert_eq!(ignored(&def), [], "{expression}");
+        let script = def.lists.script[0].def.as_ref().unwrap();
+        assert_eq!(
+            (
+                script.kind,
+                script.cronexp.as_str(),
+                script.name.as_str(),
+                script.path.as_str(),
+                script.timeout
+            ),
+            (
+                ScriptKind::Cron,
+                "55 23 * * *",
+                "Sync",
+                "https://cdn.test/sync.js",
+                Some(900.0)
+            ),
+            "{expression}"
+        );
+    }
 }

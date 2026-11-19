@@ -229,6 +229,18 @@ fn split_legacy_script(kind: &str, rest: &str) -> Result<(String, String, Params
         if http || !first.text.contains('=') {
             value = first.text.clone();
             from = first.to;
+            // An argument fills a cron expression in unquoted, its fields apart.
+            if kind == "cron" {
+                for field in fields
+                    .iter()
+                    .skip(1)
+                    .take_while(|field| !field.text.contains('='))
+                {
+                    value.push(' ');
+                    value.push_str(&field.text);
+                    from = field.to;
+                }
+            }
         }
     }
     let mut params = script_params(rest.get(from..).unwrap_or_default())?;

@@ -35,6 +35,8 @@ mod rule;
 mod source;
 mod stash;
 mod surge;
+#[cfg(test)]
+mod surge_tests;
 
 use std::collections::BTreeMap;
 
@@ -49,7 +51,7 @@ pub use arguments::{ArgumentDef, ArgumentKind};
 pub use network::{DomainEntry, ListEdit, NetworkDef};
 pub use requirement::{Environment, evaluate};
 pub(crate) use resource::is_url;
-pub use resource::{ResourceDef, ResourceKind};
+pub use resource::{InlineFile, ResourceDef, ResourceKind};
 pub use rule::{InlineRule, ModuleRule, Policy, RuleSetDef, RuleSetSource};
 
 /// What [read_module] reads besides the text.
@@ -203,6 +205,7 @@ pub struct ModuleDef {
     /// The rule sets the rules name, under names no profile uses.
     pub rule_sets: Vec<RuleSetDef>,
     pub resources: Vec<ResourceDef>,
+    pub inline_files: Vec<InlineFile>,
     pub network: NetworkDef,
     /// The lines that declare a script Concord runs, whatever the arguments turn off: what the
     /// user consents to.

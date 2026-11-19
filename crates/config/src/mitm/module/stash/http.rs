@@ -8,10 +8,11 @@ use serde_json::{Map, Value};
 
 use super::{item_line, text_of};
 use crate::mitm::module::loon::{Out, jq_path, unreadable};
-use crate::mitm::module::resource::ResourceKind;
+use crate::mitm::module::resource::InlineFile;
 use crate::mitm::module::rule::Refusal;
 use crate::mitm::module::surge::Reader;
 use crate::mitm::module::{HostLine, IgnoreReason, ModuleLine};
+use crate::mitm::modules::stored_name;
 use crate::mitm::{
     BodyActionDef, BodyRewriteDef, HeadConditionsDef, HeaderEditDef, HeaderRewriteDef,
     MapLocalBody, MapLocalDef, ScriptDef, ScriptKind, UrlAction, UrlRewriteDef, host_items,
@@ -57,9 +58,8 @@ pub(super) fn read(
                 "header-rewrite" => header_rewrite(&text_of(item)),
                 "body-rewrite" => body_rewrite(&text_of(item)),
                 "mock" => mock(item),
-                "script" => {
-                    script(item, false, scripts).and_then(|def| locate(reader, def, number))
-                }
+                "script" => script(item, false, scripts)
+                    .and_then(|(def, payload)| locate(reader, def, payload, number)),
                 _ => {
                     reader.ignore(number, IgnoreReason::Setting, Some(format!("http.{key}")));
                     continue;
@@ -93,7 +93,8 @@ pub(super) fn cron(
             .unwrap_or_default();
         for (at, item) in items.iter().enumerate() {
             let number = item_line(item_lines, at, line);
-            let read = script(item, true, scripts).and_then(|def| locate(reader, def, number));
+            let read = script(item, true, scripts)
+                .and_then(|(def, payload)| locate(reader, def, payload, number));
             place(reader, read, number);
         }
     }
@@ -342,8 +343,12 @@ fn mock(item: &Value) -> Result<Option<Out>, Refusal> {
     }))))
 }
 
-/// An `http.script` or `cron.script` item, its file the script provider of its name.
-fn script(item: &Value, cron: bool, providers: &Map<String, Value>) -> Result<ScriptDef, Refusal> {
+/// An `http.script` or `cron.script` item, with the script its provider carries as `payload`.
+fn script(
+    item: &Value,
+    cron: bool,
+    providers: &Map<String, Value>,
+) -> Result<(ScriptDef, Option<String>), Refusal> {
     let field = |key: &str| item.get(key).map(text_of).filter(|text| !text.is_empty());
     let on = |key: &str| field(key).is_some_and(|text| text.eq_ignore_ascii_case("true"));
     let kind = match (cron, field("type").as_deref()) {
@@ -355,49 +360,53 @@ fn script(item: &Value, cron: bool, providers: &Map<String, Value>) -> Result<Sc
         }
     };
     let name = field("name").ok_or_else(|| unreadable("a script needs name"))?;
-    let provider = providers.get(&name);
-    let path = provider
-        .and_then(|provider| {
-            provider
-                .get("url")
-                .or_else(|| provider.get("path"))
-                .map(text_of)
-                .filter(|text| !text.is_empty())
-        })
-        .ok_or_else(
-            || match provider.and_then(|provider| provider.get("payload")) {
-                Some(_) => (IgnoreReason::NoAttachment, Some("payload".to_string())),
-                None => unreadable(format!("no script provider {name}")),
-            },
-        )?;
+    let provider = |key: &str| {
+        providers
+            .get(&name)
+            .and_then(|provider| provider.get(key))
+            .map(text_of)
+            .filter(|text| !text.is_empty())
+    };
+    let (path, payload) = match (
+        provider("url").or_else(|| provider("path")),
+        provider("payload"),
+    ) {
+        (Some(path), _) => (path, None),
+        (None, Some(payload)) => (String::new(), Some(payload)),
+        (None, None) => return Err(unreadable(format!("no script provider {name}"))),
+    };
     let number = |key: &str| field(key).and_then(|text| text.trim().parse::<f64>().ok());
-    Ok(ScriptDef {
-        name,
-        path,
-        kind,
-        pattern: if cron { None } else { field("match") },
-        conditions: HeadConditionsDef::default(),
-        requires_body: on("require-body"),
-        binary_body: on("binary-mode"),
-        max_size: field("max-size")
-            .and_then(|text| text.trim().parse::<i64>().ok())
-            .unwrap_or(0),
-        cronexp: if cron {
-            field("cron").unwrap_or_default()
-        } else {
-            String::new()
+    Ok((
+        ScriptDef {
+            name,
+            path,
+            kind,
+            pattern: if cron { None } else { field("match") },
+            conditions: HeadConditionsDef::default(),
+            requires_body: on("require-body"),
+            binary_body: on("binary-mode"),
+            max_size: field("max-size")
+                .and_then(|text| text.trim().parse::<i64>().ok())
+                .unwrap_or(0),
+            cronexp: if cron {
+                field("cron").unwrap_or_default()
+            } else {
+                String::new()
+            },
+            event: String::new(),
+            timeout: number("timeout").filter(|seconds| seconds.is_finite() && *seconds > 0.0),
+            argument: field("argument").map(Value::String),
         },
-        event: String::new(),
-        timeout: number("timeout").filter(|seconds| seconds.is_finite() && *seconds > 0.0),
-        argument: field("argument").map(Value::String),
-    })
+        payload,
+    ))
 }
 
-/// The script's file, placed as every format's is; `None` once the line is ignored for want
-/// of one.
+/// A script placed as every format's is, or one its provider carries in the text written out
+/// under the name its content gives.
 fn locate(
     reader: &mut Reader<'_>,
     mut def: ScriptDef,
+    payload: Option<String>,
     number: u32,
 ) -> Result<Option<Out>, Refusal> {
     if def.pattern.is_none() && def.kind != ScriptKind::Cron {
@@ -407,9 +416,21 @@ fn locate(
         return Err(unreadable("a cron script needs cron"));
     }
     reader.def.declared_scripts.push(number);
-    let Some(file) = reader.locate(&def.path, ResourceKind::Script, number) else {
-        return Ok(None);
+    let Some(content) = payload else {
+        return Ok(Some(Out::Script(def)));
     };
+    let file = stored_name("inline.js", content.as_bytes());
+    let inline = &mut reader.def.inline_files;
+    if !inline.iter().any(|inline| inline.file == file) {
+        inline.push(InlineFile {
+            file: file.clone(),
+            content,
+        });
+    }
     def.path = file;
-    Ok(Some(Out::Script(def)))
+    reader.def.lists.script.push(ModuleLine {
+        line: number,
+        def: Ok(def),
+    });
+    Ok(None)
 }
