@@ -300,7 +300,7 @@ impl Resolver {
             default_ns,
         ));
         let mut builder = Builder {
-            shared,
+            shared: Arc::clone(&shared),
             system_client: Arc::clone(&system_client),
             rules: deps.rules.as_ref(),
             raw: HashMap::new(),
@@ -326,6 +326,11 @@ impl Resolver {
             domain: Vec::new(),
             ip: Vec::new(),
         };
+        let events = &deps.events;
+        let plain = |clients| {
+            let parts = parts(clients, Vec::new(), no_filters(), false, Vec::new(), config);
+            Group::new(parts, Arc::clone(events))
+        };
 
         let ipv6 = config.ipv6 && deps.ipv6;
         let enhancer = if config.enable {
@@ -336,17 +341,7 @@ impl Resolver {
         let hosts = Hosts::from_config(hosts, config.enable && config.use_system_hosts)?;
 
         if !config.enable {
-            let main = Group::new(
-                parts(
-                    vec![Arc::clone(&builder.system_client)],
-                    Vec::new(),
-                    no_filters(),
-                    false,
-                    Vec::new(),
-                    config,
-                ),
-                Arc::clone(&deps.events),
-            );
+            let main = plain(vec![Arc::clone(&builder.system_client)]);
             return Ok(Arc::new(Resolver {
                 default: Arc::clone(&main),
                 main,
@@ -357,21 +352,13 @@ impl Resolver {
                 ipv6: AtomicBool::new(deps.ipv6),
                 clients: builder.all,
                 system,
+                scripts: crate::scripted::ScriptAnswers::new(deps.scripts),
+                dial: Arc::clone(&shared),
             }));
         }
 
         let default_clients = builder.clients(&config.default_nameserver, false)?;
-        let default = Group::new(
-            parts(
-                default_clients,
-                Vec::new(),
-                no_filters(),
-                false,
-                Vec::new(),
-                config,
-            ),
-            Arc::clone(&deps.events),
-        );
+        let default = plain(default_clients);
         builder.bootstrap = Some(Arc::clone(&default));
 
         let respect = config.respect_rules;
@@ -429,6 +416,8 @@ impl Resolver {
             ipv6: AtomicBool::new(deps.ipv6),
             clients: builder.all,
             system,
+            scripts: crate::scripted::ScriptAnswers::new(deps.scripts),
+            dial: Arc::clone(&shared),
         }))
     }
 }

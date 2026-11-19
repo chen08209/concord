@@ -160,6 +160,8 @@ pub struct RouteState {
     pub special_rules: Option<Arc<str>>,
     pub rematch_name: Option<Arc<str>>,
     pub http: Option<Arc<HttpFacts>>,
+    /// The verdicts of the rule scripts asked so far, by the program's index of each script.
+    pub scripts: Vec<(u32, bool)>,
 }
 
 impl RouteState {

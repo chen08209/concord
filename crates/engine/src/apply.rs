@@ -413,6 +413,7 @@ pub(crate) struct Shared {
     pub fake_ip_store: Arc<FakeIpStore>,
     pub android: bool,
     pub proxy_tasks: Arc<crate::proxy_tasks::ProxyTasks>,
+    pub scripts: Arc<concord_common::scripts::ScriptSlot>,
 }
 
 /// Why a config could not be applied. Only the text reaches the host, as the failure message.
@@ -627,6 +628,7 @@ pub(crate) async fn build(
         sniffer,
         shared.geo.store.clone(),
         shared.platform.clone(),
+        shared.scripts.clone(),
     ));
     let applied = Applied {
         tun_inet4: crate::tun::inet4_of(profile.dns.fake_ip_range),
@@ -679,6 +681,7 @@ async fn build_dns(
             ipv6: profile.general.ipv6,
             store_fake_ip: profile.store_fake_ip,
             tasks: shared.proxy_tasks.tasks(),
+            scripts: shared.scripts.clone(),
         };
         match Resolver::new(&profile.dns, &profile.hosts, deps) {
             Ok(resolver) => break resolver,

@@ -1,6 +1,7 @@
 use std::collections::BTreeMap;
 
 use super::*;
+use crate::hosts::HostValue;
 use crate::{LoadOptions, Profile, load_str};
 
 const BASE: &str = "\
@@ -360,4 +361,91 @@ fn the_system_resolver_a_host_appends_comes_after_the_modules() {
     let named = base.replace("[1.1.1.1]", "[system, 1.1.1.1]");
     assert_eq!(servers(&named), ["system", "1.1.1.1"]);
     assert_eq!(servers(BASE), ["1.1.1.1"]);
+}
+
+#[test]
+fn a_script_rule_needs_a_rule_script_the_profile_or_a_module_declares() {
+    let module = "\
+#!name=Pick
+[Rule]
+SCRIPT,pick,PROXY,requires-resolve
+SCRIPT,own,DIRECT
+SCRIPT,nowhere,REJECT
+[Script]
+pick = type=rule,script-path=https://cdn.test/pick.js
+";
+    let text = format!(
+        "{BASE}mitm:\n  enable: true\n  module-policy: {{PROXY: sel}}\n  \
+         script: ['own = type=rule,script-path=own.js']\n  modules:\n{}",
+        inline("pick", module)
+    )
+    .replace("  - MATCH,sel\n", "  - SCRIPT,gone,DIRECT\n  - MATCH,sel\n");
+    let profile = load_str(&text, &LoadOptions::default()).unwrap();
+    let rules: Vec<&str> = profile.rules.iter().collect();
+    assert_eq!(
+        rules,
+        [
+            "SCRIPT,pick,sel,requires-resolve",
+            "SCRIPT,own,DIRECT",
+            "DOMAIN,own.test,DIRECT",
+            "SCRIPT,gone,DIRECT",
+            "MATCH,sel",
+        ]
+    );
+    let refused = &profile.modules[0].refused_rules;
+    assert_eq!(refused.len(), 1, "{refused:?}");
+    assert_eq!(refused[0].line, 5);
+    assert!(refused[0].detail.contains("nowhere"), "{refused:?}");
+    let warned = profile
+        .report
+        .warnings
+        .iter()
+        .find(|warning| warning.code == "rule_unknown_script")
+        .unwrap();
+    assert_eq!(warned.path, "rules[1]");
+}
+
+#[test]
+fn a_host_answered_by_a_script_needs_a_dns_script_the_profile_or_a_module_declares() {
+    let module = "\
+#!name=Pick
+[Host]
+*.pick.test = script:pick
+own.test = script:own
+gone.test = script:nowhere
+[Script]
+pick = type=dns,script-path=https://cdn.test/pick.js
+";
+    let text = format!(
+        "{}mitm:\n  enable: true\n  module-policy: {{PROXY: sel}}\n  \
+         script: ['own = type=dns,script-path=own.js']\n  modules:\n{}",
+        BASE.replace(
+            "  own.test: 9.9.9.9\n",
+            "  mine.test: script:own\n  lost.test: script:lost\n"
+        ),
+        inline("pick", module)
+    );
+    let profile = load_str(&text, &LoadOptions::default()).unwrap();
+    let script = |domain: &str| match profile.hosts.lookup(domain).map(|entry| &entry.value) {
+        Some(HostValue::Script(name)) => Some(name.clone()),
+        _ => None,
+    };
+    assert_eq!(script("a.pick.test").as_deref(), Some("pick"));
+    assert_eq!(script("own.test").as_deref(), Some("own"));
+    assert_eq!(script("mine.test").as_deref(), Some("own"));
+    assert!(profile.hosts.lookup("gone.test").is_none());
+    assert!(profile.hosts.lookup("lost.test").is_none());
+    let refused = &profile.modules[0].refused_rules;
+    assert_eq!(refused.len(), 1, "{refused:?}");
+    assert_eq!(refused[0].line, 5);
+    assert!(refused[0].detail.contains("nowhere"), "{refused:?}");
+    let mut warned: Vec<&str> = profile
+        .report
+        .warnings
+        .iter()
+        .filter(|warning| warning.code == "invalid_host")
+        .map(|warning| warning.path.as_str())
+        .collect();
+    warned.sort_unstable();
+    assert_eq!(warned, ["hosts.gone.test", "hosts.lost.test"]);
 }

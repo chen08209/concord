@@ -99,6 +99,9 @@ dto! {
         /// header of a request the MITM engine routes, and sees the SNI only when sniffing is
         /// on; on any other rule it is not applied.
         pub extended_matching: bool,
+        /// A `SCRIPT` rule's script reads the address the host resolves to.
+        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+        pub requires_resolve: bool,
     }
 
     pub struct MitmModuleRuleSet {

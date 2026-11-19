@@ -1094,3 +1094,58 @@ fn extended_matching_also_tries_the_dialed_name_and_the_host_header() {
         );
     }
 }
+
+#[test]
+fn a_script_rule_asks_once_per_run_and_resolves_first_when_told() {
+    let kit = Kit::new();
+    let lines = [
+        "SCRIPT,ads,REJECT",
+        "AND,((DOMAIN,a.test),(SCRIPT,ads)),DIRECT",
+        "SCRIPT,geo,PROXY,requires-resolve",
+        "MATCH,DIRECT",
+    ];
+    for merge in MERGES {
+        let program = kit.compile(&lines, merge);
+        let flow = |scripts| Flow {
+            scripts,
+            resolves_to: Some("203.0.113.9".parse().unwrap()),
+            ..Flow::domain("a.test")
+        };
+        let trace = drive(&program, &kit.geo, &flow(&["ads"]), true);
+        assert_eq!(trace.accepted, pick(0, "REJECT"), "merge {merge}");
+        assert_eq!((trace.scripts.len(), trace.ip_lookups), (1, 0));
+
+        let trace = drive(&program, &kit.geo, &flow(&["geo"]), true);
+        assert_eq!(trace.accepted, pick(2, "PROXY"), "merge {merge}");
+        assert_eq!(
+            trace.scripts,
+            ["ads", "geo"],
+            "ads is asked once for two rules"
+        );
+        assert_eq!(trace.ip_lookups, 1);
+
+        let trace = drive(&program, &kit.geo, &flow(&[]), true);
+        assert_eq!(trace.accepted, pick(3, "DIRECT"), "merge {merge}");
+    }
+}
+
+#[test]
+fn a_rule_set_leaves_out_its_script_rules() {
+    let kit = Kit::new();
+    let entries: Vec<String> = [
+        "SCRIPT,ads",
+        "AND,((SCRIPT,ads),(DOMAIN,a.test))",
+        "DOMAIN,b.test",
+    ]
+    .iter()
+    .map(|entry| entry.to_string())
+    .collect();
+    let built = RuleSet::from_entries(Behavior::Classical, &entries, &kit.env(8));
+    assert_eq!(built.warnings.len(), 2, "{:?}", built.warnings);
+    assert!(
+        built
+            .warnings
+            .iter()
+            .all(|warning| warning.contains("SCRIPT"))
+    );
+}

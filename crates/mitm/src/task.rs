@@ -64,8 +64,8 @@ pub(crate) fn task_flow(host: &str, port: u16) -> InterceptFlow {
     }
 }
 
-struct TaskDial {
-    core: Arc<Core>,
+pub(crate) struct TaskDial {
+    pub(crate) core: Arc<Core>,
 }
 
 #[async_trait]

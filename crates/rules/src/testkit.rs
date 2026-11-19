@@ -77,6 +77,8 @@ pub(crate) struct Flow {
     /// The name sniffed from the flow, which the rules see in place of `host`.
     pub sniffed: Option<&'static str>,
     pub connect_agent: Option<&'static str>,
+    /// The rule scripts that match it; any other does not.
+    pub scripts: &'static [&'static str],
 }
 
 impl Flow {
@@ -96,6 +98,7 @@ impl Flow {
             dscp: 0,
             http: None,
             connect_agent: None,
+            scripts: &[],
             sniffed: None,
         }
     }
@@ -135,6 +138,8 @@ pub(crate) struct Trace {
     pub accepted: Option<(usize, String)>,
     pub ip_lookups: u32,
     pub process_lookups: u32,
+    /// Each rule script run, in order.
+    pub scripts: Vec<String>,
     pub observed: crate::Observed,
     pub http_pending: bool,
 }
@@ -196,6 +201,10 @@ pub(crate) fn drive(
                     })
                 });
                 state.process_looked_up = true;
+            }
+            Step::NeedScript { id, name } => {
+                trace.scripts.push(name.to_string());
+                state.scripts.push((id, flow.scripts.contains(&name)));
             }
             Step::Candidate { target, rule } => {
                 trace.candidates.push((rule.index(), target.to_string()));

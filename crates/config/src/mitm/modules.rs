@@ -14,10 +14,11 @@ use super::module::{
     Environment, ListEdit, ModuleDef, ModuleInput, NetworkDef, Policy, RuleSetDef, RuleSetSource,
     is_url, read_module,
 };
-use super::{BodyActionDef, MapLocalBody, MitmDef, MitmLine, Read};
-use crate::Map;
+use super::{BodyActionDef, MapLocalBody, MitmDef, MitmLine, Read, ScriptKind};
+use crate::hosts::HostsConfig;
 use crate::raw::RawConfig;
-use crate::rule::{EXTENDED_MATCHING, RuleLines};
+use crate::rule::{EXTENDED_MATCHING, REQUIRES_RESOLVE, RuleLines};
+use crate::{LoadReport, Map};
 
 /// The MITM engine's directory under the home directory, and its resources directory: the
 /// engine's `AUTHORITY_DIR` and the `resources` it keeps there.
@@ -299,6 +300,10 @@ impl Modules {
                     line.push(',');
                     line.push_str(EXTENDED_MATCHING);
                 }
+                if rule.def.requires_resolve {
+                    line.push(',');
+                    line.push_str(REQUIRES_RESOLVE);
+                }
                 match check(&line) {
                     Ok(()) => lines.push(line),
                     Err(err) => module.refused_rules.push(RefusedRule {
@@ -319,6 +324,49 @@ impl Modules {
         }
         joined
     }
+}
+
+/// `hosts` without the entries naming no `dns` script the profile or a module declares, each
+/// `[Host]` line of those noted on its module.
+pub(crate) fn hosts_with_scripts(
+    hosts: HostsConfig,
+    own: &MitmDef,
+    modules: &mut [AppliedModule],
+    report: &mut LoadReport,
+) -> HostsConfig {
+    let declared = script_names(own, modules, ScriptKind::Dns);
+    for module in modules.iter_mut().filter(|module| module.in_force()) {
+        for entry in &module.def.network.hosts {
+            let unknown = entry.values.iter().find_map(|value| {
+                value
+                    .strip_prefix(crate::hosts::SCRIPT_PREFIX)
+                    .filter(|name| !declared.contains(name.trim()))
+            });
+            if let Some(name) = unknown {
+                module.refused_rules.push(RefusedRule {
+                    line: entry.line,
+                    detail: format!("dns script [{name}] not found"),
+                });
+            }
+        }
+    }
+    hosts.with_scripts(&declared, report)
+}
+
+/// The names of the scripts of `kind` the profile's own section and the modules in force declare.
+pub fn script_names(own: &MitmDef, modules: &[AppliedModule], kind: ScriptKind) -> HashSet<String> {
+    let modules = modules
+        .iter()
+        .filter(|module| module.in_force())
+        .flat_map(|module| module.def.lists.script.iter().map(|line| &line.def));
+    own.script
+        .iter()
+        .map(|line| &line.read)
+        .chain(modules)
+        .filter_map(|read| read.as_ref().ok())
+        .filter(|def| def.kind == kind)
+        .map(|def| def.name.clone())
+        .collect()
 }
 
 fn joined<T: Clone>(a: &[T], b: &[T]) -> Vec<T> {

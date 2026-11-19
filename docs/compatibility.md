@@ -78,6 +78,28 @@ case-sensitive `*` and `?` pattern. Either payload may be double-quoted to hold 
 they are undecided: they do not match, a `NOT` around one does not turn that into a match, and matching goes on
 to the rules after them.
 
+`SCRIPT,<name>,<policy>`, Surge's, asks the `rule` script of that name, declared in `mitm.script` or a module's
+`[Script]` as `<name> = type=rule,script-path=…`, whether it matches; the script reads Surge's `$request` and
+answers `$done({matched})`, and runs at most once per connection, or per request the MITM engine routes, however
+many rules name it. `requires-resolve` looks up the host first and passes every address found as `dnsResult`.
+Rule and `dns` scripts run two at a time, as Surge's JSC engine does, and wait for a turn within their `timeout`,
+five seconds unless the line sets one; a script that is missing, throws, runs out of time or answers no boolean does
+not match and is logged. A rule naming no declared script loads with a warning and never matches, a module's is
+left out with the reason, and a rule set leaves out its `SCRIPT` lines. Scripts run only while `mitm` is
+enabled, and the core's own connections, a script's requests among them, are not asked about.
+
+A `hosts` entry `script:<name>`, or a module's `[Host]` line `<domain> = script:<name>`, hands the name to the
+`dns` script declared as `<name> = type=dns,script-path=…`, as Surge's `[Host]` does. The script reads `$domain`
+and answers `$done({address})` or `$done({addresses})`, kept for `ttl` seconds when it gives one and asked again
+otherwise, or `$done({server})` or `$done({servers})` to ask those servers over UDP, directly. Queries for one name
+share a run. `$done({})`, a script that throws, runs out of time or is missing, and every run while `mitm` is off
+leave the name to the rest of DNS, and a failure is logged. The lookups for the apps' connections and, with
+`dns.use-hosts`, the queries the DNS listener answers go through the script. The core's own connections, a
+script's requests among them, resolve without `dns` scripts, so a script that reaches a name it answers for does not
+wait on itself. The default timeout equals the query deadline, five seconds, so with the defaults a `dns` script
+that runs out of time fails the query; for it to fall back, set the script's `timeout` below that. An entry naming
+no declared `dns` script is left out with a warning, and a module's with the reason.
+
 Surge's and Loon's REJECT variants are built-in policies: `REJECT-NO-DROP`, `REJECT-TINYGIF`, `REJECT-IMG`,
 `REJECT-DICT`, `REJECT-ARRAY`, `REJECT-200` and `REJECT-VIDEO` reject a connection as `REJECT` does, and keep
 their names in the connection's chain. They are not listed among the proxies.

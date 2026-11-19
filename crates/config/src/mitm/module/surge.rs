@@ -45,7 +45,15 @@ const APP_ONLY_SECTIONS: [&str; 10] = [
     "keystore",
     "wireguard",
 ];
-const RUNNABLE_SCRIPTS: [&str; 5] = ["http-request", "http-response", "cron", "event", "generic"];
+const RUNNABLE_SCRIPTS: [&str; 7] = [
+    "http-request",
+    "http-response",
+    "cron",
+    "event",
+    "generic",
+    "rule",
+    "dns",
+];
 
 /// What the `#!` lines and section headers say, read before any line, so a line may use an
 /// argument or a rule set declared after it.
@@ -537,7 +545,6 @@ impl<'a> Reader<'a> {
             let param = |key: &str| params.get(key).map(String::as_str);
             let off = |key: &str| param(key).is_some_and(|on| on.eq_ignore_ascii_case("false"));
             let refused = match kind.as_str() {
-                "dns" | "rule" => Some(IgnoreReason::ScriptType),
                 "event"
                     if !matches!(
                         param("event-name"),

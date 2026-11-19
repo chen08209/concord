@@ -200,6 +200,7 @@ impl Engine {
             fake_ip_store: Arc::default(),
             android: config.android,
             proxy_tasks,
+            scripts: Arc::default(),
         };
         Arc::new(Engine {
             home: ArcSwapOption::empty(),
@@ -276,6 +277,9 @@ impl Engine {
             self.is_running(),
             self.shared.proxy_tasks.tasks(),
         );
+        if let Some(hooks) = self.mitm.script_hooks() {
+            self.shared.scripts.set(hooks);
+        }
     }
 
     pub fn mitm(&self) -> &MitmService {

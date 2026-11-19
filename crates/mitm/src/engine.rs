@@ -36,6 +36,9 @@ const ACCEPT_TIMEOUT: Duration = Duration::from_secs(15);
 const QUIC_MEMORY: Duration = Duration::from_secs(60);
 const QUIC_CACHE_SIZE: usize = 4096;
 const TASK_CONCURRENCY: usize = 2;
+/// Surge's overview, "Performance Constraints": at most 2 JSC sessions run at once, the
+/// engine it recommends for `rule` and `dns` scripts.
+const HOOK_CONCURRENCY: usize = 2;
 const HTTP_METHODS: [&[u8]; 8] = [
     b"GET ",
     b"POST ",
@@ -94,6 +97,7 @@ pub(crate) struct Core {
     pub bodies: Arc<Semaphore>,
     pub session_gate: ScriptGate,
     pub task_gate: ScriptGate,
+    pub hook_gate: ScriptGate,
     /// Where this section's sessions, scripts and schedule run; the engine stops them.
     pub tasks: concord_common::Tasks,
     /// Cancelled once another section's engine takes over or MITM is turned off: each
@@ -361,6 +365,7 @@ impl MitmEngine {
             )),
             session_gate: ScriptGate::new(limits.script_concurrency),
             task_gate: ScriptGate::new(TASK_CONCURRENCY),
+            hook_gate: ScriptGate::new(HOOK_CONCURRENCY),
             tasks,
             replaced: CancellationToken::new(),
             sessions: AtomicUsize::new(0),

@@ -216,4 +216,6 @@ pub enum MitmScriptKind {
     Cron,
     Event,
     Generic,
+    Rule,
+    Dns,
 }

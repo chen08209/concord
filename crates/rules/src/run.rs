@@ -19,11 +19,11 @@ enum Advance {
     Pos(u32),
 }
 
-enum Outcome {
+enum Outcome<'p> {
     Next,
     Enter { sub: u32, from: u32 },
     Candidate { idx: u32, advance: Advance },
-    Yield(Step<'static>),
+    Yield(Step<'p>),
 }
 
 /// The execution cursor over a program. It allocates only when `SUB-RULE`
@@ -57,7 +57,7 @@ impl<'p> Run<'p> {
         self.http_pending
     }
 
-    fn passed_over(&mut self, ev: &Ev<'_>) -> Outcome {
+    fn passed_over(&mut self, ev: &Ev<'_>) -> Outcome<'p> {
         self.http_pending |= ev.unknown && ev.http_gap;
         Outcome::Next
     }
@@ -226,13 +226,17 @@ impl<'p> Run<'p> {
         )
     }
 
-    fn yielded(&mut self, why: Yield) -> Step<'static> {
+    fn yielded(&mut self, why: Yield) -> Step<'p> {
         match why {
             Yield::Ip(counted) => {
                 self.replay = counted;
                 Step::NeedIp
             }
             Yield::Process => Step::NeedProcess,
+            Yield::Script(id) => Step::NeedScript {
+                id,
+                name: self.program.script_name(id),
+            },
         }
     }
 

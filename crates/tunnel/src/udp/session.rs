@@ -126,7 +126,7 @@ pub(super) async fn associate(
     {
         return Err(err);
     }
-    let env = runtime.outbounds.env();
+    let env = runtime.env_for(state);
     let cx = DialCx::new(&env, Initiator::Other, Some(deadline)).with_source(state.meta.src);
     let outcome = match timeout_at(deadline, leaf.associate(&cx, hint)).await {
         Ok(result) => result,

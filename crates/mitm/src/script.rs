@@ -94,6 +94,10 @@ pub struct ScriptInvocation {
     pub trigger: String,
     pub console: Option<ConsoleSink>,
     pub notify: Option<NotifySink>,
+    /// A `rule` script's `$request`.
+    pub rule: Option<serde_json::Value>,
+    /// A `dns` script's `$domain`.
+    pub domain: Option<String>,
 }
 
 impl ScriptInvocation {
@@ -115,6 +119,8 @@ impl ScriptInvocation {
             trigger: String::new(),
             console: None,
             notify: None,
+            rule: None,
+            domain: None,
         }
     }
 }
@@ -263,6 +269,8 @@ impl Script {
                 ScriptKind::Cron => ScriptViewKind::Cron,
                 ScriptKind::Event => ScriptViewKind::Event,
                 ScriptKind::Generic => ScriptViewKind::Generic,
+                ScriptKind::Rule => ScriptViewKind::Rule,
+                ScriptKind::Dns => ScriptViewKind::Dns,
             },
             path: self.path.clone(),
             pattern: self
@@ -668,10 +676,9 @@ mod tests {
         let (_home, resources, host) = setup();
         let cases = [
             (
-                "DNS = type=dns,script-path=a.js",
-                "dns scripts are not supported",
+                "X = type=network-changed,script-path=a.js",
+                "network-changed scripts are not supported",
             ),
-            ("rule Ad script-path=a.js", "rule scripts are not supported"),
             ("Cron = type=cron,script-path=a.js", "cronexp is missing"),
             (
                 r#"Cron = type=cron,cronexp="0 9 * *",script-path=a.js"#,

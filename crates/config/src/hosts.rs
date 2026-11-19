@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use std::net::{IpAddr, Ipv4Addr};
 
 use crate::Map;
@@ -11,6 +12,8 @@ pub enum HostValue {
     Domain(String),
     /// The host's own addresses, read when the profile is applied.
     Lan,
+    /// Surge's `script:<name>`: the `dns` script of that name answers for the domain.
+    Script(String),
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -53,6 +56,30 @@ impl HostsConfig {
     }
 }
 
+pub const SCRIPT_PREFIX: &str = "script:";
+
+impl HostsConfig {
+    /// Leaves out, with a warning, each entry naming no declared `dns` script.
+    pub(crate) fn with_scripts(
+        mut self,
+        declared: &HashSet<String>,
+        report: &mut LoadReport,
+    ) -> Self {
+        self.entries.retain(|entry| match &entry.value {
+            HostValue::Script(name) if !declared.contains(name) => {
+                report.warn(
+                    "invalid_host",
+                    format!("hosts.{}", entry.domain),
+                    format!("dns script [{name}] not found, so the entry is left out"),
+                );
+                false
+            }
+            _ => true,
+        });
+        self
+    }
+}
+
 fn valid_domain(domain: &str) -> bool {
     !domain.is_empty()
         && !domain.starts_with('.')
@@ -69,8 +96,13 @@ pub fn parse_hosts(map: &Map, report: &mut LoadReport) -> Result<HostsConfig> {
     };
     for (domain, value) in map {
         let items = value_to_strings(value);
+        let script = items
+            .first()
+            .and_then(|item| item.strip_prefix(SCRIPT_PREFIX));
         let parsed = if items.len() == 1 && items.first().is_some_and(|item| item == "lan") {
             HostValue::Lan
+        } else if let Some(name) = script.filter(|_| items.len() == 1) {
+            HostValue::Script(name.trim().to_string())
         } else if items.len() == 1
             && items
                 .first()
@@ -189,6 +221,18 @@ mod tests {
             "{err}"
         );
         assert!(parse(json!({"a.example": "b.example", "b.example": "9.9.9.9"})).is_ok());
+    }
+
+    #[test]
+    fn a_script_value_names_the_dns_script_that_answers() {
+        let hosts =
+            parse(json!({"a.example": "script:pick", "b.example": ["script:pick", "1.2.3.4"]}));
+        assert!(hosts.is_err(), "a script stands alone");
+        let hosts = parse(json!({"a.example": "script: pick"})).unwrap();
+        assert_eq!(
+            hosts.lookup("a.example").unwrap().value,
+            HostValue::Script("pick".into())
+        );
     }
 
     #[test]

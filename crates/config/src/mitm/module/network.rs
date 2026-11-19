@@ -7,6 +7,7 @@ use ipnetwork::IpNetwork;
 use serde::Serialize;
 
 use super::source::{ListMark, list_mark};
+use crate::hosts::SCRIPT_PREFIX;
 
 /// How a module changes one of the profile's lists: `before` goes ahead of it, `after` behind
 /// it, and with `replace` the profile's own entries are dropped.
@@ -89,6 +90,8 @@ pub struct NetworkDef {
 pub struct DomainEntry {
     pub domain: String,
     pub values: Vec<String>,
+    #[serde(skip)]
+    pub line: u32,
 }
 
 impl NetworkDef {
@@ -187,7 +190,9 @@ impl NetworkEdits {
         {
             let server =
                 dns_server(server).ok_or_else(|| Refused::Unreadable(format!("{server:?}")))?;
-            put(&mut self.def.nameserver_policy, host, vec![server]);
+            put(&mut self.def.nameserver_policy, host, vec![server], line);
+        } else if value.starts_with(SCRIPT_PREFIX) {
+            put(&mut self.def.hosts, host, vec![value.to_string()], line);
         } else {
             let targets: Vec<String> = value
                 .split(',')
@@ -201,7 +206,7 @@ impl NetworkEdits {
             {
                 return Err(Refused::Unreadable(format!("{bad:?}")));
             }
-            put(&mut self.def.hosts, host, targets);
+            put(&mut self.def.hosts, host, targets, line);
         }
         self.def.lines.push(line);
         Ok(())
@@ -256,12 +261,13 @@ impl NetworkEdits {
 }
 
 /// A later line for the same domain replaces an earlier one.
-fn put(list: &mut Vec<DomainEntry>, domain: &str, values: Vec<String>) {
+fn put(list: &mut Vec<DomainEntry>, domain: &str, values: Vec<String>, line: u32) {
     match list.iter_mut().find(|entry| entry.domain == domain) {
-        Some(entry) => entry.values = values,
+        Some(entry) => (entry.values, entry.line) = (values, line),
         None => list.push(DomainEntry {
             domain: domain.to_string(),
             values,
+            line,
         }),
     }
 }
@@ -404,14 +410,15 @@ mod tests {
         );
         assert!(edits.read_host("d.test = bad host", 3).is_err());
         let def = edits.finish(false);
-        let entry = |domain: &str, values: &[&str]| DomainEntry {
+        let entry = |domain: &str, values: &[&str], line| DomainEntry {
             domain: domain.to_string(),
             values: values.iter().map(|value| value.to_string()).collect(),
+            line,
         };
-        assert_eq!(def.hosts, [entry("a.test", &["1.2.3.4", "b.test"])]);
+        assert_eq!(def.hosts, [entry("a.test", &["1.2.3.4", "b.test"], 1)]);
         assert_eq!(
             def.nameserver_policy,
-            [entry("*.c.test", &["https://dns.test/q#h3=true"])]
+            [entry("*.c.test", &["https://dns.test/q#h3=true"], 2)]
         );
     }
 }

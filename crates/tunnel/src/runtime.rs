@@ -6,9 +6,11 @@ use std::time::{Duration, Instant};
 
 use arc_swap::{ArcSwap, ArcSwapOption};
 use concord_common::packet::PacketSession;
+use concord_common::scripts::ScriptHooks;
 use concord_common::{
-    Address, BoxStream, FindProcessMode, FlowHandler, FlowKey, FlowMeta, HostResolver, InboundKind,
-    Initiator, IpVersion, LookupIps, ProcessInfo, Tasks, TunnelMode, UdpFlow, UdpPayload, UdpReply,
+    Address, BoxStream, DialEnv, FindProcessMode, FlowHandler, FlowKey, FlowMeta, HostResolver,
+    InboundKind, Initiator, IpVersion, LookupIps, ProcessInfo, Tasks, TunnelMode, UdpFlow,
+    UdpPayload, UdpReply,
 };
 use concord_dns::Resolver;
 use concord_group::{Outbounds, Touch};
@@ -36,6 +38,9 @@ pub struct Runtime {
     pub sniffer: Arc<Dispatcher>,
     pub geo: Arc<GeoStore>,
     pub platform: Arc<dyn Platform>,
+    pub scripts: Arc<dyn ScriptHooks>,
+    /// What the core's own connections resolve with: `dns` without its scripts.
+    inner_dns: Arc<dyn HostResolver>,
     pub(crate) owner_cache: OwnerCache,
 }
 
@@ -47,25 +52,45 @@ impl Runtime {
         sniffer: Arc<Dispatcher>,
         geo: Arc<GeoStore>,
         platform: Arc<dyn Platform>,
+        scripts: Arc<dyn ScriptHooks>,
     ) -> Self {
         Runtime {
             program,
             outbounds,
+            inner_dns: dns.unscripted(),
             dns,
             sniffer,
             geo,
             platform,
+            scripts,
             owner_cache: OwnerCache::default(),
         }
     }
 
     pub(crate) fn dns_lookup<'a>(
         &'a self,
+        flow: &FlowState,
         host: &'a str,
         version: IpVersion,
         initiator: Initiator,
     ) -> impl Future<Output = io::Result<LookupIps>> + Send + 'a {
-        self.dns.lookup(host, version, initiator)
+        if flow.is_inner() {
+            self.inner_dns.lookup(host, version, initiator)
+        } else {
+            self.dns.lookup(host, version, initiator)
+        }
+    }
+
+    /// The outbounds' dial environment, resolving without `dns` scripts for the core's own flows.
+    pub(crate) fn env_for(&self, flow: &FlowState) -> Arc<DialEnv> {
+        let env = self.outbounds.env();
+        if !flow.is_inner() {
+            return env;
+        }
+        Arc::new(DialEnv {
+            resolver: Arc::clone(&self.inner_dns),
+            ..(*env).clone()
+        })
     }
 }
 

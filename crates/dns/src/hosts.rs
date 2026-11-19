@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::net::IpAddr;
 use std::path::PathBuf;
-use std::sync::Mutex;
+use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
 use concord_common::addr::unmap;
@@ -19,6 +19,8 @@ pub struct HostValue {
     pub is_domain: bool,
     pub ips: Vec<IpAddr>,
     pub domain: String,
+    /// The `dns` script that answers in place of the entry.
+    pub script: Option<Arc<str>>,
 }
 
 impl HostValue {
@@ -27,6 +29,7 @@ impl HostValue {
             is_domain: false,
             ips: ips.into_iter().map(unmap).collect(),
             domain: String::new(),
+            script: None,
         })
     }
 
@@ -36,6 +39,7 @@ impl HostValue {
             is_domain: true,
             ips: Vec::new(),
             domain: domain.to_string(),
+            script: None,
         })
     }
 
@@ -149,6 +153,12 @@ impl Hosts {
                 ConfigValue::Ips(ips) => HostValue::from_ips(ips.clone()),
                 ConfigValue::Domain(domain) => HostValue::from_domain(domain),
                 ConfigValue::Lan => HostValue::from_ips(lan_addrs()),
+                ConfigValue::Script(name) => Some(HostValue {
+                    is_domain: false,
+                    ips: Vec::new(),
+                    domain: String::new(),
+                    script: Some(name.as_str().into()),
+                }),
             }
             .ok_or_else(|| DnsError::config(format!("hosts[{}]: invalid value", entry.domain)))?;
             hosts
@@ -179,7 +189,11 @@ impl Hosts {
     /// the caller asked for. `is_domain` asks for an alias, otherwise for
     /// addresses; an alias is followed until the shape matches.
     pub fn search(&self, domain: &str, is_domain: bool) -> (Option<HostValue>, bool) {
-        if let Some(found) = self.trie.search(domain) {
+        if let Some(found) = self
+            .trie
+            .search(domain)
+            .filter(|found| found.script.is_none())
+        {
             let mut value = found.clone();
             for _ in 0..64 {
                 if is_domain && value.is_domain {
@@ -200,6 +214,11 @@ impl Hosts {
             }
         }
         (None, false)
+    }
+
+    /// The `dns` script an entry names for `domain`; `search` passes such an entry over.
+    pub fn script_for(&self, domain: &str) -> Option<Arc<str>> {
+        self.trie.search(domain)?.script.clone()
     }
 
     /// The addresses for `domain`, when `search` finds some.

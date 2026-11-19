@@ -719,7 +719,7 @@ impl Association {
 }
 
 /// A nameserver that answers every A query with the loopback address.
-async fn loopback_nameserver() -> SocketAddr {
+pub(super) async fn nameserver_answering(ip: [u8; 4]) -> SocketAddr {
     let socket = UdpSocket::bind((Ipv4Addr::LOCALHOST, 0)).await.unwrap();
     let addr = socket.local_addr().unwrap();
     tokio::spawn(async move {
@@ -737,8 +737,8 @@ async fn loopback_nameserver() -> SocketAddr {
             answer[2..4].copy_from_slice(&[0x81, 0x80]);
             answer[6..12].copy_from_slice(&[0, u8::from(is_a), 0, 0, 0, 0]);
             if is_a {
-                answer
-                    .extend_from_slice(&[0xc0, 0x0c, 0, 1, 0, 1, 0, 0, 0, 60, 0, 4, 127, 0, 0, 1]);
+                answer.extend_from_slice(&[0xc0, 0x0c, 0, 1, 0, 1, 0, 0, 0, 60, 0, 4]);
+                answer.extend_from_slice(&ip);
             }
             let _ = socket.send_to(&answer, from).await;
         }
@@ -750,7 +750,7 @@ async fn loopback_nameserver() -> SocketAddr {
 async fn mitm_drops_quic_to_a_listed_host_by_name_or_fake_ip() {
     let echo = udp_echo().await;
     let port = echo.port();
-    let nameserver = loopback_nameserver().await;
+    let nameserver = nameserver_answering([127, 0, 0, 1]).await;
     let dns = free_port();
     let rig = Rig::new();
     let info = rig.engine.mitm().generate_certificate().unwrap();

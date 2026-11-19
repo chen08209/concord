@@ -502,4 +502,6 @@
   if (input.event) global.$event = { name: input.event };
   if (input.trigger) global.$trigger = input.trigger;
   if (input.argument !== undefined && input.argument !== null) global.$argument = input.argument;
+  if (input.rule) global.$request = input.rule;
+  if (input.domain !== undefined) global.$domain = input.domain;
 })(globalThis);

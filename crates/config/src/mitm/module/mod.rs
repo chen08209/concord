@@ -155,7 +155,7 @@ pub enum IgnoreReason {
     Requirement,
     /// A line requirement that cannot be read.
     RequirementUnreadable,
-    /// A `dns` or `rule` script.
+    /// A script of a type Concord does not run.
     ScriptType,
     /// An event script for an event Concord does not raise.
     Event,

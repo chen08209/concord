@@ -159,6 +159,10 @@ impl MitmService {
         self.current.load().is_some()
     }
 
+    pub(crate) fn script_hooks(&self) -> Option<Arc<dyn concord_common::scripts::ScriptHooks>> {
+        self.current.load().as_ref().map(|mitm| mitm.script_hooks())
+    }
+
     pub(crate) fn start(&self, home: &Arc<HomeDir>, tunnel: &Tunnel, running: bool, tasks: Tasks) {
         let mitm = Arc::new(Mitm::new(MitmEnv {
             home: home.clone(),

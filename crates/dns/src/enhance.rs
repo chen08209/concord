@@ -4,9 +4,10 @@ use std::net::IpAddr;
 use std::pin::Pin;
 use std::sync::Mutex;
 
+use concord_common::scripts::DnsScriptAnswer;
 use concord_common::sync::lock;
 use concord_common::{DnsMode, Host, Initiator};
-use hickory_proto::op::{Message, ResponseCode};
+use hickory_proto::op::{Message, Query, ResponseCode};
 use hickory_proto::rr::RecordType;
 
 use crate::engine::Resolver;
@@ -155,6 +156,24 @@ impl Resolver {
         }
         let host = query_host(&req);
         let qtype = query.query_type;
+        if let Some(script) = self.hosts.script_for(&host) {
+            let mut resp = msg::empty_answer(&req);
+            match self.scripts.answer(&script, &host).await {
+                DnsScriptAnswer::Addresses { ips, ttl } => {
+                    let ttl = ttl.map_or(HOSTS_TTL, |ttl| {
+                        u32::try_from(ttl.as_secs()).unwrap_or(u32::MAX)
+                    });
+                    self.push_ips(&mut resp, &query, &host, &ips, ttl);
+                }
+                DnsScriptAnswer::Servers(servers) => {
+                    resp = self.ask_servers(&servers, &req, initiator).await?;
+                }
+                DnsScriptAnswer::Resolve => {
+                    return self.next_stage(Stage::Hosts, req, initiator).await;
+                }
+            }
+            return Ok(resp);
+        }
         let want_domain = !matches!(qtype, RecordType::A | RecordType::AAAA);
         let (record, matched) = self.hosts.search(&host, want_domain);
         if !matched {
@@ -182,20 +201,7 @@ impl Resolver {
         let mut resp = msg::empty_answer(&req);
         match qtype {
             RecordType::A | RecordType::AAAA => {
-                for ip in &record.ips {
-                    match (ip, qtype) {
-                        (IpAddr::V4(v4), RecordType::A) => {
-                            resp.answers
-                                .push(msg::a_record(&query.name, HOSTS_TTL, *v4));
-                        }
-                        (IpAddr::V6(v6), RecordType::AAAA) => {
-                            resp.answers
-                                .push(msg::aaaa_record(&query.name, HOSTS_TTL, *v6));
-                        }
-                        _ => continue,
-                    }
-                    self.enhancer.insert_mapping(*ip, &host);
-                }
+                self.push_ips(&mut resp, &query, &host, &record.ips, HOSTS_TTL);
             }
             RecordType::CNAME => {
                 if let Some(cname) = msg::cname_record(&query.name, HOSTS_TTL, &record.domain) {
@@ -205,6 +211,21 @@ impl Resolver {
             _ => return self.next_stage(Stage::Hosts, req, initiator).await,
         }
         Ok(resp)
+    }
+
+    fn push_ips(&self, resp: &mut Message, query: &Query, host: &str, ips: &[IpAddr], ttl: u32) {
+        for ip in ips {
+            match (ip, query.query_type) {
+                (IpAddr::V4(v4), RecordType::A) => {
+                    resp.answers.push(msg::a_record(&query.name, ttl, *v4));
+                }
+                (IpAddr::V6(v6), RecordType::AAAA) => {
+                    resp.answers.push(msg::aaaa_record(&query.name, ttl, *v6));
+                }
+                _ => continue,
+            }
+            self.enhancer.insert_mapping(*ip, host);
+        }
     }
 
     async fn fake_ip_stage(&self, req: Message, initiator: Initiator) -> io::Result<Message> {

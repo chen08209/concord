@@ -5057,7 +5057,9 @@
         "httpResponse",
         "cron",
         "event",
-        "generic"
+        "generic",
+        "rule",
+        "dns"
       ],
       "description": "Loon's `network-changed` script is an `event` one."
     },
@@ -5582,6 +5584,10 @@
         "extendedMatching": {
           "type": "boolean",
           "description": "Surge's `extended-matching`. A DOMAIN, DOMAIN-SUFFIX, DOMAIN-KEYWORD or\nDOMAIN-WILDCARD rule also matches the name the flow was dialed by and the Host\nheader of a request the MITM engine routes, and sees the SNI only when sniffing is\non; on any other rule it is not applied."
+        },
+        "requiresResolve": {
+          "type": "boolean",
+          "description": "A `SCRIPT` rule's script reads the address the host resolves to."
         }
       },
       "required": [

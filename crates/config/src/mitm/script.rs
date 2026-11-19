@@ -29,6 +29,10 @@ pub enum ScriptKind {
     Cron,
     Event,
     Generic,
+    /// Surge's `type=rule`, run by a `SCRIPT` rule.
+    Rule,
+    /// Surge's `type=dns`, run for the domains a `hosts` entry names it for.
+    Dns,
 }
 
 impl ScriptKind {
@@ -39,6 +43,8 @@ impl ScriptKind {
             ScriptKind::Cron => "cron",
             ScriptKind::Event => "event",
             ScriptKind::Generic => "generic",
+            ScriptKind::Rule => "rule",
+            ScriptKind::Dns => "dns",
         }
     }
 
@@ -84,6 +90,8 @@ pub fn parse_script(line: &str) -> Result<ScriptDef, LineError> {
         "cron" => ScriptKind::Cron,
         "event" => ScriptKind::Event,
         "generic" => ScriptKind::Generic,
+        "rule" => ScriptKind::Rule,
+        "dns" => ScriptKind::Dns,
         other if SCRIPT_TYPES.contains(&other) => {
             return Err(LineError::unsupported(format!(
                 "{other} scripts are not supported"
@@ -140,7 +148,7 @@ pub fn parse_script(line: &str) -> Result<ScriptDef, LineError> {
                 }
             }
         }
-        ScriptKind::Generic => {}
+        ScriptKind::Generic | ScriptKind::Rule | ScriptKind::Dns => {}
     }
     if let Some(text) = params.get("timeout") {
         let seconds = text

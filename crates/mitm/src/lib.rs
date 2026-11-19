@@ -15,6 +15,9 @@ mod facade;
 mod forward;
 mod headers;
 mod heads;
+mod hooks;
+#[cfg(test)]
+mod hooks_tests;
 mod hostlist;
 mod jq;
 mod limits;

@@ -450,7 +450,7 @@ mitm:
     - \"# note\"
     - (broken _ reject
   script:
-    - x = type=dns,script-path=a.js
+    - x = type=network-changed,script-path=a.js
 ",
         );
         assert_eq!(
@@ -472,7 +472,7 @@ mitm:
                 (
                     "mitm_line".into(),
                     "mitm.script[0]".into(),
-                    "line 10: \"x = type=dns,script-path=a.js\": dns scripts are not supported"
+                    "line 10: \"x = type=network-changed,script-path=a.js\": network-changed scripts are not supported"
                         .into(),
                 ),
             ]

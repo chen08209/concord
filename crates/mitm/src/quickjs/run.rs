@@ -141,6 +141,12 @@ fn build_input(invocation: &ScriptInvocation) -> String {
     if let Some(argument) = &invocation.argument {
         input["argument"] = argument.clone();
     }
+    if let Some(rule) = &invocation.rule {
+        input["rule"] = rule.clone();
+    }
+    if let Some(domain) = &invocation.domain {
+        input["domain"] = json!(domain);
+    }
     if let Some(request) = &invocation.request {
         let mut value = json!({
             "id": request.id,

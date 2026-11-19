@@ -10,6 +10,7 @@ use sha2::{Digest, Sha256};
 use super::IgnoreReason;
 use super::resource::is_url;
 use super::source::{split_commas, unquote};
+use crate::rule::REQUIRES_RESOLVE;
 
 /// A built-in policy in its Surge name, or one the host maps to an outbound.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
@@ -32,6 +33,9 @@ pub struct ModuleRule {
     pub no_resolve: bool,
     /// Surge's `extended-matching`: a domain also matches the SNI and the Host header.
     pub extended_matching: bool,
+    /// A `SCRIPT` rule's script reads the address the host resolves to.
+    #[serde(skip_serializing_if = "std::ops::Not::not")]
+    pub requires_resolve: bool,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
@@ -128,6 +132,7 @@ const TYPES: &[(&str, &str)] = &[
     ("NETWORK", "NETWORK"),
     ("URL-REGEX", "URL-REGEX"),
     ("USER-AGENT", "USER-AGENT"),
+    ("SCRIPT", "SCRIPT"),
 ];
 
 /// Rules on what only an Apple device knows of its network or itself.
@@ -142,7 +147,12 @@ const DEVICE_TYPES: &[&str] = &[
 
 /// Options after the policy that say nothing of what a rule matches; Loon leaves the policy
 /// out for DIRECT.
-const OPTIONS: &[&str] = &["no-resolve", "extended-matching", "pre-matching"];
+const OPTIONS: &[&str] = &[
+    "no-resolve",
+    "extended-matching",
+    "pre-matching",
+    REQUIRES_RESOLVE,
+];
 
 pub(super) type Refusal = (IgnoreReason, Option<String>);
 
@@ -215,6 +225,7 @@ impl<'a> RuleReader<'a> {
             policy: policy_of(policy)?,
             no_resolve: resolves && has(options, "no-resolve"),
             extended_matching: has(options, "extended-matching"),
+            requires_resolve: kind == "SCRIPT" && has(options, REQUIRES_RESOLVE),
         })
     }
 
@@ -266,6 +277,7 @@ impl<'a> RuleReader<'a> {
             policy,
             no_resolve: has(options, "no-resolve"),
             extended_matching: false,
+            requires_resolve: false,
         })
     }
 
@@ -388,6 +400,7 @@ pub(super) fn ip_rewrite(line: &str) -> Result<ModuleRule, Refusal> {
         policy: Policy::Builtin(policy),
         no_resolve: true,
         extended_matching: false,
+        requires_resolve: false,
     })
 }
 
@@ -684,7 +697,6 @@ mod tests {
         for (line, reason) in [
             ("FINAL,DIRECT", IgnoreReason::FinalRule),
             ("SUBNET,SSID:home,DIRECT", IgnoreReason::DeviceRule),
-            ("SCRIPT,x,DIRECT", IgnoreReason::RuleType),
             ("PROTOCOL,QUIC,REJECT", IgnoreReason::RuleType),
             ("DOMAIN,a.test,${policy}", IgnoreReason::Policy),
             ("IP-CIDR,300.0.0.1/8,DIRECT", IgnoreReason::Unreadable),

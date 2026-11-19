@@ -21,6 +21,8 @@ pub(crate) enum Yield {
     /// checks ran, unanswered, before this one in the same rule.
     Ip(u32),
     Process,
+    /// The verdict of the rule script the program numbers so.
+    Script(u32),
 }
 
 pub(crate) type EvResult = Result<bool, Yield>;
@@ -105,6 +107,10 @@ pub(crate) enum Node {
     Not(Box<Node>),
     /// A domain rule with `extended-matching`, which holds for any of the flow's names.
     Extended(Box<Node>),
+    Script {
+        id: u32,
+        resolves: bool,
+    },
 }
 
 impl Node {
@@ -244,6 +250,16 @@ impl<'a> Ev<'a> {
         }))
     }
 
+    fn script(&mut self, id: u32, resolves: bool) -> EvResult {
+        if resolves {
+            self.dst_ip(true)?;
+        }
+        let verdict = self.state.scripts.iter().find(|(asked, _)| *asked == id);
+        verdict
+            .map(|(_, matched)| *matched)
+            .ok_or(Yield::Script(id))
+    }
+
     fn not(&mut self, child: &Node) -> EvResult {
         let matched = self.eval(child)?;
         if matched {
@@ -315,10 +331,9 @@ impl<'a> Ev<'a> {
                 }
                 None => false,
             },
-            Node::Cidr { net, src, resolves } => match self.view_ip(*src, *resolves)? {
-                Some(ip) => net.contains(ip),
-                None => false,
-            },
+            Node::Cidr { net, src, resolves } => self
+                .view_ip(*src, *resolves)?
+                .is_some_and(|ip| net.contains(ip)),
             Node::IpSuffix {
                 ip: rule,
                 bits,
@@ -415,6 +430,7 @@ impl<'a> Ev<'a> {
             }
             Node::Not(child) => self.not(child)?,
             Node::Extended(child) => self.any_name(child)?,
+            Node::Script { id, resolves } => self.script(*id, *resolves)?,
         })
     }
 }

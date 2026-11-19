@@ -134,6 +134,7 @@ pub(super) async fn start(list: Vec<u8>, names: &'static [&'static str]) -> Arc<
             ipv6: true,
             store_fake_ip: false,
             tasks: Default::default(),
+            scripts: Arc::new(concord_common::scripts::ScriptSlot::default()),
         },
     )
     .unwrap();

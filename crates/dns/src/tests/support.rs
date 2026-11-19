@@ -278,6 +278,7 @@ pub fn deps(sink: &Arc<Sink>) -> ResolverDeps {
         ipv6: true,
         store_fake_ip: false,
         tasks: Default::default(),
+        scripts: Arc::new(concord_common::scripts::ScriptSlot::default()),
     }
 }
 

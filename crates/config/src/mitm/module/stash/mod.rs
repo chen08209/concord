@@ -415,6 +415,7 @@ fn read_dns(
                     out.policy.push(DomainEntry {
                         domain: domain.clone(),
                         values,
+                        line,
                     });
                     Ok(())
                 })

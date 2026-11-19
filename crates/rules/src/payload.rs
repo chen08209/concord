@@ -74,7 +74,8 @@ pub(crate) fn cond_payload(cond: &Cond) -> String {
         | Cond::ProcessPathWildcard(p)
         | Cond::UrlRegex(p)
         | Cond::UserAgent(p)
-        | Cond::RuleSet(p) => p.clone(),
+        | Cond::RuleSet(p)
+        | Cond::Script { name: p, .. } => p.clone(),
         Cond::IpCidr(c)
         | Cond::IpCidr6(c)
         | Cond::SrcIpCidr(c)

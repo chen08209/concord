@@ -254,7 +254,7 @@ pub(super) async fn resolve_target(
     let Address::Domain(host, port) = &pure else {
         return Ok(pure);
     };
-    let env = runtime.outbounds.env();
+    let env = runtime.env_for(state);
     let cx = DialCx::new(
         &env,
         Initiator::Other,
@@ -277,7 +277,7 @@ pub(super) async fn resolve_target(
     let version = decision.leaf.info().ip_version;
     let ips = timeout(
         ASSOCIATE_TIMEOUT,
-        runtime.dns_lookup(host, version, initiator),
+        runtime.dns_lookup(state, host, version, initiator),
     )
     .await
     .map_err(|_| io::Error::from(io::ErrorKind::TimedOut))??;

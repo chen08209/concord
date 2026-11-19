@@ -1,4 +1,5 @@
 mod alloc;
+mod scripts;
 mod shared_dial;
 pub(super) mod support;
 

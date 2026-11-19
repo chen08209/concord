@@ -144,11 +144,11 @@ fn a_script_line_an_argument_fills_in_whole_still_asks_for_consent() {
 }
 
 #[test]
-fn a_placeholder_in_a_dns_script_declares_nothing() {
+fn a_placeholder_in_a_script_of_a_type_not_run_declares_nothing() {
     let def = read(
-        "#!arguments=Line:http-request ^https://a script-path=https://cdn.test/a.js\n[Script]\nA = type=dns,x={{{Line}}}\n",
+        "#!arguments=Line:http-request ^https://a script-path=https://cdn.test/a.js\n[Script]\nA = type=dhcp,x={{{Line}}}\n",
     );
-    assert_eq!(ignored(&def), [(3, IgnoreReason::ScriptType)]);
+    assert!(def.lists.script[0].def.is_err());
     assert!(def.declared_scripts.is_empty());
 }
 

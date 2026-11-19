@@ -294,7 +294,7 @@ async fn dial_once(
             .loopback
             .check_flow(flow.meta.src, flow.meta.arrived_at())?;
     }
-    let env = runtime.outbounds.env();
+    let env = runtime.env_for(flow);
     let cx = DialCx::new(&env, Initiator::Other, Some(deadline));
     match timeout_at(deadline, decision.leaf.connect(&cx, dst)).await {
         Ok(result) => result,
@@ -394,7 +394,7 @@ pub(crate) async fn associate_inner(
     let live = inner.live();
     let decision = route(&mut flow, &runtime, &live, Touch::Yes).await?;
     let deadline = Instant::now() + DIAL_TIMEOUT;
-    let env = runtime.outbounds.env();
+    let env = runtime.env_for(&flow);
     let cx = DialCx::new(&env, Initiator::Other, Some(deadline));
     let hint = flow.pure_address();
     let session = match timeout_at(deadline, decision.leaf.associate(&cx, &hint)).await {

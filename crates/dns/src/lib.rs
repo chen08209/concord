@@ -19,6 +19,7 @@ mod query;
 mod record;
 mod resets;
 mod resolver;
+mod scripted;
 mod shared_dial;
 mod system;
 #[cfg(test)]

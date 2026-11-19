@@ -31,6 +31,8 @@ pub(crate) struct FlowState {
     pub observed: Observed,
     /// The request a MITM upstream is dialed for, which HTTP rules read.
     pub http: Option<Arc<HttpFacts>>,
+    /// Every address the rules' lookup gave, of which `dst_ip` is one.
+    pub resolved: Vec<IpAddr>,
 }
 
 /// `netip.ParseAddr`: an IPv6 literal may carry a `%zone`, which the address drops.
@@ -100,7 +102,12 @@ impl FlowState {
             dscp,
             observed: Observed::default(),
             http: None,
+            resolved: Vec::new(),
         }
+    }
+
+    pub fn is_inner(&self) -> bool {
+        self.meta.inbound.kind == InboundKind::Inner
     }
 
     pub fn valid(&self) -> bool {
@@ -133,6 +140,7 @@ impl FlowState {
             special_rules: self.special_rules.clone(),
             rematch_name: self.rematch_name.clone(),
             http: self.http.clone(),
+            scripts: Vec::new(),
         }
     }
 

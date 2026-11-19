@@ -114,6 +114,13 @@ impl Mitm {
         })
     }
 
+    /// Runs the `rule` and `dns` scripts of whichever section is in force.
+    pub fn script_hooks(&self) -> Arc<dyn concord_common::scripts::ScriptHooks> {
+        Arc::new(crate::hooks::Hooks {
+            current: self.current.clone(),
+        })
+    }
+
     pub fn authority(&self) -> &Arc<Authority> {
         &self.shared.authority
     }

@@ -134,6 +134,8 @@ pub enum ScriptViewKind {
     Cron,
     Event,
     Generic,
+    Rule,
+    Dns,
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize)]

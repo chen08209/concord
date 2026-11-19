@@ -30,10 +30,18 @@ pub struct RuleInfo<'p> {
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Step<'p> {
-    Candidate { target: &'p str, rule: RuleRef },
+    Candidate {
+        target: &'p str,
+        rule: RuleRef,
+    },
     Done,
     NeedIp,
     NeedProcess,
+    /// The verdict of a rule script, which goes into `RouteState::scripts` under `id`.
+    NeedScript {
+        id: u32,
+        name: &'p str,
+    },
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
@@ -221,6 +229,8 @@ pub struct RouteProgram {
     pub(crate) rule_sets: Box<[(Arc<RuleSetHandle>, bool, bool)]>,
     pub(crate) demands: Demands,
     pub(crate) deferred_geo: Box<[GeoFile]>,
+    /// The rule scripts by the index `Node::Script` names them with.
+    pub(crate) scripts: Box<[Box<str>]>,
 }
 
 impl RouteProgram {
@@ -307,5 +317,9 @@ impl RouteProgram {
 
     pub(crate) fn target_name(&self, id: u16) -> &str {
         self.targets.get(usize::from(id)).map_or("", |t| &**t)
+    }
+
+    pub(crate) fn script_name(&self, id: u32) -> &str {
+        self.scripts.get(id as usize).map_or("", |name| &**name)
     }
 }

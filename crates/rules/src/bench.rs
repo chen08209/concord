@@ -48,6 +48,7 @@ fn sweep(program: &RouteProgram, kit: &Kit, flows: &[Flow]) -> Vec<u128> {
                     state.ip_resolved = true;
                 }
                 Step::NeedProcess => state.process_looked_up = true,
+                Step::NeedScript { id, .. } => state.scripts.push((id, false)),
                 Step::Candidate { .. } | Step::Done => break,
             }
         }

@@ -75,6 +75,12 @@ pub enum Cond {
     Not(Box<Cond>),
     RuleSet(String),
     SubRule(Box<Cond>),
+    /// Surge's `SCRIPT`: the `rule` script of this name decides, with the address the
+    /// host resolves to when `requires-resolve` asks for it.
+    Script {
+        name: String,
+        requires_resolve: bool,
+    },
     Match,
     /// A child of a logic rule that carried `src` or `no-resolve`.
     Flagged {
@@ -125,6 +131,7 @@ impl Cond {
             Cond::Not(_) => "NOT",
             Cond::RuleSet(_) => "RULE-SET",
             Cond::SubRule(_) => "SUB-RULE",
+            Cond::Script { .. } => "SCRIPT",
             Cond::Match => "MATCH",
             Cond::Flagged { cond, .. } => cond.type_name(),
         }
@@ -136,6 +143,16 @@ impl Cond {
             Cond::And(items) | Cond::Or(items) => items.iter().for_each(|c| c.rule_sets(out)),
             Cond::Not(inner) | Cond::SubRule(inner) => inner.rule_sets(out),
             Cond::Flagged { cond, .. } => cond.rule_sets(out),
+            _ => {}
+        }
+    }
+
+    pub fn scripts<'a>(&'a self, out: &mut Vec<&'a str>) {
+        match self {
+            Cond::Script { name, .. } => out.push(name),
+            Cond::And(items) | Cond::Or(items) => items.iter().for_each(|c| c.scripts(out)),
+            Cond::Not(inner) | Cond::SubRule(inner) => inner.scripts(out),
+            Cond::Flagged { cond, .. } => cond.scripts(out),
             _ => {}
         }
     }
@@ -266,6 +283,7 @@ pub const T1_RULE_TYPES: &[&str] = &[
     "REMATCH-NAME",
     "URL-REGEX",
     "USER-AGENT",
+    "SCRIPT",
 ];
 
 pub fn rule_type_names() -> impl Iterator<Item = &'static str> {
@@ -396,6 +414,7 @@ pub fn parse_rule(line: &str) -> Result<RuleDef> {
 }
 
 pub const EXTENDED_MATCHING: &str = "extended-matching";
+pub const REQUIRES_RESOLVE: &str = "requires-resolve";
 
 fn flags(params: &[String]) -> (bool, bool) {
     let src = params.iter().any(|p| p == "src");
@@ -568,28 +587,17 @@ fn build_cond(parts: &Parts) -> Result<(Cond, bool, bool)> {
             Cond::UrlRegex(owned())
         }
         "USER-AGENT" => Cond::UserAgent(owned()),
+        "SCRIPT" => Cond::Script {
+            name: owned(),
+            requires_resolve: parts.params.iter().any(|p| p == REQUIRES_RESOLVE),
+        },
         "AND" => Cond::And(parse_logic(payload)?),
         "OR" => Cond::Or(parse_logic(payload)?),
-        "NOT" => {
-            let mut inner = parse_logic(payload)?;
-            if inner.len() != 1 {
-                return Err(ConfigError::new("not rule must contain one rule"));
-            }
-            match inner.pop() {
-                Some(only) => Cond::Not(Box::new(only)),
-                None => return Err(ConfigError::new("not rule must contain one rule")),
-            }
-        }
-        "SUB-RULE" => {
-            let mut inner = parse_logic(&format!("({payload})"))?;
-            if inner.len() != 1 {
-                return Err(ConfigError::new("Sub-Rule rule must contain one rule"));
-            }
-            match inner.pop() {
-                Some(only) => Cond::SubRule(Box::new(only)),
-                None => return Err(ConfigError::new("Sub-Rule rule must contain one rule")),
-            }
-        }
+        "NOT" => Cond::Not(only_one(parse_logic(payload)?, "not rule")?),
+        "SUB-RULE" => Cond::SubRule(only_one(
+            parse_logic(&format!("({payload})"))?,
+            "Sub-Rule rule",
+        )?),
         "RULE-SET" => Cond::RuleSet(owned()),
         "MATCH" => return Ok((Cond::Match, false, false)),
         other => {
@@ -597,6 +605,13 @@ fn build_cond(parts: &Parts) -> Result<(Cond, bool, bool)> {
         }
     };
     Ok((cond, src, no_resolve))
+}
+
+fn only_one(mut inner: Vec<Cond>, what: &str) -> Result<Box<Cond>> {
+    match (inner.pop(), inner.is_empty()) {
+        (Some(only), true) => Ok(Box::new(only)),
+        _ => Err(ConfigError::new(format!("{what} must contain one rule"))),
+    }
 }
 
 fn parse_logic(payload: &str) -> Result<Vec<Cond>> {
@@ -925,6 +940,6 @@ mod tests {
 
     #[test]
     fn thirty_nine_types_are_known() {
-        assert_eq!(rule_type_names().count(), 39);
+        assert_eq!(rule_type_names().count(), 40);
     }
 }

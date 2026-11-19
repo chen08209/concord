@@ -30,6 +30,10 @@ mod http_rules;
 #[path = "e2e/modules.rs"]
 mod modules;
 
+#[cfg(feature = "mitm")]
+#[path = "e2e/scripts.rs"]
+mod scripts;
+
 #[path = "e2e/rematch.rs"]
 mod rematch;
 

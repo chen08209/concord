@@ -31,6 +31,12 @@ impl MitmService {
         false
     }
 
+    pub(crate) fn script_hooks(
+        &self,
+    ) -> Option<std::sync::Arc<dyn concord_common::scripts::ScriptHooks>> {
+        None
+    }
+
     pub(crate) fn start(
         &self,
         _home: &Arc<HomeDir>,

@@ -36,6 +36,7 @@ pub struct ResolverDeps {
     pub store_fake_ip: bool,
     /// Where the resolver's queries, connection drivers and QUIC endpoints run.
     pub tasks: concord_common::Tasks,
+    pub scripts: Arc<dyn concord_common::scripts::ScriptHooks>,
 }
 
 pub struct Resolver {
@@ -48,6 +49,8 @@ pub struct Resolver {
     pub(crate) ipv6: AtomicBool,
     pub(crate) clients: Vec<ClientRef>,
     pub(crate) system: Arc<SystemServers>,
+    pub(crate) scripts: crate::scripted::ScriptAnswers,
+    pub(crate) dial: Arc<crate::dialer::Shared>,
 }
 
 impl Resolver {
@@ -211,16 +214,29 @@ fn version_error() -> io::Error {
     io::Error::new(io::ErrorKind::InvalidInput, "ip version error")
 }
 
-#[async_trait]
-impl HostResolver for Resolver {
-    async fn lookup(
+impl Resolver {
+    /// A view that never asks a `dns` script, for the core's own connections: a script's
+    /// requests among them would otherwise wait on a run of the script itself.
+    pub fn unscripted(self: &Arc<Self>) -> Arc<dyn HostResolver> {
+        Arc::new(Unscripted(Arc::clone(self)))
+    }
+
+    async fn lookup_with(
         &self,
         host: &str,
         version: IpVersion,
         initiator: Initiator,
+        scripted: bool,
     ) -> io::Result<LookupIps> {
         if version == IpVersion::Ipv6 && !self.ipv6.load(Ordering::Relaxed) {
             return Err(CoreError::Ipv6Disabled.into());
+        }
+        if let Some(script) = self.hosts.script_for(host).filter(|_| scripted)
+            && let Some(found) = self
+                .scripted_lookup(&script, host, version, initiator)
+                .await?
+        {
+            return Ok(found);
         }
         if let Some(ips) = self.hosts.lookup_ips(host) {
             let found = split(ips);
@@ -255,6 +271,40 @@ impl HostResolver for Resolver {
             _ if self.ipv6.load(Ordering::Relaxed) => group.lookup_dual(host, initiator).await,
             _ => group.lookup_v4(host, initiator).await,
         }
+    }
+}
+
+struct Unscripted(Arc<Resolver>);
+
+#[async_trait]
+impl HostResolver for Unscripted {
+    async fn lookup(
+        &self,
+        host: &str,
+        version: IpVersion,
+        initiator: Initiator,
+    ) -> io::Result<LookupIps> {
+        self.0.lookup_with(host, version, initiator, false).await
+    }
+
+    async fn resolve_ech(&self, host: &str, initiator: Initiator) -> io::Result<Vec<u8>> {
+        self.0.resolve_ech(host, initiator).await
+    }
+
+    fn dns_server(&self) -> Option<&dyn DnsHijack> {
+        self.0.dns_server()
+    }
+}
+
+#[async_trait]
+impl HostResolver for Resolver {
+    async fn lookup(
+        &self,
+        host: &str,
+        version: IpVersion,
+        initiator: Initiator,
+    ) -> io::Result<LookupIps> {
+        self.lookup_with(host, version, initiator, true).await
     }
 
     async fn resolve_ech(&self, host: &str, initiator: Initiator) -> io::Result<Vec<u8>> {

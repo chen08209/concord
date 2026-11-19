@@ -3,8 +3,10 @@ use std::net::IpAddr;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 
+use concord_common::scripts::RuleScriptRequest;
 use concord_common::{
-    CoreError, FindProcessMode, Initiator, IpVersion, LookupIps, Network, Outbound, TunnelMode,
+    CoreError, FindProcessMode, Initiator, IpVersion, LookupIps, Network, Outbound, RouteState,
+    TunnelMode,
 };
 use concord_group::{Resolved, Touch};
 use concord_rules::{MatchCtx, RuleInfo, Step};
@@ -15,6 +17,48 @@ use crate::flow::FlowState;
 use crate::runtime::{LiveOptions, Runtime};
 
 const DNS_TIMEOUT: Duration = Duration::from_secs(5);
+
+/// A script's own requests go out as the core's, which are not asked, so no rule script
+/// waits on a run of itself.
+async fn ask_script(flow: &FlowState, state: &RouteState, runtime: &Runtime, name: &str) -> bool {
+    if flow.is_inner() {
+        return false;
+    }
+    runtime.scripts.rule(name, &rule_request(flow, state)).await
+}
+
+fn rule_request(flow: &FlowState, state: &RouteState) -> RuleScriptRequest {
+    let meta = &flow.meta;
+    let http = state.http.as_deref();
+    let protocol = match (http, meta.network) {
+        (Some(http), _) if http.url.starts_with("https:") => "HTTPS",
+        (Some(_), _) => "HTTP",
+        (None, Network::Udp) => "UDP",
+        (None, Network::Tcp) => "TCP",
+    };
+    let user_agent = http
+        .and_then(|http| http.user_agent.as_deref())
+        .or(meta.inbound.user_agent.as_deref());
+    RuleScriptRequest {
+        hostname: state
+            .host
+            .as_ref()
+            .map(ToString::to_string)
+            .or_else(|| state.ip.map(|ip| ip.to_string())),
+        dest_port: meta.dst.port(),
+        protocol,
+        source_ip: Some(meta.src.ip()),
+        source_port: Some(meta.src.port()),
+        listen_port: meta.inbound.addr.map(|addr| addr.port()),
+        process_path: state.process.as_ref().map(|process| process.path.clone()),
+        user_agent: user_agent.map(str::to_string),
+        url: http.map(|http| http.url.to_string()),
+        dns_result: state.ip_resolved.then(|| match flow.resolved.is_empty() {
+            true => state.ip.into_iter().collect(),
+            false => flow.resolved.clone(),
+        }),
+    }
+}
 
 pub(crate) struct MatchedRule {
     pub type_name: Arc<str>,
@@ -224,6 +268,10 @@ async fn match_rules(
                 state.process = flow.process.clone();
                 state.process_looked_up = true;
             }
+            Step::NeedScript { id, name } => {
+                let matched = ask_script(flow, &state, runtime, name).await;
+                state.scripts.push((id, matched));
+            }
             Step::Candidate { target, rule } => {
                 let candidate = runtime
                     .outbounds
@@ -343,10 +391,11 @@ async fn resolve_rule_ip(flow: &mut FlowState, runtime: &Runtime) {
     let Some(host) = flow.host.clone() else {
         return;
     };
-    let lookup = runtime.dns_lookup(&host, IpVersion::Dual, Initiator::Rule);
+    let lookup = runtime.dns_lookup(flow, &host, IpVersion::Dual, Initiator::Rule);
     match timeout(DNS_TIMEOUT, lookup).await {
         Ok(Ok(ips)) => {
             flow.dst_ip = pick_ip(&ips);
+            flow.resolved = ips.v4.iter().chain(&ips.v6).copied().collect();
             if let Some(ip) = flow.dst_ip {
                 tracing::debug!("[DNS] {host} --> {ip}");
             }
@@ -359,6 +408,27 @@ async fn resolve_rule_ip(flow: &mut FlowState, runtime: &Runtime) {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn a_rule_script_reads_every_address_the_rules_resolved() {
+        let meta = concord_common::FlowMeta {
+            dscp: 0,
+            network: Network::Tcp,
+            inbound: concord_common::InboundInfo::new(concord_common::InboundKind::Socks5),
+            src: "10.0.0.1:1000".parse().unwrap(),
+            dst: concord_common::Address::new("a.example", 443),
+        };
+        let mut flow = FlowState::new(meta);
+        flow.ip_resolved = true;
+        flow.dst_ip = Some("1.1.1.1".parse().unwrap());
+        let only = rule_request(&flow, &flow.route_state());
+        assert_eq!(only.dns_result, Some(vec!["1.1.1.1".parse().unwrap()]));
+        flow.resolved = ["2.2.2.2", "1.1.1.1", "2001:db8::1"]
+            .map(|ip| ip.parse().unwrap())
+            .to_vec();
+        let every = rule_request(&flow, &flow.route_state());
+        assert_eq!(every.dns_result.as_deref(), Some(&flow.resolved[..]));
+    }
 
     #[test]
     fn a_v4_answer_wins_over_v6_and_v6_is_the_fallback() {

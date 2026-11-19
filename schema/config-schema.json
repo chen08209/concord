@@ -411,7 +411,8 @@
       "IN-NAME",
       "REMATCH-NAME",
       "URL-REGEX",
-      "USER-AGENT"
+      "USER-AGENT",
+      "SCRIPT"
     ],
     "t2": []
   },
