@@ -16,7 +16,7 @@ use serde::{Deserialize, Deserializer, Serialize};
 pub use heads::{HeadConditionsDef, REQUEST_HEAD, RESPONSE_HEAD};
 pub use hosts::{HostEntryDef, SourceEntryDef, parse_host_line, parse_source_line};
 pub use issue::{IssueKind, LineError};
-pub use pattern::{MULTILINE, check_multiline, check_pattern, multiline};
+pub use pattern::{MULTILINE, check_multiline, check_pattern, multiline, regex_source};
 pub use rules::{
     BodyActionDef, BodyRewriteDef, HeaderEditDef, HeaderRewriteDef, MapLocalBody, MapLocalDef,
     UrlAction, UrlRewriteDef, parse_body_rewrite, parse_header_rewrite, parse_map_local,

@@ -1,6 +1,6 @@
 use std::sync::OnceLock;
 
-use concord_config::mitm::{IssueKind, LineError};
+use concord_config::mitm::{IssueKind, LineError, regex_source};
 use fancy_regex::{Captures, Regex};
 
 /// A backtracking regex, as Surge's and Loon's patterns need. fancy-regex's default step
@@ -38,7 +38,7 @@ impl Pattern {
         } else {
             pattern.to_string()
         };
-        Regex::new(&source).map_err(|err| PatternError(err.to_string()))?;
+        Regex::new(&regex_source(&source)).map_err(|err| PatternError(err.to_string()))?;
         Ok(Pattern {
             source,
             regex: OnceLock::new(),
@@ -52,7 +52,7 @@ impl Pattern {
 
     fn regex(&self) -> Option<&Regex> {
         self.regex
-            .get_or_init(|| Regex::new(&self.source).ok())
+            .get_or_init(|| Regex::new(&regex_source(&self.source)).ok())
             .as_ref()
     }
 
@@ -241,6 +241,16 @@ mod tests {
             m.replace("x\nline\ny", "r", true).as_deref(),
             Some("x\nr\ny")
         );
+    }
+
+    #[test]
+    fn a_control_escape_matches_its_control_character() {
+        let p = Pattern::new(r"^https?:\/\/res\.kfc\.com.\cn\/").unwrap();
+        assert!(!p.is_match("https://res.kfc.com.cn/"));
+        assert!(p.is_match("https://res.kfc.com.\u{e}/"));
+        let p = Pattern::new(r"^[\ca-\cz]\\cn$").unwrap();
+        assert!(p.is_match("\u{1}\\cn"));
+        assert!(!p.is_match("\u{1}\u{e}"));
     }
 
     #[test]
