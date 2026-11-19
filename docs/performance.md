@@ -101,8 +101,8 @@ Concord inside the FlClash Android app, against the same app on its Go core (a m
 (`concord-bench run --attach … --via tun`) and sends as another app's uid; the origin is another machine reached over
 a Wi-Fi hotspot of about 230 Mbit/s.
 
-So every rate is bound by the link: the comparison is CPU per byte, latency and memory, and the throughput ceiling is
-not measured here. Each app ran eight rounds of 5 s, in four sessions that alternate the order, on charge with the
+So every rate is bound by the link: the comparison is CPU per byte, latency and memory; the throughput ceiling is
+measured in the emulator below. Each app ran eight rounds of 5 s, in four sessions that alternate the order, on charge with the
 screen off and no thermal throttling. CPU is the app process's own CPU time. Figures are the ratio of the medians with
 a 95% bootstrap interval, judged as on Linux. "Four flows" is four parallel downloads.
 
@@ -124,13 +124,35 @@ a 95% bootstrap interval, judged as on Linux. "Four flows" is four parallel down
 For the cold start both apps were force-stopped and started by their start action with no UI, so neither had the
 Flutter engine loaded; PSS is read from `smaps_rollup`, in two passes of opposite order.
 
+**A link that loads the core.** The Android emulator (arm64, API 34, 4 vCPUs, 4 GiB, on an Apple M4 Pro) runs the
+origin and a SOCKS5 relay (the sing-box command-line client) inside itself, so no traffic leaves it and the apps,
+not a link, set the rate. Concord's FlClash app is compared with SFA, the sing-box app, on its default TUN stack
+(sing-tun's Go stack). Each app sends the bench's load to the relay through its own VPN at the same MTU, one flow per
+workload and four for "four flows". Each app ran five rounds of 10 s, each in a fresh process with the order rotating,
+in one emulator session per MTU. CPU is the app process's own CPU time; figures are judged as on Linux.
+
+| Metric | MTU 1500 | MTU 9000 |
+|---|---|---|
+| Download, Gbit/s | +18.6% | tie (-2.8%) |
+| Download, CPU per GB | -18.6% | tie (+2.2%) |
+| Upload, Gbit/s | +17.8% | tie (-12.7%) |
+| Upload, CPU per GB | -13.2% | tie (-15.8%) |
+| Four flows, Gbit/s | +30.5% | tie (+0.7%) |
+| Four flows, CPU per GB | -25.4% | tie (-2.4%) |
+| Peak memory | -40% to -45% | -43% to -46% |
+
+Fairness among the four flows is 1.000 in both apps. In this setup the TUN queue drops about one packet per MB of upload,
+so upload exercises out-of-order reassembly; before reassembly stopped copying a whole out-of-order range for
+each segment, Concord's upload at MTU 1500 was 17% below SFA's at 29% more CPU per GB.
+
 ## Not Covered Yet
 
 - Windows.
 - TUN, which is being worked on; these results are through the SOCKS5 port only.
 - The other protocols and workloads (several flows at once, idle connections, large profiles), and links with added
   delay or loss.
-- On Android: proxy protocols, new connections, and a link fast enough to load the core.
+- On Android: proxy protocols and new connections, and a link that loads the core on a phone rather than in the
+  emulator.
 
 ## Reproducing
 
