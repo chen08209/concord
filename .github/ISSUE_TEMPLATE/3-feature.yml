@@ -1,16 +1,29 @@
 name: Feature request
-description: Something mihomo or sing-box has that Concord lacks.
+description: Something Concord lacks, with a reference implementation or specification to follow.
 labels: [enhancement]
 body:
   - type: markdown
     attributes:
       value: |
-        Concord implements what mihomo and sing-box implement, within the scope of `docs/compatibility.md`. A request
-        without a reference implementation, or outside that scope, is closed.
+        Concord implements what mihomo and sing-box implement, within the scope of `docs/compatibility.md`. Where
+        neither has the feature, a request can name another reference instead. A request outside that scope is closed.
   - type: textarea
     id: request
     attributes:
       label: Request
+    validations:
+      required: true
+  - type: dropdown
+    id: reference-source
+    attributes:
+      label: Reference source
+      description: >-
+        Pick mihomo or sing-box when either implements the feature. Pick Other only when neither does: another proxy
+        core or client (Xray, Surge and the like), a specification or an RFC.
+      options:
+        - mihomo
+        - sing-box
+        - Other
     validations:
       required: true
   - type: input
@@ -18,8 +31,9 @@ body:
     attributes:
       label: Reference
       description: >-
-        A link to the implementation or documentation in mihomo or sing-box: github.com/MetaCubeX/mihomo,
-        wiki.metacubex.one, github.com/SagerNet/sing-box or sing-box.sagernet.org.
+        A link to the implementation or documentation. For mihomo: github.com/MetaCubeX/mihomo or wiki.metacubex.one.
+        For sing-box: github.com/SagerNet/sing-box or sing-box.sagernet.org. For Other: an https link to the source,
+        documentation or specification.
     validations:
       required: true
   - type: textarea

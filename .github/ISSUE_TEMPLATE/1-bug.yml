@@ -5,8 +5,9 @@ body:
   - type: markdown
     attributes:
       value: |
-        Concord follows mihomo. A report needs the same configuration's behaviour under mihomo; without it a
-        compatibility problem cannot be judged. Incomplete reports are labelled `needs-info` and closed after 7 days.
+        Concord follows mihomo, and sing-box or another reference for what mihomo does not have. A report needs the
+        same setup's behaviour under that reference; without it a compatibility problem cannot be judged. Incomplete
+        reports are labelled `needs-info` and closed after 7 days.
   - type: input
     id: version
     attributes:
@@ -76,18 +77,31 @@ body:
       render: text
     validations:
       required: true
-  - type: input
-    id: mihomo-version
+  - type: dropdown
+    id: reference-source
     attributes:
-      label: mihomo version
-      description: The mihomo release or commit you ran the same configuration with.
+      label: Reference
+      description: >-
+        mihomo, unless mihomo does not have the feature. Then sing-box, or for anything else (Xray, a specification)
+        Other, naming it in the version below.
+      options:
+        - mihomo
+        - sing-box
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: reference-version
+    attributes:
+      label: Reference version
+      description: The release or commit you ran the same setup with, such as mihomo `v1.19.15` or sing-box `1.12.8`.
     validations:
       required: true
   - type: textarea
-    id: mihomo-behaviour
+    id: reference-behaviour
     attributes:
-      label: Behaviour under mihomo
-      description: What the same configuration does under that mihomo version.
+      label: Behaviour under the reference
+      description: What the same setup does there; for sing-box or Other, include the configuration you ran it with.
     validations:
       required: true
   - type: checkboxes

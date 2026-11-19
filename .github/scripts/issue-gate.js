@@ -11,12 +11,11 @@ const UNRELEASED_COMMIT_DAYS = 30;
 const DAY_MS = 24 * 60 * 60 * 1000;
 const EXEMPT = ['OWNER', 'MEMBER', 'COLLABORATOR'];
 const EMPTY = '_No response_';
-const REFERENCES = [
-  /https:\/\/github\.com\/MetaCubeX\/mihomo\b/i,
-  /https:\/\/wiki\.metacubex\.one\//i,
-  /https:\/\/github\.com\/SagerNet\/sing-box\b/i,
-  /https:\/\/sing-box\.sagernet\.org\//i,
-];
+const REFERENCES = {
+  mihomo: [/https:\/\/github\.com\/MetaCubeX\/mihomo\b/i, /https:\/\/wiki\.metacubex\.one\//i],
+  'sing-box': [/https:\/\/github\.com\/SagerNet\/sing-box\b/i, /https:\/\/sing-box\.sagernet\.org\//i],
+};
+const HTTPS_LINK = /^https:\/\/[^\s/]+\.[^\s/]+\S*$/i;
 
 function unquote(text) {
   const trimmed = text.trim();
@@ -133,6 +132,20 @@ async function versionProblems(github, repo, value) {
   return committed >= since ? [] : [wanted];
 }
 
+// A reference from mihomo or sing-box must link to that project; any other must be an https link.
+function referenceProblems(form, found) {
+  const reference = form.fields.find((field) => field.id === 'reference');
+  const link = reference && found.get(reference.heading);
+  if (!link || link === EMPTY) return [];
+  const source = form.fields.find((field) => field.id === 'reference-source');
+  const project = source && found.get(source.heading);
+  const patterns = REFERENCES[project];
+  if (patterns) {
+    return patterns.some((pattern) => pattern.test(link)) ? [] : [`"${reference.heading}" does not link to ${project}.`];
+  }
+  return HTTPS_LINK.test(link) ? [] : [`"${reference.heading}" is not an https link.`];
+}
+
 async function problemsOf(github, repo, issue, forms) {
   const labels = issue.labels.map((label) => (typeof label === 'string' ? label : label.name));
   const found = sections(issue.body);
@@ -142,11 +155,7 @@ async function problemsOf(github, repo, issue, forms) {
   const version = form.fields.find((field) => field.id === 'version');
   const value = version && found.get(version.heading);
   if (value && value !== EMPTY) problems.push(...(await versionProblems(github, repo, value)));
-  const reference = form.fields.find((field) => field.id === 'reference');
-  const link = reference && found.get(reference.heading);
-  if (link && link !== EMPTY && !REFERENCES.some((pattern) => pattern.test(link))) {
-    problems.push(`"${reference.heading}" does not link to mihomo or sing-box.`);
-  }
+  problems.push(...referenceProblems(form, found));
   return problems;
 }
 

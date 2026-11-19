@@ -1,7 +1,7 @@
 [
   { "name": "bug", "color": "d73a4a", "description": "Concord fails, crashes or misroutes traffic" },
   { "name": "compatibility", "color": "5319e7", "description": "Concord differs from mihomo" },
-  { "name": "enhancement", "color": "a2eeef", "description": "Something mihomo or sing-box has that Concord lacks" },
+  { "name": "enhancement", "color": "a2eeef", "description": "Something Concord lacks, with a reference to follow" },
   { "name": "needs-info", "color": "fbca04", "description": "Incomplete; closed 7 days after this label unless completed" },
   { "name": "needs-repro", "color": "f9d0c4", "description": "Complete, but not reproduced yet" },
   { "name": "confirmed", "color": "0e8a16", "description": "Reproduced by a maintainer" },
