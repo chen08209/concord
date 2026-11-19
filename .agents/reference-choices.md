@@ -113,6 +113,13 @@ Concord already takes these from the references; keep them unless the reference 
   CONNECTION_CLOSE and its drain; `proxy::quic::tests::a_stop_sends_connection_close_and_the_drivers_end_with_the_connection`
   holds it.
 
+- [language-neutral] **When `dns.listen` serves** follows mihomo `v1.19.33` (`3f27ef39`): `ApplyConfig` opens
+  the DNS listener (`updateDNS`, `dns.ReCreateServer` at `hub/executor/executor.go:303`) in the same pass as the
+  inbound listeners (`:105`, `:107`), so the two share one lifetime. A host opens and closes Concord's listeners with
+  `engine.start` and `engine.stop`, and `dns.listen` goes with them (`crates/engine/src/engine/reconcile.rs`,
+  `sync_dns_server`). What mihomo's apply starts besides them (health checks, provider updates, NTP) stays with the
+  config and runs whatever the run state. `engine::lifecycle_tests` holds it.
+
 - [language-neutral] **Proxy group/provider name collisions** follow mihomo `v1.19.33` (`3f27ef39`)
   `adapter/outboundgroup/parser.go:155-163`: reject a provider with the group's name only when the group's
   `proxies` list is nonempty; a provider-only group may share a provider's name.

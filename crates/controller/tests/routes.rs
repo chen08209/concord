@@ -605,6 +605,15 @@ async fn a_new_address_moves_the_controller_and_an_empty_one_closes_it() {
     panic!("the controller stayed open");
 }
 
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn the_controller_outlives_an_engine_stop() {
+    let rig = Rig::new(false).await;
+    rig.control.engine_start(Empty {}).await.unwrap();
+    rig.control.engine_stop(Empty {}).await.unwrap();
+    assert_eq!(rig.call("GET", "/proxies", None).await.status, 200);
+    rig.control.shutdown().await;
+}
+
 /// Serves whatever `body` holds at the time of each request.
 async fn subscription(body: Arc<Mutex<String>>) -> SocketAddr {
     let listener = TcpListener::bind((Ipv4Addr::LOCALHOST, 0)).await.unwrap();

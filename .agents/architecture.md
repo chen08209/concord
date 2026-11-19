@@ -120,6 +120,19 @@ it. The engine's own work runs on its `Tasks` too. xtask's `task_owner` test kee
 `JoinSet` and `TokioExecutor` out of `proxy`, `quic`, `transport`, `net`, `tls`, `dns`, `group`, `tunnel`, `inbound`,
 `tun`, `mitm`, `engine` and `api`.
 
+What the engine runs has one of three lifetimes, and a new service picks one:
+
+- The core's, from `core.init` to shutdown: the control plane, the external controller, MITM's CA, scripts and
+  captures, the geo store and its auto-update.
+- A config's, from one apply to the next: the runtime (rules, nodes, resolver, groups), health checks, provider and
+  rule-set updates, NTP and the fake-ip store. They run whether or not the core runs.
+- A run's, from `engine.start` to `engine.stop`: what takes traffic in, the inbound listeners, the desktop TUN and
+  `dns.listen`, and MITM's scheduled scripts. An apply opens them only while the core runs. Android's TUN comes and
+  goes with `tun.start` and `tun.stop` instead, and its stop ends the run.
+
+A stop leaves established connections relaying. `engine::lifecycle_tests` walks apply, start, stop and start again
+and fails when a port or a task begun by a start outlives the stop.
+
 The control plane is layered: `proto` (types, errors, the method registry with execution class `inline`, `serial` or
 `concurrent`, stream policies `latest`, `drop_oldest` or `resync`) → `api` (one async function per method) → `rpc`
 (JSON-RPC 2.0, cancellation, credit-based subscriptions) → `ipc` (length-prefixed frames and the token handshake over

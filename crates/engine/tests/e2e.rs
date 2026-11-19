@@ -946,6 +946,7 @@ async fn the_dns_listener_answers_from_hosts_over_udp_and_tcp() {
          rules:\n  - MATCH,DIRECT\n"
     );
     rig.apply(&config).await.unwrap();
+    rig.engine.start_listeners().await;
 
     let socket = UdpSocket::bind((Ipv4Addr::LOCALHOST, 0)).await.unwrap();
     socket
@@ -1493,6 +1494,7 @@ async fn stored_fake_ips_outlive_a_restart() {
     );
     let rig = Rig::new();
     rig.apply(&config).await.unwrap();
+    rig.engine.start_listeners().await;
     let kept = fake_ip_of(port, "kept.test").await;
     rig.engine.shutdown().await;
     let Rig { engine, home, .. } = rig;
@@ -1500,6 +1502,7 @@ async fn stored_fake_ips_outlive_a_restart() {
 
     let rig = Rig::at(home);
     rig.apply(&config).await.unwrap();
+    rig.engine.start_listeners().await;
     assert_ne!(fake_ip_of(port, "new.test").await, kept);
     assert_eq!(fake_ip_of(port, "kept.test").await, kept);
     rig.engine.shutdown().await;

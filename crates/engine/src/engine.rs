@@ -43,6 +43,8 @@ use crate::route::RouteCounters;
 use crate::views::*;
 
 mod connections;
+#[cfg(test)]
+mod lifecycle_tests;
 #[cfg_attr(not(feature = "mitm"), path = "engine/mitm_disabled.rs")]
 mod mitm;
 mod providers;
@@ -399,12 +401,11 @@ impl Engine {
                 self.shared.fake_ip_store.clone(),
                 &self.own,
                 home.clone(),
-                resolver.clone(),
+                resolver,
                 applied.stop.clone(),
             );
         }
-        self.sync_dns_server(&applied.dns_listen, applied.dns_listen_mark, resolver)
-            .await;
+        self.sync_dns_server(&applied).await;
         self.start_ntp(&applied, &outbounds);
         let answered = lock(&self.answered).clone();
         outbounds.start_background(applied.stop.clone(), answered.clone());

@@ -2,7 +2,6 @@ use std::sync::Arc;
 use std::sync::atomic::Ordering;
 
 use concord_common::sync::lock;
-use concord_dns::Resolver;
 use concord_inbound::ListenSpec;
 
 use super::Engine;
@@ -11,8 +10,19 @@ use crate::dns_server::DnsServer;
 use crate::faults::{Service, ServiceFault};
 
 impl Engine {
-    pub(super) async fn sync_dns_server(&self, address: &str, mark: u32, resolver: Arc<Resolver>) {
+    /// `dns.listen` serves only while the core runs, like the listeners.
+    pub(super) async fn sync_dns_server(&self, applied: &Applied) {
         let mut server = self.dns_server.lock().await;
+        let resolver = self
+            .runtime()
+            .filter(|_| self.running.load(Ordering::SeqCst))
+            .map(|runtime| runtime.dns.clone());
+        let Some(resolver) = resolver else {
+            *server = None;
+            self.faults.set_dns(None);
+            return;
+        };
+        let (address, mark) = (applied.dns_listen.as_str(), applied.dns_listen_mark);
         if let Some(running) = server.as_ref() {
             if running.address() == address && running.mark() == mark {
                 running.set_resolver(resolver);
@@ -71,6 +81,7 @@ impl Engine {
         self.set_running(true);
         if let Some(applied) = state.as_ref() {
             self.reconcile_listeners(applied).await;
+            self.sync_dns_server(applied).await;
         }
         self.reset_resolver_connections();
         self.route.reset(self.is_running());
@@ -81,6 +92,8 @@ impl Engine {
         self.set_running(false);
         self.listeners.stop_all().await;
         self.faults.set_listeners(Vec::new());
+        *self.dns_server.lock().await = None;
+        self.faults.set_dns(None);
         if !self.android {
             let mut slot = self.tun.lock().await;
             self.close_tun(&mut slot).await;

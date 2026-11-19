@@ -120,6 +120,7 @@ async fn shutdown_releases_dns_sockets_and_streams_before_reinit() {
     };
     engine.init(home_dir, 0).unwrap();
     engine.setup(request()).await.unwrap();
+    engine.start_listeners().await;
     assert!(engine.faults.list().is_empty());
 
     let udp = UdpSocket::bind("127.0.0.1:0").await.unwrap();
@@ -159,6 +160,7 @@ async fn shutdown_releases_dns_sockets_and_streams_before_reinit() {
     drop((rebound_udp, rebound_tcp));
     engine.init(home_dir, 0).unwrap();
     engine.setup(request()).await.unwrap();
+    engine.start_listeners().await;
     assert!(engine.faults.list().is_empty());
     assert_eq!(
         UdpSocket::bind(address).await.unwrap_err().kind(),
@@ -226,7 +228,7 @@ async fn shutdown_ends_a_geo_update_in_flight_and_frees_its_claim() {
     engine.shutdown().await;
 }
 
-fn bare_engine() -> Arc<Engine> {
+pub(super) fn bare_engine() -> Arc<Engine> {
     Engine::new(EngineConfig {
         sink: Arc::new(NoEvents),
         android: false,
@@ -327,7 +329,7 @@ async fn shutdown_leaves_no_task_of_a_live_flow_a_resolver_or_a_group_running() 
 }
 
 /// An engine started from `config` plus a free mixed port, with its listeners up.
-async fn running(config: &str) -> (Arc<Engine>, u16, tempfile::TempDir) {
+pub(super) async fn running(config: &str) -> (Arc<Engine>, u16, tempfile::TempDir) {
     let mixed = TcpListener::bind("127.0.0.1:0").await.unwrap();
     let port = mixed.local_addr().unwrap().port();
     drop(mixed);
@@ -354,7 +356,7 @@ async fn running(config: &str) -> (Arc<Engine>, u16, tempfile::TempDir) {
 /// Sends a SOCKS5 request for `target` with `command` (1 connect, 3 UDP associate) and returns
 /// the stream with the address the reply binds.
 #[expect(clippy::disallowed_methods, reason = "a client outside the core")]
-async fn socks(port: u16, command: u8, target: SocketAddr) -> (TcpStream, SocketAddr) {
+pub(super) async fn socks(port: u16, command: u8, target: SocketAddr) -> (TcpStream, SocketAddr) {
     let SocketAddr::V4(v4) = target else {
         panic!("IPv4 expected")
     };
