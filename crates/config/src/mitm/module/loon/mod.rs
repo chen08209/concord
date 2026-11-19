@@ -18,6 +18,7 @@ use super::arguments::ArgumentDef;
 use super::rule::Refusal;
 use crate::mitm::{BodyRewriteDef, HeaderRewriteDef, MapLocalDef, Read, ScriptDef, UrlRewriteDef};
 
+pub(super) use action::jq_path;
 pub(super) use legacy::{legacy_script, read_legacy};
 
 /// What a line gives Concord's lists; a line may give several.

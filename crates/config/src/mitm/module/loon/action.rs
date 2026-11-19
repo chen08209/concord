@@ -532,8 +532,15 @@ pub(super) fn header_name(text: &str) -> Result<HeaderName, Refusal> {
         .map_err(|_| unreadable(format!("invalid header name {name:?}")))
 }
 
-/// Loon writes a JSON key path dotted, `[n]` for an array's item: `data.apps[0].name`.
-pub(super) fn jq_path(path: &str) -> Result<String, Refusal> {
+/// Loon and Stash write a JSON key path dotted, `[n]` for an array's item: `data.apps[0].name`.
+/// A leading `$` is JSONPath's root, which authors write though neither documents it.
+pub(in crate::mitm::module) fn jq_path(path: &str) -> Result<String, Refusal> {
+    let path = match path.strip_prefix('$') {
+        Some(rest) if rest.is_empty() || rest.starts_with(['.', '[']) => {
+            rest.strip_prefix('.').unwrap_or(rest)
+        }
+        _ => path,
+    };
     let mut out = String::new();
     for segment in path.split('.') {
         let key_end = segment.find('[').unwrap_or(segment.len());

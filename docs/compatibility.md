@@ -218,8 +218,8 @@ value after `=` ends only at a quote followed by a space or the end of the line,
 JSON's own quotes, and a field that starts with a quote not closed that way is taken as written, so a body rewrite's
 `"key":\{.+\}` matches the key with its quotes.
 
-A host reads a module (a Surge `.sgmodule` or a Loon plugin) with `mitm.readModule`, which answers with each line by
-its line number: what goes into the MITM lists, the rules and rule sets with their policies for the host to map, the
+A host reads a module (a Surge `.sgmodule`, a Loon plugin, a Quantumult X snippet or a Stash override) with
+`mitm.readModule`, which answers with each line by its line number: what goes into the MITM lists, the rules and rule sets with their policies for the host to map, the
 DNS, hosts and route changes in mihomo's keys, the remote files it reads, and every line Concord does not take with the
 reason. A module's `force-http-engine-hosts` comes back as a list of its own, `force-http-hostname`, for the host to
 decide on. A `map-local` line's `data-type=json`, which Loon writes and Surge's manual does not list, reads as text
@@ -233,7 +233,22 @@ the URL and the method, as `condition`. A batch of JSON edits becomes one jq fil
 one rewrite; a batch of header edits is one rewrite per header. `reject_video` answers with an empty `video/mp4`
 body, `response.json.jq_file` names a jq file fetched as a script is, and a mock whose file is base64 is decoded when
 the rules are built. In Loon's old syntax a script's URL regex ignores case, as Loon's does, and
-`argument=[{a},{b}]` hands the script its arguments as a JSON object.
+`argument=[{a},{b}]` hands the script its arguments as a JSON object. A JSON key path that starts with `$.`, which
+authors write though Loon does not document it, starts at the body's root.
+A Quantumult X snippet reads with or without its `[rewrite_local]`, `[filter_local]`, `[task_local]` and `[mitm]`
+headers. Every rewrite type of its sample.conf is read; `request-header` and `response-header` rewrite the whole head
+and `echo-response` sends a file the host fetches, with the type and headers written before it. A filter's
+`force-cellular`, `multi-interface` and `via-interface` are dropped, as Concord does not pick interfaces. A task has
+no time limit in Quantumult X and gets Concord's longest, 60 s; one with `require-devices` is left out as
+`requirement`. `skip_src_ip` leaves those clients out of decryption; `skip_dst_ip`, which needs the address a host
+resolves to, is left out as `setting`. `[rewrite_remote]` and `[filter_remote]` name files the host fetches itself.
+A Stash override (`.stoverride`) reads its `http` lists, `cron` scripts, `rules`, `rule-providers`,
+`script-providers`, `dns` and `hosts`, with `${args.name}` filled in as Stash's override arguments are, a lone
+reference keeping the argument's type. An `http.mitm` host without a port covers 443 only, as Stash's does, and
+`host:*` every port; `force-http-engine` comes back as `force-http-hostname`. Its JSON edits keep Stash's reading:
+`replace` and `del` touch a value that is neither null nor false, and `add` writes one that is missing or null. A
+rule provider is read when it is a classical list, inline or fetched as text; the domain and CIDR behaviors and the YAML
+and MRS formats are left out as `ruleType`, and a script provider with only `payload` as `noAttachment`.
 
 Shadowsocks supports `gost-plugin` in WebSocket mode, including TLS and its default per-connection smux v1 stream.
 Gost relay supports TCP, destination-bound UDP, forward mode, TLS and per-connection smux v1.

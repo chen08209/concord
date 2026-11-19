@@ -39,6 +39,15 @@ repository's own licence text.
 | `app2smile-tieba.plugin` | https://raw.githubusercontent.com/app2smile/rules/df6366a7024e0b3f0aa3510c5b791eea6f3cba89/plugin/tieba.plugin | MIT |
 | `sparkle-bilibili.lpx` | https://raw.githubusercontent.com/kokoryh/Sparkle/0eb4fd1c0c30e7aeaab6c70f5ec546a34f3c9d81/release/loon/plugin/bilibili.lpx | GPL-3.0 |
 | `chavy-boxjs.rewrite.loon.plugin` | https://raw.githubusercontent.com/chavyleung/scripts/bfab3c906f3d5d126e9094f15730e025f7f32128/box/rewrite/boxjs.rewrite.loon.plugin | GPL-3.0 |
+| `fmz200-rewrite.snippet` | https://raw.githubusercontent.com/fmz200/wool_scripts/eca3853dfed0f2db829408a81b98ff279bcfe8f9/QuantumultX/rewrite/rewrite.snippet | GPL-3.0 |
+| `fmz200-cleanup.snippet` | https://raw.githubusercontent.com/fmz200/wool_scripts/eca3853dfed0f2db829408a81b98ff279bcfe8f9/QuantumultX/rewrite/cleanup.snippet | GPL-3.0 |
+| `fmz200-weibo.snippet` | https://raw.githubusercontent.com/fmz200/wool_scripts/eca3853dfed0f2db829408a81b98ff279bcfe8f9/QuantumultX/rewrite/weibo.snippet | GPL-3.0 |
+| `app2smile-bilibili.stoverride` | https://raw.githubusercontent.com/app2smile/rules/df6366a7024e0b3f0aa3510c5b791eea6f3cba89/module/bilibili.stoverride | MIT |
+| `app2smile-tieba.stoverride` | https://raw.githubusercontent.com/app2smile/rules/df6366a7024e0b3f0aa3510c5b791eea6f3cba89/module/tieba.stoverride | MIT |
+| `rstore-vvebo.conf` | https://raw.githubusercontent.com/zirawell/R-Store/d0f4dd305bade7cc6a38e3445a768d72aaea0e5b/Rule/QuanX/Plugin/vvebo.conf | GPL-3.0 |
+| `rstore-wechatAdBlock.snippet` | https://raw.githubusercontent.com/zirawell/R-Store/d0f4dd305bade7cc6a38e3445a768d72aaea0e5b/Rule/QuanX/Adblock/All/snippet/wechatAdBlock.snippet | GPL-3.0 |
+| `chavy-boxjs.rewrite.quanx.conf` | https://raw.githubusercontent.com/chavyleung/scripts/bfab3c906f3d5d126e9094f15730e025f7f32128/box/rewrite/boxjs.rewrite.quanx.conf | GPL-3.0 |
+| `chavy-boxjs.rewrite.stash.stoverride` | https://raw.githubusercontent.com/chavyleung/scripts/bfab3c906f3d5d126e9094f15730e025f7f32128/box/rewrite/boxjs.rewrite.stash.stoverride | GPL-3.0 |
 
 `remote.json` lists modules from repositories that declare no licence compatible with
 GPL-3.0-or-later, by URL and SHA-256 only. `cargo xtask module-corpus` downloads them into

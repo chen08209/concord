@@ -1,0 +1,50 @@
+{
+  "format": "quantumult-x",
+  "meta": {
+    "name": null,
+    "desc": null,
+    "author": null,
+    "icon": null,
+    "homepage": null,
+    "category": null,
+    "system": null,
+    "requirement": null,
+    "argumentsDesc": null
+  },
+  "off": null,
+  "arguments": [],
+  "hostname": [
+    {
+      "line": 1,
+      "items": "boxjs.com, boxjs.net, *.boxjs.com, *.boxjs.net"
+    }
+  ],
+  "force-http-hostname": [],
+  "skip-server-cert-verify": null,
+  "client-source-address": [],
+  "h2": null,
+  "url-rewrite": {},
+  "header-rewrite": {},
+  "body-rewrite": {},
+  "map-local": {},
+  "request-body-mock": {},
+  "script": {
+    "3": "ScriptDef { name: \"chavy.boxjs.js\", path: \"https://raw.githubusercontent.com/chavyleung/scripts/master/box/chavy.boxjs.js\", kind: HttpRequest, pattern: Some(\"^https?:\\\\/\\\\/(.+\\\\.)?boxjs\\\\.(com|net)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }"
+  },
+  "rules": {},
+  "rule-sets": [],
+  "resources": [
+    {
+      "url": "https://raw.githubusercontent.com/chavyleung/scripts/master/box/chavy.boxjs.js",
+      "kind": "script",
+      "lines": [
+        3
+      ]
+    }
+  ],
+  "network": {},
+  "declared-scripts": [
+    3
+  ],
+  "ignored": []
+}

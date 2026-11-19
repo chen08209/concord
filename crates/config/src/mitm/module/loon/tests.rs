@@ -119,7 +119,7 @@ fn actions_become_concord_definitions() {
         r#"[Rewrite]
 request if ${request.header['X-Optional']} == null then reject(451, "gone")
 request if ${url} ~= /api/ then request.header.set(["X-A", "X-B"], ["1", "2"])
-response if ${url} ~= /api/ then response.json.delete(["data.ads", "data.apps[0].name"])
+response if ${url} ~= /api/ then response.json.delete(["$.data.ads", "data.apps[0].name"])
 response if ${url} ~= /api/ then response.body.mock_file("png", "https://cdn.test/a.base64", 200, true) | response.header.set("X-M", "1")
 request if ${url} ~= /ad/ then reject_dict(200) | reject_video(204)
 "#,

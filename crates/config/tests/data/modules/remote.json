@@ -203,5 +203,25 @@
     "name": "bm7-TikTokJP.plugin",
     "url": "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/0b6897dc17e0c513d25449c935a9694818e32f0c/external/Loon/TikTokUnlock/TikTokJP/TikTokJP.plugin",
     "sha256": "a4d88d165026f13f588dc5055f7991d014d8381d23daf6cd05dce6ceacdb265e"
+  },
+  {
+    "name": "luestr-TestFlight.snippet",
+    "url": "https://raw.githubusercontent.com/luestr/ProxyResource/b7f70ce6ed207a2225851f0a2827675a3a538fe3/Tool/QuantumultX/Rewrite/TestFlight.snippet",
+    "sha256": "e2220de1fddfc63991ff27a5136375056440c55a5d13fe471d9415352e6abcba"
+  },
+  {
+    "name": "romeo-Adblock4limbo.conf",
+    "url": "https://raw.githubusercontent.com/ifflagged/Romeo/5685038ec50b505d6d24691b01b5ae8ca05a6142/Modules/QuantumultX/ddgksf2013/Adblock4limbo.conf",
+    "sha256": "049e699364bdcad75972faa9f0a82a73ddf32baf4a966041336f3577c1400c89"
+  },
+  {
+    "name": "keywos-bdsrf.snippet",
+    "url": "https://raw.githubusercontent.com/Keywos/rule/a06d921d370ad6fca9e972a3f76e64d90bc8cfae/JS/quanx/bdsrf.snippet",
+    "sha256": "735d844362af2f37e010d6b33a99c13829b1cb54f2d862cb30454c0111df0d0c"
+  },
+  {
+    "name": "bm7-TikTokJP.conf",
+    "url": "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/0b6897dc17e0c513d25449c935a9694818e32f0c/external/QuantumultX/TikTokUnlock/TikTokJP/TikTokJP.conf",
+    "sha256": "6c14efe6f51a663f19540afda375ce422efb3c032b99d5375caa652cf90331e6"
   }
 ]

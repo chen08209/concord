@@ -1,0 +1,48 @@
+{
+  "format": "quantumult-x",
+  "meta": {
+    "name": null,
+    "desc": null,
+    "author": null,
+    "icon": null,
+    "homepage": null,
+    "category": null,
+    "system": null,
+    "requirement": null,
+    "argumentsDesc": null
+  },
+  "off": null,
+  "arguments": [],
+  "hostname": [
+    {
+      "line": 20,
+      "items": "*.byteoversea.com, *.tik-tokapi.com, *.tiktokv.com"
+    }
+  ],
+  "force-http-hostname": [],
+  "skip-server-cert-verify": null,
+  "client-source-address": [],
+  "h2": null,
+  "url-rewrite": {
+    "10": "UrlRewriteDef { pattern: \"(?<=&mcc_mnc=)4\", head: None, replacement: \"2\", action: Redirect307 }",
+    "11": "UrlRewriteDef { pattern: \"(?<=\\\\d\\\\/\\\\?\\\\w{7}_\\\\w{4}=)1[6-9]..(?=.?.?&)\", head: None, replacement: \"17\", action: Redirect307 }",
+    "12": "UrlRewriteDef { pattern: \"(?<=_region=)CN(?=&)\", head: None, replacement: \"JP\", action: Redirect307 }"
+  },
+  "header-rewrite": {},
+  "body-rewrite": {},
+  "map-local": {},
+  "request-body-mock": {},
+  "script": {},
+  "rules": {},
+  "rule-sets": [],
+  "resources": [],
+  "network": {},
+  "declared-scripts": [],
+  "ignored": [
+    {
+      "line": 13,
+      "reason": "unreadable",
+      "detail": "302 takes one target"
+    }
+  ]
+}

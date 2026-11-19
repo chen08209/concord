@@ -156,6 +156,8 @@ pub(super) struct RuleReader<'a> {
     pub(super) sets: Vec<RuleSetDef>,
     inline: Vec<String>,
     attachments: &'a BTreeMap<String, String>,
+    /// Stash's `rule-providers` by name: the set's key and where it comes from.
+    providers: BTreeMap<String, (String, RuleSetSource)>,
 }
 
 impl<'a> RuleReader<'a> {
@@ -164,6 +166,7 @@ impl<'a> RuleReader<'a> {
             sets: Vec::new(),
             inline,
             attachments,
+            providers: BTreeMap::new(),
         }
     }
 
@@ -239,6 +242,8 @@ impl<'a> RuleReader<'a> {
                 format!("surge:{}", value.to_ascii_uppercase()),
                 RuleSetSource::Builtin { rules },
             )
+        } else if let Some((key, source)) = self.providers.get(value) {
+            (key.clone(), source.clone())
         } else if self.inline.iter().any(|name| name == value) {
             (
                 inline_key(value),
@@ -289,6 +294,37 @@ impl<'a> RuleReader<'a> {
         self.rule_set(url, policy, &[], false).map(Some)
     }
 
+    /// A Stash rule provider `RULE-SET,<name>` names; `rules` are an inline one's.
+    pub(super) fn provider(&mut self, name: &str, source: RuleSetSource) {
+        let key = match &source {
+            RuleSetSource::Url { url, .. } => url.clone(),
+            _ => format!("stash:{name}"),
+        };
+        self.providers.insert(name.to_string(), (key, source));
+    }
+
+    /// A rule of an inline provider's payload, as a `[Ruleset]` line is read.
+    pub(super) fn inline_rule(line: &str) -> Result<String, Refusal> {
+        let parts = rule_parts(without_comment(line));
+        let kind = parts
+            .first()
+            .copied()
+            .unwrap_or_default()
+            .to_ascii_uppercase();
+        if kind == "RULE-SET" || kind == "DOMAIN-SET" {
+            return Err(refuse(IgnoreReason::NestedRuleSet));
+        }
+        if DEVICE_TYPES.contains(&kind.as_str()) {
+            return Err(refuse(IgnoreReason::DeviceRule));
+        }
+        let (mut rule, resolves) =
+            translate(&kind, parts.get(1).copied().unwrap_or_default(), false)?;
+        if resolves && has(parts.get(2..).unwrap_or_default(), "no-resolve") {
+            rule.push_str(",no-resolve");
+        }
+        Ok(rule)
+    }
+
     fn add_set(&mut self, key: &str, domain: bool, source: RuleSetSource) -> String {
         let name = set_name(key);
         if !self.sets.iter().any(|set| set.name == name) {
@@ -308,23 +344,7 @@ impl<'a> RuleReader<'a> {
         line: &str,
         number: u32,
     ) -> Result<(), Refusal> {
-        let parts = rule_parts(without_comment(line));
-        let kind = parts
-            .first()
-            .copied()
-            .unwrap_or_default()
-            .to_ascii_uppercase();
-        if kind == "RULE-SET" || kind == "DOMAIN-SET" {
-            return Err(refuse(IgnoreReason::NestedRuleSet));
-        }
-        if DEVICE_TYPES.contains(&kind.as_str()) {
-            return Err(refuse(IgnoreReason::DeviceRule));
-        }
-        let (mut rule, resolves) =
-            translate(&kind, parts.get(1).copied().unwrap_or_default(), false)?;
-        if resolves && has(parts.get(2..).unwrap_or_default(), "no-resolve") {
-            rule.push_str(",no-resolve");
-        }
+        let rule = Self::inline_rule(line)?;
         let name = self.add_set(
             &inline_key(set),
             false,

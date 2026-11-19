@@ -1,0 +1,40 @@
+{
+  "format": "quantumult-x",
+  "meta": {
+    "name": "TestFlight解锁",
+    "desc": "解除TestFlight的区域限制",
+    "author": "RuCu6[https://github.com/RuCu6]",
+    "icon": null,
+    "homepage": "https://gitlab.com/lodepuly/ProxyResource/-/tree/main/Tool/QuantumultX/Rewrite",
+    "category": null,
+    "system": null,
+    "requirement": null,
+    "argumentsDesc": null
+  },
+  "off": null,
+  "arguments": [],
+  "hostname": [
+    {
+      "line": 10,
+      "items": "testflight.apple.com"
+    }
+  ],
+  "force-http-hostname": [],
+  "skip-server-cert-verify": null,
+  "client-source-address": [],
+  "h2": null,
+  "url-rewrite": {},
+  "header-rewrite": {},
+  "body-rewrite": {
+    "7": "BodyRewriteDef { response: false, pattern: \"^https:\\\\/\\\\/testflight\\\\.apple\\\\.com\\\\/v2\\\\/accounts\\\\/.*\\\\/apps\\\\/\\\\d*\\\\/builds\\\\/\\\\d*\\\\/install$\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"\\\"storefrontId\\\"\\\\x20:\\\\x20.*,\", \"\\\"storefrontId\\\":\\\"143441-19,29\\\",\")]) }"
+  },
+  "map-local": {},
+  "request-body-mock": {},
+  "script": {},
+  "rules": {},
+  "rule-sets": [],
+  "resources": [],
+  "network": {},
+  "declared-scripts": [],
+  "ignored": []
+}

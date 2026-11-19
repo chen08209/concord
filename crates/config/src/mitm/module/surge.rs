@@ -5,6 +5,7 @@ use std::borrow::Cow;
 use super::arguments::{read_loon, read_surge, substitute_loon, substitute_surge};
 use super::loon::{self, Out};
 use super::network::{NetworkEdits, Refused};
+use super::qx;
 use super::requirement::evaluate;
 use super::resource::{ResourceKind, is_url, locate};
 use super::rule::{RuleReader, ip_rewrite};
@@ -26,6 +27,9 @@ use crate::mitm::{
 };
 
 const LOON_SECTIONS: [&str; 4] = ["rewrite", "argument", "remote rule", "plugin"];
+const QX_SECTIONS: [&str; 3] = ["rewrite_local", "filter_local", "task_local"];
+/// Quantumult X's sections that name remote files, which the host fetches and reads itself.
+const QX_REMOTE_SECTIONS: [&str; 3] = ["rewrite_remote", "filter_remote", "server_remote"];
 const PROXY_SECTIONS: [&str; 4] = ["proxy", "proxy group", "proxy-groups", "proxies"];
 const APP_ONLY_SECTIONS: [&str; 10] = [
     "panel",
@@ -55,6 +59,7 @@ fn declarations(text: &str, def: &mut ModuleDef) -> Declarations {
     let mut format = ModuleFormat::Surge;
     let mut tag = None;
     let mut in_arguments = false;
+    let mut sectioned = false;
     for (number, raw) in numbered(text) {
         let line = raw.trim();
         if in_arguments && !line.is_empty() && !is_comment(line) && section_name(line).is_none() {
@@ -77,7 +82,15 @@ fn declarations(text: &str, def: &mut ModuleDef) -> Declarations {
             if LOON_SECTIONS.contains(&lower.as_str()) {
                 format = ModuleFormat::Loon;
             }
+            if QX_SECTIONS.contains(&lower.as_str()) || QX_REMOTE_SECTIONS.contains(&lower.as_str())
+            {
+                format = ModuleFormat::QuantumultX;
+            }
+            sectioned = true;
             continue;
+        }
+        if !sectioned && !line.starts_with("#!") && !is_comment(line) && qx::kind(line).is_some() {
+            format = ModuleFormat::QuantumultX;
         }
         let Some((key, value)) = line.strip_prefix("#!").and_then(key_value) else {
             continue;
@@ -127,13 +140,7 @@ pub(super) fn read(text: &str, input: &ModuleInput<'_>) -> ModuleDef {
         format,
         inline_sets,
     } = declarations(text, &mut def);
-    let mut reader = Reader {
-        input,
-        rules: RuleReader::new(inline_sets, input.attachments),
-        network: NetworkEdits::default(),
-        skip_verify: None,
-        def,
-    };
+    let mut reader = Reader::new(input, inline_sets, def);
     reader.def.format = format;
     let mut section: Option<&str> = None;
     for (number, raw) in numbered(text) {
@@ -153,7 +160,13 @@ pub(super) fn read(text: &str, input: &ModuleInput<'_>) -> ModuleDef {
             continue;
         }
         let Some(section) = section else {
-            reader.ignore(number, IgnoreReason::Section, None);
+            match qx::kind(line) {
+                Some(kind) => reader.read_qx(kind, line, number),
+                None if reader.def.format == ModuleFormat::QuantumultX => {
+                    reader.ignore(number, IgnoreReason::Unreadable, None)
+                }
+                None => reader.ignore(number, IgnoreReason::Section, None),
+            }
             continue;
         };
         let lower = section.to_ascii_lowercase();
@@ -197,16 +210,31 @@ fn unmet(requirement: LineRequirement<'_>, input: &ModuleInput<'_>) -> Option<Ig
     }
 }
 
-struct Reader<'a> {
-    input: &'a ModuleInput<'a>,
-    rules: RuleReader<'a>,
-    network: NetworkEdits,
-    skip_verify: Option<u32>,
-    def: ModuleDef,
+/// What every format's lines go into, and what places their files and rules.
+pub(super) struct Reader<'a> {
+    pub(super) input: &'a ModuleInput<'a>,
+    pub(super) rules: RuleReader<'a>,
+    pub(super) network: NetworkEdits,
+    pub(super) skip_verify: Option<u32>,
+    pub(super) def: ModuleDef,
 }
 
-impl Reader<'_> {
-    fn ignore(&mut self, line: u32, reason: IgnoreReason, detail: Option<String>) {
+impl<'a> Reader<'a> {
+    pub(super) fn new(
+        input: &'a ModuleInput<'a>,
+        inline_sets: Vec<String>,
+        def: ModuleDef,
+    ) -> Self {
+        Reader {
+            input,
+            rules: RuleReader::new(inline_sets, input.attachments),
+            network: NetworkEdits::default(),
+            skip_verify: None,
+            def,
+        }
+    }
+
+    pub(super) fn ignore(&mut self, line: u32, reason: IgnoreReason, detail: Option<String>) {
         self.def.ignored.push(IgnoredLine {
             line,
             reason,
@@ -249,6 +277,12 @@ impl Reader<'_> {
                 Ok(outs) => outs.into_iter().for_each(|out| self.place(number, out)),
                 Err((reason, detail)) => self.ignore(number, reason, detail),
             },
+            "rewrite_local" | "filter_local" | "task_local" => match qx::kind(line) {
+                Some(qx::Kind::Mitm) | None => self.ignore(number, IgnoreReason::Unreadable, None),
+                Some(kind) => self.read_qx(kind, line, number),
+            },
+            "http_backend" => self.ignore(number, IgnoreReason::AppOnly, None),
+            "server_local" | "policy" => self.ignore(number, IgnoreReason::Proxies, None),
             "remote rule" => match self.rules.remote(line) {
                 Ok(Some(def)) => self.def.rules.push(ModuleLine { line: number, def }),
                 Ok(None) => self.ignore(number, IgnoreReason::Disabled, None),
@@ -273,7 +307,11 @@ impl Reader<'_> {
         }
     }
 
-    fn read_rule(&mut self, read: Result<super::ModuleRule, super::rule::Refusal>, line: u32) {
+    pub(super) fn read_rule(
+        &mut self,
+        read: Result<super::ModuleRule, super::rule::Refusal>,
+        line: u32,
+    ) {
         match read {
             Ok(def) => self.def.rules.push(ModuleLine { line, def }),
             Err((reason, detail)) => self.ignore(line, reason, detail),
@@ -333,10 +371,55 @@ impl Reader<'_> {
                     });
                 }
             }
-            "ca-p12" | "ca-passphrase" | "ca-keystore-name" | "keystore" => {
+            "ca-p12" | "ca-passphrase" | "ca-keystore-name" | "keystore" | "p12" | "passphrase" => {
                 self.ignore(number, IgnoreReason::ManagedCa, None)
             }
+            "skip_validating_cert" if on => self.skip_verify = Some(number),
+            "skip_validating_cert" => {}
+            "skip_src_ip" => {
+                let excluded: Vec<String> = value
+                    .split(',')
+                    .map(str::trim)
+                    .filter(|item| !item.is_empty())
+                    .map(|item| format!("-{item}"))
+                    .collect();
+                if !excluded.is_empty() {
+                    lists.client_source_address.push(ModuleLine {
+                        line: number,
+                        def: source_items(&excluded.join(",")),
+                    });
+                }
+            }
             _ => self.ignore(number, IgnoreReason::Setting, Some(key)),
+        }
+    }
+
+    /// A Quantumult X line of the form `kind` says it is.
+    fn read_qx(&mut self, kind: qx::Kind, line: &str, number: u32) {
+        let read = match kind {
+            qx::Kind::Mitm => return self.read_mitm(line, number),
+            qx::Kind::Filter => {
+                let read = qx::filter(line).and_then(|rule| self.rules.read(&rule));
+                return self.read_rule(read, number);
+            }
+            qx::Kind::Task => {
+                self.def.declared_scripts.push(number);
+                match qx::task(line) {
+                    Ok(Some(def)) => Ok(Out::Script(def)),
+                    Ok(None) => return self.ignore(number, IgnoreReason::Disabled, None),
+                    Err(refusal) => Err(refusal),
+                }
+            }
+            qx::Kind::Rewrite => qx::rewrite(line),
+        };
+        match read {
+            Ok(out) => {
+                if matches!(out, Out::Script(_)) && kind == qx::Kind::Rewrite {
+                    self.def.declared_scripts.push(number);
+                }
+                self.place(number, out);
+            }
+            Err((reason, detail)) => self.ignore(number, reason, detail),
         }
     }
 
@@ -349,7 +432,7 @@ impl Reader<'_> {
         }
     }
 
-    fn place(&mut self, number: u32, out: Out) {
+    pub(super) fn place(&mut self, number: u32, out: Out) {
         match out {
             Out::Url(read) => self.def.lists.url_rewrite.push(at(number, read)),
             Out::Header(read) => self.def.lists.header_rewrite.push(at(number, read)),
@@ -385,7 +468,7 @@ impl Reader<'_> {
 
     /// The file a line names: a URL stays as the resource it is, a relative path becomes its
     /// attachment; `None` once the line is ignored for want of one.
-    fn locate(&mut self, path: &str, kind: ResourceKind, number: u32) -> Option<String> {
+    pub(super) fn locate(&mut self, path: &str, kind: ResourceKind, number: u32) -> Option<String> {
         let path = unquote(path);
         match locate(
             path,
@@ -486,7 +569,7 @@ impl Reader<'_> {
         }
     }
 
-    fn finish(mut self) -> ModuleDef {
+    pub(super) fn finish(mut self) -> ModuleDef {
         self.finish_skip_verify();
         let loon = self.def.format == ModuleFormat::Loon;
         self.def.network = std::mem::take(&mut self.network).finish(loon);

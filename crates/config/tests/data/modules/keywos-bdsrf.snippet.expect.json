@@ -1,0 +1,74 @@
+{
+  "format": "quantumult-x",
+  "meta": {
+    "name": "百度输入法",
+    "desc": "净化 个人页随机图片",
+    "author": "Keywos",
+    "icon": null,
+    "homepage": null,
+    "category": null,
+    "system": null,
+    "requirement": null,
+    "argumentsDesc": null
+  },
+  "off": null,
+  "arguments": [],
+  "hostname": [
+    {
+      "line": 7,
+      "items": "imeres.baidu.com, mbd.baidu.com, mime.baidu.com, h2tcbox.baidu.com"
+    }
+  ],
+  "force-http-hostname": [],
+  "skip-server-cert-verify": null,
+  "client-source-address": [],
+  "h2": null,
+  "url-rewrite": {
+    "11": "UrlRewriteDef { pattern: \"^https?:\\\\/\\\\/mime\\\\.baidu\\\\.com\\\\/v5\\\\/start_screen_ads/list\", head: None, replacement: \"\", action: RejectDict }",
+    "26": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/mime\\\\.baidu\\\\.com\\\\/v5\\\\/(fb\\\\/st\\\\?logtype|(notiv3|cellloc_noti|noti_cloudswitch_noti)\\\\/info)\", head: None, replacement: \"\", action: RejectDict }"
+  },
+  "header-rewrite": {},
+  "body-rewrite": {},
+  "map-local": {
+    "14": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/mime\\\\.baidu\\\\.com\\\\/sapi\\\\/v1\\\\/lccorpus\\\\/(applist|pannellist)\", conditions: HeadConditionsDef { request: None, response: None }, body: File { base64: false }, data: \"https://github.com/Keywos/rule/raw/main/mocks/mime.json\", status: 200, header: {\"content-type\": \"application/json\"}, content_type: \"application/json\", request: false }",
+    "17": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/mime\\\\.baidu\\\\.com\\\\/sapi\\\\/v1\\\\/(circle\\\\/joinedlist|lccorpus\\\\/usercorpussync|aihelpactivity\\\\/aihelpresource)\", conditions: HeadConditionsDef { request: None, response: None }, body: File { base64: false }, data: \"https://github.com/Keywos/rule/raw/main/mocks/mime.json\", status: 200, header: {\"content-type\": \"application/json\"}, content_type: \"application/json\", request: false }",
+    "19": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/mime\\\\.baidu\\\\.com\\\\/commer\\\\/pocket_api\\\\/enterprise_list\", conditions: HeadConditionsDef { request: None, response: None }, body: File { base64: false }, data: \"https://github.com/Keywos/rule/raw/main/mocks/mime.json\", status: 200, header: {\"content-type\": \"application/json\"}, content_type: \"application/json\", request: false }",
+    "21": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/mbd\\\\.baidu\\\\.com\\\\/ccs\\\\/v1\\\\/start\\\\/confsync\\\\?appname=baidu_input\", conditions: HeadConditionsDef { request: None, response: None }, body: File { base64: false }, data: \"https://github.com/Keywos/rule/raw/main/mocks/bd.json\", status: 200, header: {\"content-type\": \"application/json\"}, content_type: \"application/json\", request: false }"
+  },
+  "request-body-mock": {},
+  "script": {
+    "9": "ScriptDef { name: \"bdsrf.js\", path: \"https://raw.githubusercontent.com/Keywos/rule/main/JS/bdsrf.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/mime\\\\.baidu\\\\.com\\\\/(imrobot\\\\/v1\\\\/pub\\\\/relation\\\\/get_robot_list|v5\\\\/custom_page\\\\/(layout|getdata))\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }"
+  },
+  "rules": {},
+  "rule-sets": [],
+  "resources": [
+    {
+      "url": "https://raw.githubusercontent.com/Keywos/rule/main/JS/bdsrf.js",
+      "kind": "script",
+      "lines": [
+        9
+      ]
+    },
+    {
+      "url": "https://github.com/Keywos/rule/raw/main/mocks/mime.json",
+      "kind": "map-local",
+      "lines": [
+        14,
+        17,
+        19
+      ]
+    },
+    {
+      "url": "https://github.com/Keywos/rule/raw/main/mocks/bd.json",
+      "kind": "map-local",
+      "lines": [
+        21
+      ]
+    }
+  ],
+  "network": {},
+  "declared-scripts": [
+    9
+  ],
+  "ignored": []
+}

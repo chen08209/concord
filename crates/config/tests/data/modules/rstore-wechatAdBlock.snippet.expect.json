@@ -1,0 +1,245 @@
+{
+  "format": "quantumult-x",
+  "meta": {
+    "name": "微信小程序-广告拦截合集-分流/重写规则",
+    "desc": "某些规则要清除缓存或者重新安装APP，拦截广告才会生效！",
+    "author": "zirawell",
+    "icon": null,
+    "homepage": "https://github.com/zirawell/R-Store",
+    "category": null,
+    "system": null,
+    "requirement": null,
+    "argumentsDesc": null
+  },
+  "off": null,
+  "arguments": [],
+  "hostname": [
+    {
+      "line": 536,
+      "items": "api.mcd.cn, dock.tenchii.com, s.jiediankeji.com, www.deppon.com, gw-passenger-wap.01zhuanche.com, wx.youhaosoft.com, minipro.95504.net, api.wandacm.com.cn, fscdn.zto.com, gugongmini.dpm.org.cn, passenger.t3go.cn, wechat-api-dj.mstand.cn, capis*.didapinche.com, api.yisouti.com, image.wjx.cn, app.homeinns.com, cn-acs.m.cainiao.com, xyk.cmbchina.com, flow.dmall.com, plt.yorentown.com, new.wwldz.com, api-marketing.zhinengxiyifang.cn, ucmp.sf-express.com, pan.baidu.com, aag.enmonster.com, mbpxapi.yundasys.com, wechat.tf.cn, kaoshi.wjx.top, api.maoyan.com, as.xiaojukeji.com, mapi.xiaotucc.com, mp.weixin.qq.com, miniapp.qmai.cn, tm-api.pin-dao.cn, sto-customer-app.oss-cn-shanghai.aliyuncs.com, api.songguo7.com, rms.meituan.com, chl.tf.cn, service.haiersmarthomes.com, qapi.huolala.cn, api.m.jd.com, meal.2dfire.com, www.bahecloud.com, miniprogram.ishansong.com, api.yonghuivip.com, membase-yxapp.feiniu.com, res.kfc.com.cn, ydmbpic.yundasys.com, extra.csair.com, capi.lkcoffee.com, dsxcx.tencent-prod.pagoda.com.cn, web-stable-cdn.ykccn.com, api.hengdianfilm.com, opss.qiye.ccbhome.cn, wx.mygolbs.com, interface.mcake.com, supplier-api.imdada.cn, proservice.powerlong.com, lawsonapi.yorentown.com, minifm.maxxipoint.com, m.ctrip.com, mcsp.cloudpnr.com, misc-api-prd-mx.wandafilm.com, cdb.meituan.com, wx.api.ke.com, egw.ejoy.sinopec.com, api-wanda.liepin.com, tf*.istrongcloud.com, vod-movie.maoyan.com, www-yxapp.feiniu.com, r2.gzyct.com, htwkop.xiaojukeji.com, search-yxapp.feiniu.com, minicap.caocaokeji.cn, dynamicad.kfc.com.cn, api-fouth-mem.huazhu.com, apiproxy.zuche.com, daijia.kuaidadi.com, m.dianping.com, ump.ems.com.cn, gateway.cotticoffee.com, mxsa.mxbc.net, api.jiahui.com, api.xibei.com.cn, mobile.laichon.com, wxproj.seeyouyima.com, *.youzan.com, res.pizzahut.com.cn, ec.ems.com.cn, ccmsupport-sz.tenpay.com, cbd-gateway-service-applets.hualala.com, api.kuaidihelp.com, www.msccruises.com.cn, alittle-tea.oss-cn-shanghai.aliyuncs.com, waimai-guide.ele.me, wxapp.bestwehotel.com, mobile-api.imlaidian.com, app.zhuanzhuan.com, peppermall.meituan.com, m.mallcoo.cn, weclub.ccc.cmbchina.com, suyun-user.daojia.com, m.sh.189.cn, api.hellobike.com, wxs-weixin.sd.zhumanggroup.com, eshop-api-wx-mini.eshop.tencent-prod.pagoda.com.cn, shop.laichon.com, shopic.sf-express.com, lop-proxy.jd.com, appuser-static.huolala.cn, ocrifs.ejoy.sinopec.com, e.weather.com.cn, conf.diditaxi.com.cn, npay.meituan.com, acs.m.shyhhema.com, creditcardapp.bankcomm.com, wxapp.api.ke.com, wx.17u.cn, ife.etcp.cn, gw3.ykccn.com, smsp.epicc.com.cn, mec.yto.net.cn, mapi.dianping.com, saas-ad.cloudpnr.com, crm.scpgroup.com.cn, apis.folidaymall.com, applets.jtexpress.com.cn, wcmp.189.cn, web.meituan.com, miniapp.sexytea2013.com, member.lxjchina.com.cn, static.etcp.cn, gw.etczs.net, wx.ymiot.net, sauron-report.yonghuivip.com, apis.alenable.com, webchatapp.fcbox.com, coco-com.e.verystar.net, clubmed.bd.clubmedmnp.com, ad.xiaotucc.com, api.blibee.com, newton.gumingnc.com, *.sh.wxgateway.com, customer-app.sto.cn, mapi.ghsmpwalmart.com, activity.yonghuivip.com, cappapi.alittle-tea.com, a.sinopecsales.com, webapi.qmai.cn, wxapi.csair.com, hdgateway.zto.com, wx.bthhotels.com, res.hongyibo.com.cn, passengerapi.saicmobility.com, 3pp.starbucks.com.cn, consumer-api.quncrm.com, wx.maoyan.com, triangle.wearemanner.com, sg.teld.cn"
+    }
+  ],
+  "force-http-hostname": [],
+  "skip-server-cert-verify": null,
+  "client-source-address": [],
+  "h2": null,
+  "url-rewrite": {
+    "count": 201,
+    "sha256": "1d5eb9ea83353465ecee1c9bc30bee21d0efbcbf91984609694b5afabb565802",
+    "errors": {}
+  },
+  "header-rewrite": {},
+  "body-rewrite": {
+    "86": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/wcmp\\\\.189\\\\.cn\\\\/xcxApiService\\\\/api\\\\/gateway\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"adItems\", \"random_body\")]) }",
+    "99": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/app\\\\.zhuanzhuan\\\\.com\\\\/zz\\\\/transfer\\\\/getpersonalcenter\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"pendantInfo\", \"random_body\")]) }",
+    "143": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/chl\\\\.tf\\\\.cn\\\\/channelmg\\\\/sys\\\\/socso\\\\/order\\\\/queryOrderInfo\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"\\\"imgUrl\\\"\", \"\\\"imgUrl0\\\"\")]) }",
+    "193": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/rms\\\\.meituan\\\\.com\\\\/api\\\\/v\\\\d\\\\/rmsmina\\\\/c\\\\/queryPortalInfo\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data.modules |= map(select(.data.advType != true and .name != \\\"float-window\\\"))\") }",
+    "348": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/membase-yxapp\\\\.feiniu\\\\.com\\\\/misc\\\\/memberIndex\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"myADArray\", \"myADArray0\")]) }",
+    "398": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/waimai-guide\\\\.ele\\\\.me\\\\/h5\\\\/mtop\\\\.alsc\\\\.eleme\\\\.miniapp\\\\.homepage\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"wechat_miniapp_scene_card_template\", \"zirawell\")]) }",
+    "413": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/wx(app)?\\\\.api\\\\.ke\\\\.com\\\\/pt\\\\/pt-xcx-php\\\\/index\\\\/v\\\\d\\\\/home\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data.modules |= map(select(.type != \\\"popup\\\" and .type != \\\"icon\\\"))\") }",
+    "439": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/api\\\\.yisouti\\\\.com\\\\/popupAd\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"data\", \"zirawell\")]) }",
+    "450": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/api-wanda\\\\.liepin\\\\.com\\\\/api\\\\/com\\\\.liepin\\\\.cbp\\\\.baizhong\\\\.op\\\\.v\\\\d-show-4pc\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"adList\", \"random_body\")]) }",
+    "512": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/misc-api-prd-mx\\\\.wandafilm\\\\.com\\\\/commend\\\\/common_banner_batch\\\\.api\\\\?bannerInfos=%5B%7B%22cinemaI\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"\\\"WX_index_mp-&-boxAD\\\"\", \"\\\"WX_index_mp-&-boxAD0\\\"\")]) }",
+    "518": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/api\\\\.wandacm\\\\.com\\\\.cn\\\\/wdmp\\\\/common\\\\/v\\\\d\\\\/xmt\\\\/nsettingInfo\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"popConfig\", \"random_body\")]) }"
+  },
+  "map-local": {
+    "232": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/web\\\\.meituan\\\\.com\\\\/api\\\\/miniprogram\\\\/index\\\\/aggregate\", conditions: HeadConditionsDef { request: None, response: None }, body: File { base64: false }, data: \"https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Data/mt_aggregate.json\", status: 200, header: {\"content-type\": \"application/json\"}, content_type: \"application/json\", request: false }"
+  },
+  "request-body-mock": {},
+  "script": {
+    "81": "ScriptDef { name: \"cmbcc.js\", path: \"https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/cmbcc.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/xyk\\\\.cmbchina\\\\.com\\\\/WebAppConfigService\\\\/get(Page)?ResourceBits\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "82": "ScriptDef { name: \"cmbcc.js\", path: \"https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/cmbcc.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/weclub\\\\.ccc\\\\.cmbchina\\\\.com\\\\/SCRMMiniAppCenterNode\\\\/resource\\\\/gateway\\\\/get-page-resource\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "89": "ScriptDef { name: \"zsgj.js\", path: \"https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/zsgj.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/wx\\\\.mygolbs\\\\.com\\\\/WxBusServer\\\\/ApiData\\\\.do\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "100": "ScriptDef { name: \"zhuanzhuan.js\", path: \"https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/zhuanzhuan.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/app\\\\.zhuanzhuan\\\\.com\\\\/zz\\\\/v\\\\d\\\\/zzlogic\\\\/mywxcontinenthomepage\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "119": "ScriptDef { name: \"tflj.js\", path: \"https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/tflj.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/tf\\\\d+\\\\.istrongcloud\\\\.com\\\\/member\\\\/v[0-9.]+\\\\/home\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "120": "ScriptDef { name: \"tflj.js\", path: \"https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/tflj.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/tf\\\\d+\\\\.istrongcloud\\\\.com\\\\/data\\\\/commonConfig\\\\/typhoon-mp-config\\\\/webModuleConfig\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "185": "ScriptDef { name: \"foliday.js\", path: \"https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/foliday.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/apis\\\\.folidaymall\\\\.com\\\\/online\\\\/capi\\\\/component\\\\/getPageComponents\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "191": "ScriptDef { name: \"qmai.js\", path: \"https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/qmai.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/(?>webapi|miniapp)\\\\.qmai\\\\.cn\\\\/web\\\\/catering([0-9]-apiserver)?\\\\/advertising\\\\/ad\\\\/advertiseInfo\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "200": "ScriptDef { name: \"wechatApplet.js\", path: \"https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/wechatApplet.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/saas-ad\\\\.cloudpnr\\\\.com\\\\/huifuad-base-api\\\\/api\\\\/tactics\\\\/ad\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "223": "ScriptDef { name: \"freshippo.js\", path: \"https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/freshippo.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/acs\\\\.m\\\\.shyhhema\\\\.com\\\\/h5\\\\/mtop\\\\.wdk\\\\.render\\\\.query(?>index|my)page\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "229": "ScriptDef { name: \"manner.js\", path: \"https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/manner.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/triangle\\\\.wearemanner\\\\.com\\\\/mp-api\\\\/v\\\\d\\\\/ads\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "242": "ScriptDef { name: \"wechatApplet.js\", path: \"https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/wechatApplet.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/wechat-api-dj\\\\.mstand\\\\.cn\\\\/scrm\\\\/mini\\\\/app\\\\/index\\\\/info\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "261": "ScriptDef { name: \"meituanwm.js\", path: \"https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/meituanwm.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/web\\\\.meituan\\\\.com\\\\/api\\\\/miniprogram\\\\/tabbar\\\\/all\\\\/query\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "262": "ScriptDef { name: \"meituanwm.js\", path: \"https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/meituanwm.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/web\\\\.meituan\\\\.com\\\\/api\\\\/miniprogram\\\\/index\\\\/aggregate\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "290": "ScriptDef { name: \"ccbHome.js\", path: \"https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/ccbHome.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/opss\\\\.qiye\\\\.ccbhome\\\\.cn\\\\/ccbhome-open\\\\/home\\\\/common\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "311": "ScriptDef { name: \"wechatApplet.js\", path: \"https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/wechatApplet.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/coco-com\\\\.e\\\\.verystar\\\\.net\\\\/v\\\\d\\\\/home\\\\/info\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "320": "ScriptDef { name: \"wechatApplet.js\", path: \"https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/wechatApplet.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/miniapp\\\\.sexytea2013\\\\.com\\\\/cms\\\\/slot\\\\/queryByCodes\\\\?codes=INDEX_TOP_BANNER\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "335": "ScriptDef { name: \"wechatApplet.js\", path: \"https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/wechatApplet.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/htwkop\\\\.xiaojukeji\\\\.com\\\\/gateway\\\\?api=hm\\\\.fa\\\\.homeConfig\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "367": "ScriptDef { name: \"wechatApplet.js\", path: \"https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/wechatApplet.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/minifm\\\\.maxxipoint\\\\.com\\\\/banner\\\\/list\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "388": "ScriptDef { name: \"wechatApplet.js\", path: \"https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/wechatApplet.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/mapi\\\\.xiaotucc\\\\.com\\\\/(mall\\\\/main|\\\\w+\\\\/main_page\\\\/index\\\\/getActivity)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "394": "ScriptDef { name: \"wechatApplet.js\", path: \"https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/wechatApplet.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/\\\\w+\\\\.ems\\\\.com\\\\.cn\\\\/[A-Za-z-]+\\\\/redis\\\\/pageInfoByChannel\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "442": "ScriptDef { name: \"cotti.js\", path: \"https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/cotti.js\", kind: HttpRequest, pattern: Some(\"^https?:\\\\/\\\\/gateway\\\\.cotticoffee\\\\.com\\\\/cotti-capi\\\\/customer\\\\/position\\\\/list$\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "458": "ScriptDef { name: \"wechatApplet.js\", path: \"https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/wechatApplet.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/lawsonapi\\\\.yorentown\\\\.com\\\\/area\\\\/sh-lawson\\\\/app\\\\/v\\\\d\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "487": "ScriptDef { name: \"yunda.js\", path: \"https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/yunda.js\", kind: HttpRequest, pattern: Some(\"^https?:\\\\/\\\\/mbpxapi\\\\.yundasys\\\\.com(:\\\\d+)?\\\\/gateway\\\\/interface\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "531": "ScriptDef { name: \"wjx.js\", path: \"https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/wjx.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/kaoshi\\\\.wjx\\\\.top\\\\/wjx\\\\/join\\\\/completemobile\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }"
+  },
+  "rules": {
+    "11": "DOMAIN,ad-api.4pyun.com => REJECT",
+    "12": "DOMAIN,ad-files.4pyun.com => REJECT",
+    "13": "DOMAIN,ad.maoyan.com => REJECT",
+    "14": "DOMAIN,ads-shopping.shouqianba.com => REJECT",
+    "15": "DOMAIN,ads.ishansong.com => REJECT",
+    "16": "DOMAIN,api.hongyibo.com.cn => REJECT",
+    "17": "DOMAIN,api.zysdsk.cn => REJECT",
+    "18": "DOMAIN,bigdata-behaviordata.189.cn => REJECT",
+    "19": "DOMAIN,djad.nmgyhxxkj.cn => REJECT",
+    "20": "DOMAIN,dsp.fcbox.com => REJECT",
+    "21": "DOMAIN,et.ykccn.com => REJECT",
+    "22": "DOMAIN,file.dian.so => REJECT",
+    "23": "DOMAIN,logs-bigdata.yeehaw.com.cn => REJECT",
+    "24": "DOMAIN,pro.dajuhl.com => REJECT",
+    "25": "DOMAIN,rumt-zh.com => REJECT",
+    "26": "DOMAIN,smarket.dian.so => REJECT",
+    "27": "DOMAIN,tracker-prd.aldi.com.cn => REJECT",
+    "28": "DOMAIN-SUFFIX,ad.duoduo.link => REJECT",
+    "29": "DOMAIN-SUFFIX,wxsmsdy.video.qq.com => REJECT"
+  },
+  "rule-sets": [],
+  "resources": [
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/cmbcc.js",
+      "kind": "script",
+      "lines": [
+        81,
+        82
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/zsgj.js",
+      "kind": "script",
+      "lines": [
+        89
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/zhuanzhuan.js",
+      "kind": "script",
+      "lines": [
+        100
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/tflj.js",
+      "kind": "script",
+      "lines": [
+        119,
+        120
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/foliday.js",
+      "kind": "script",
+      "lines": [
+        185
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/qmai.js",
+      "kind": "script",
+      "lines": [
+        191
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/wechatApplet.js",
+      "kind": "script",
+      "lines": [
+        200,
+        242,
+        311,
+        320,
+        335,
+        367,
+        388,
+        394,
+        458
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/freshippo.js",
+      "kind": "script",
+      "lines": [
+        223
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/manner.js",
+      "kind": "script",
+      "lines": [
+        229
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Data/mt_aggregate.json",
+      "kind": "map-local",
+      "lines": [
+        232
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/meituanwm.js",
+      "kind": "script",
+      "lines": [
+        261,
+        262
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/ccbHome.js",
+      "kind": "script",
+      "lines": [
+        290
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/cotti.js",
+      "kind": "script",
+      "lines": [
+        442
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/yunda.js",
+      "kind": "script",
+      "lines": [
+        487
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/wjx.js",
+      "kind": "script",
+      "lines": [
+        531
+      ]
+    }
+  ],
+  "network": {},
+  "declared-scripts": [
+    81,
+    82,
+    89,
+    100,
+    119,
+    120,
+    185,
+    191,
+    200,
+    223,
+    229,
+    242,
+    261,
+    262,
+    290,
+    311,
+    320,
+    335,
+    367,
+    388,
+    394,
+    442,
+    458,
+    487,
+    531
+  ],
+  "ignored": []
+}

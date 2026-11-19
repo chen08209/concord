@@ -275,7 +275,7 @@ fn is_host(text: &str) -> bool {
 
 /// A DNS server as mihomo writes one: Surge's `system` and Loon's `h3://` read as
 /// `system://` and DoH over HTTP/3.
-fn dns_server(server: &str) -> Option<String> {
+pub(super) fn dns_server(server: &str) -> Option<String> {
     let value = server.trim();
     if value == "system" || value == "syslib" {
         return Some("system://".to_string());

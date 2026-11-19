@@ -1,0 +1,59 @@
+{
+  "format": "stash",
+  "meta": {
+    "name": "贴吧去广告(>=iOS15)",
+    "desc": "开屏广告;推荐和吧内帖子列表的直播及广告;详情页直播/关联商品/广告;看图模式广告;首页和帖子详情页右下角悬浮广告;部分吧内的置顶/最新中间的广告/head图片广告/head直播",
+    "author": null,
+    "icon": null,
+    "homepage": null,
+    "category": null,
+    "system": null,
+    "requirement": null,
+    "argumentsDesc": null
+  },
+  "off": null,
+  "arguments": [],
+  "hostname": [
+    {
+      "line": 6,
+      "items": "tiebac.baidu.com:443"
+    }
+  ],
+  "force-http-hostname": [],
+  "skip-server-cert-verify": null,
+  "client-source-address": [],
+  "h2": null,
+  "url-rewrite": {},
+  "header-rewrite": {},
+  "body-rewrite": {},
+  "map-local": {},
+  "request-body-mock": {},
+  "script": {
+    "8": "ScriptDef { name: \"smile_tieba_json\", path: \"https://raw.githubusercontent.com/app2smile/rules/master/js/tieba-json.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/(tiebac|c\\\\.tieba)\\\\.baidu\\\\.com\\\\/(c\\\\/(s\\\\/sync|f\\\\/(ad\\\\/getSplashAd|frs\\\\/(page|threadlist|generalTabList)|pb\\\\/(pic)?page|excellent\\\\/personalized))$|tiebaads\\\\/commonbatch\\\\?)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(10.0), argument: None }",
+    "13": "ScriptDef { name: \"smile_tieba_proto\", path: \"https://raw.githubusercontent.com/app2smile/rules/master/js/tieba-proto.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/(tiebac|c\\\\.tieba)\\\\.baidu\\\\.com\\\\/c\\\\/(b\\\\/ad\\\\/adBid|f\\\\/(frs\\\\/(page|threadlist|generalTabList)|ad\\\\/getFeedAd|pb\\\\/page|excellent\\\\/personalized))\\\\?cmd\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: true, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(10.0), argument: None }"
+  },
+  "rules": {},
+  "rule-sets": [],
+  "resources": [
+    {
+      "url": "https://raw.githubusercontent.com/app2smile/rules/master/js/tieba-json.js",
+      "kind": "script",
+      "lines": [
+        8
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/app2smile/rules/master/js/tieba-proto.js",
+      "kind": "script",
+      "lines": [
+        13
+      ]
+    }
+  ],
+  "network": {},
+  "declared-scripts": [
+    8,
+    13
+  ],
+  "ignored": []
+}

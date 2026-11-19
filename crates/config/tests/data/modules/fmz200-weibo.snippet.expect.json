@@ -1,0 +1,199 @@
+{
+  "format": "quantumult-x",
+  "meta": {
+    "name": "微博&国际版去广告",
+    "desc": "整合了@zmqcherish和@Keywos的去广告配置，根据UA判断微博版本去广告",
+    "author": "奶思",
+    "icon": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/icons/gif/naisi-01.gif",
+    "homepage": "https://github.com/fmz200/wool_scripts",
+    "category": "奶思的模块",
+    "system": "iOS, iPadOS",
+    "requirement": null,
+    "argumentsDesc": null
+  },
+  "off": null,
+  "arguments": [],
+  "hostname": [
+    {
+      "line": 146,
+      "items": "*.weibo.cn, *.weibo.com, weibo.com"
+    }
+  ],
+  "force-http-hostname": [],
+  "skip-server-cert-verify": null,
+  "client-source-address": [],
+  "h2": null,
+  "url-rewrite": {
+    "63": "UrlRewriteDef { pattern: \"^https?:\\\\/\\\\/weibointl\\\\.api\\\\.weibo\\\\.cn\\\\/portal\\\\.php\\\\?a=get_searching_info\", head: Some(\"WeiboOverseas\"), replacement: \"\", action: RejectDict }",
+    "72": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/weibointl\\\\.api\\\\.weibo\\\\.cn\\\\/portal\\\\.php\\\\?a=treehole&auth=\", head: None, replacement: \"\", action: RejectDict }",
+    "78": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/m?api\\\\.weibo\\\\.c(n|om)\\\\/2\\\\/!\\\\/huati\\\\/discovery_home_bottom_channels\", head: Some(\"Weibo\"), replacement: \"\", action: RejectDict }",
+    "79": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/m?api\\\\.weibo\\\\.c(n|om)\\\\/2\\\\/!\\\\/chaohua\\\\/discovery\\\\/home_bottom\\\\/switch\", head: Some(\"Weibo\"), replacement: \"\", action: RejectDict }",
+    "80": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/m?api\\\\.weibo\\\\.c(n|om)\\\\/2\\\\/!\\\\/was\\\\/finder\\\\/searchbarchange\\\\?\", head: Some(\"Weibo\"), replacement: \"\", action: RejectDict }",
+    "81": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/m?api\\\\.weibo\\\\.c(n|om)\\\\/2\\\\/push\\\\/info\\\\?\", head: Some(\"Weibo\"), replacement: \"\", action: RejectDict }",
+    "90": "UrlRewriteDef { pattern: \"^https?:\\\\/\\\\/m?api\\\\.weibo\\\\.c(n|om)\\\\/\\\\d/push/daily\", head: Some(\"Weibo\"), replacement: \"\", action: RejectDict }",
+    "93": "UrlRewriteDef { pattern: \"^https?:\\\\/\\\\/m?api\\\\.weibo\\\\.c(n|om)\\\\/2\\\\/!\\\\/huati\\\\/discovery_home_bottom_getdotinfo\", head: Some(\"Weibo\"), replacement: \"\", action: Reject }",
+    "128": "UrlRewriteDef { pattern: \"^https?:\\\\/\\\\/bootrealtime\\\\.uve\\\\.weibo\\\\.com\\\\/v\\\\d\\\\/ad\\\\/realtime\", head: Some(\"Weibo\"), replacement: \"\", action: RejectDict }",
+    "129": "UrlRewriteDef { pattern: \"^https?:\\\\/\\\\/bootpreload\\\\.uve\\\\.weibo\\\\.com\\\\/v\\\\d\\\\/ad\\\\/preload\", head: Some(\"Weibo\"), replacement: \"\", action: RejectDict }",
+    "130": "UrlRewriteDef { pattern: \"^https?:\\\\/\\\\/sdkapp\\\\.uve\\\\.weibo\\\\.com\\\\/interface\\\\/sdk\\\\/(get-lbs-cell-info\\\\.php|sdkconfig\\\\.php)\", head: Some(\"Weibo\"), replacement: \"\", action: RejectDict }"
+  },
+  "header-rewrite": {},
+  "body-rewrite": {
+    "65": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/weibointl\\\\.api\\\\.weibo\\\\.cn\\\\/portal\\\\.php\\\\?a=trends&\", conditions: HeadConditionsDef { request: Some(\"WeiboOverseas\"), response: None }, action: Jq(\"del(.data.banner)\") }"
+  },
+  "map-local": {
+    "58": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/api\\\\.weibo\\\\.cn\\\\/\\\\d\\\\/(cardlist\\\\?v_f=\\\\d|ad\\\\/weibointl\\\\?)\", conditions: HeadConditionsDef { request: Some(\"WeiboOverseas\"), response: None }, body: File { base64: false }, data: \"https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/template/reject-dict.json\", status: 200, header: {\"content-type\": \"text/html\"}, content_type: \"application/json\", request: false }",
+    "59": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/weibointl\\\\.api\\\\.weibo\\\\.cn\\\\/portal\\\\.php\\\\?a=hot_search_users\", conditions: HeadConditionsDef { request: Some(\"WeiboOverseas\"), response: None }, body: File { base64: false }, data: \"https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/template/reject-dict.json\", status: 200, header: {\"content-type\": \"text/html\"}, content_type: \"application/json\", request: false }",
+    "60": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/weibointl\\\\.api\\\\.weibo\\\\.cn\\\\/portal\\\\.php\\\\?a=get_coopen_ads\", conditions: HeadConditionsDef { request: Some(\"WeiboOverseas\"), response: None }, body: File { base64: false }, data: \"https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/template/reject-dict.json\", status: 200, header: {\"content-type\": \"text/html\"}, content_type: \"application/json\", request: false }"
+  },
+  "request-body-mock": {},
+  "script": {
+    "67": "ScriptDef { name: \"index.js\", path: \"https://raw.githubusercontent.com/Keywos/rule/master/script/weibo_us/js/index.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/weibointl\\\\.api\\\\.weibo\\\\.cn\\\\/portal\\\\.php\\\\?(ct=(feed&a=trends|user&a=get_searching_info)|a=(get_coopen_ads|user_center|search_topic|open_app&auth|icon_center))\"), conditions: HeadConditionsDef { request: Some(\"WeiboOverseas\"), response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "68": "ScriptDef { name: \"index.js\", path: \"https://raw.githubusercontent.com/Keywos/rule/master/script/weibo_us/js/index.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/api\\\\.weibo\\\\.cn\\\\/\\\\d\\\\/statuses\\\\/.*timeline\"), conditions: HeadConditionsDef { request: Some(\"WeiboOverseas\"), response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "69": "ScriptDef { name: \"index.js\", path: \"https://raw.githubusercontent.com/Keywos/rule/master/script/weibo_us/js/index.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/sdkapp\\\\.uve\\\\.weibo\\\\.com\\\\/interface\\\\/sdk\\\\/sdkad\\\\.php\"), conditions: HeadConditionsDef { request: Some(\"WeiboOverseas\"), response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "87": "ScriptDef { name: \"req_replace_body.js\", path: \"https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/template/req_replace_body.js\", kind: HttpRequest, pattern: Some(\"^https?:\\\\/\\\\/m?api\\\\.weibo\\\\.c(n|om)\\\\/2\\\\/(push\\\\/active|client\\\\/addlog_batch|ad\\\\/preload)\"), conditions: HeadConditionsDef { request: Some(\"Weibo\"), response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "96": "ScriptDef { name: \"weibo_ads.js\", path: \"https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/weibo/weibo_ads.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/m?api\\\\.weibo\\\\.c(n|om)\\\\/2\\\\/search\\\\/(finder|container_timeline|container_discover)\\\\?\"), conditions: HeadConditionsDef { request: Some(\"Weibo\"), response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "99": "ScriptDef { name: \"weibo_ads.js\", path: \"https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/weibo/weibo_ads.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/m?api\\\\.weibo\\\\.c(n|om)\\\\/2\\\\/(page|flowpage)\\\\?\"), conditions: HeadConditionsDef { request: Some(\"Weibo\"), response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "102": "ScriptDef { name: \"weibo_ads.js\", path: \"https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/weibo/weibo_ads.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/m?api\\\\.weibo\\\\.c(n|om)\\\\/2\\\\/searchall\\\\?\"), conditions: HeadConditionsDef { request: Some(\"Weibo\"), response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "105": "ScriptDef { name: \"weibo_ads.js\", path: \"https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/weibo/weibo_ads.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/m?api\\\\.weibo\\\\.c(n|om)\\\\/2\\\\/statuses\\\\/container_timeline_topicpage\\\\?\"), conditions: HeadConditionsDef { request: Some(\"Weibo\"), response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "108": "ScriptDef { name: \"weibo_ads.js\", path: \"https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/weibo/weibo_ads.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/m?api\\\\.weibo\\\\.c(n|om)\\\\/2\\\\/statuses\\\\/container_timeline_topic\\\\?\"), conditions: HeadConditionsDef { request: Some(\"Weibo\"), response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "111": "ScriptDef { name: \"weibo_ads.js\", path: \"https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/weibo/weibo_ads.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/m?api\\\\.weibo\\\\.c(n|om)\\\\/2\\\\/statuses\\\\/extend\\\\?\"), conditions: HeadConditionsDef { request: Some(\"Weibo\"), response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "112": "ScriptDef { name: \"weibo_ads.js\", path: \"https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/weibo/weibo_ads.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/m?api\\\\.weibo\\\\.c(n|om)\\\\/2\\\\/statuses\\\\/container_detail\\\\?\"), conditions: HeadConditionsDef { request: Some(\"Weibo\"), response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "115": "ScriptDef { name: \"weibo_ads.js\", path: \"https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/weibo/weibo_ads.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/m?api\\\\.weibo\\\\.c(n|om)\\\\/2\\\\/groups\\\\/allgroups\\\\/v2\"), conditions: HeadConditionsDef { request: Some(\"Weibo\"), response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "118": "ScriptDef { name: \"weibo_ads.js\", path: \"https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/weibo/weibo_ads.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/m?api\\\\.weibo\\\\.c(n|om)\\\\/2\\\\/comments\\\\/mix_comments\\\\?\"), conditions: HeadConditionsDef { request: Some(\"Weibo\"), response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "119": "ScriptDef { name: \"weibo_ads.js\", path: \"https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/weibo/weibo_ads.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/m?api\\\\.weibo\\\\.c(n|om)\\\\/2\\\\/statuses\\\\/(container_detail_comment|container_detail_mix)\\\\?\"), conditions: HeadConditionsDef { request: Some(\"Weibo\"), response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "122": "ScriptDef { name: \"weibo_ads.js\", path: \"https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/weibo/weibo_ads.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/m?api\\\\.weibo\\\\.c(n|om)\\\\/2\\\\/statuses\\\\/container_detail_forward\\\\?\"), conditions: HeadConditionsDef { request: Some(\"Weibo\"), response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "125": "ScriptDef { name: \"weibo_main.js\", path: \"https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/weibo/weibo_main.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/m?api\\\\.weibo\\\\.c(n|om)/2/(cardlist|searchall|page|messageflow|statuses/(unread_)?friends(/|_)timeline|groups/timeline|statuses/(container_timeline|container_timeline_hot|unread_hot_timeline|extend|video_mixtimeline|repost_timeline)|profile/(me|container_timeline)|video/(community_tab|remind_info|tiny_stream_video_list)|checkin/show|(\\\\!/)?live/media_homelist|comments/build_comments|container/get_item)\"), conditions: HeadConditionsDef { request: Some(\"Weibo\"), response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "131": "ScriptDef { name: \"weibo_launch.js\", path: \"https://raw.githubusercontent.com/zmqcherish/proxy-script/main/weibo_launch.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/(sdk|wb)app\\\\.uve\\\\.weibo\\\\.com(/interface/sdk/sdkad.php|/wbapplua/wbpullad.lua)\"), conditions: HeadConditionsDef { request: Some(\"Weibo\"), response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "134": "ScriptDef { name: \"weibo_main.js\", path: \"https://raw.githubusercontent.com/zmqcherish/proxy-script/main/weibo_main.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/api\\\\.weibo\\\\.c(n|om)\\\\/2\\\\/!\\\\/client\\\\/light_skin\"), conditions: HeadConditionsDef { request: Some(\"Weibo\"), response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "137": "ScriptDef { name: \"weibo_main.js\", path: \"https://raw.githubusercontent.com/zmqcherish/proxy-script/main/weibo_main.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/new\\\\.vip\\\\.weibo\\\\.c(n|om)\\\\/littleskin\\\\/preview\"), conditions: HeadConditionsDef { request: Some(\"Weibo\"), response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "140": "ScriptDef { name: \"weibo_vip.js\", path: \"https://github.com/fmz200/wool_scripts/raw/main/Scripts/weibo/weibo_vip.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/new\\\\.vip\\\\.weibo\\\\.c(n|om)/aj/appicon/list\"), conditions: HeadConditionsDef { request: Some(\"Weibo\"), response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }"
+  },
+  "rules": {
+    "23": "DOMAIN-SUFFIX,fastimage.uve.weibo.com => REJECT",
+    "24": "DOMAIN-SUFFIX,adimg.vue.weibo.com => REJECT",
+    "25": "DOMAIN-SUFFIX,zymo.mps.weibo.com => REJECT",
+    "26": "DOMAIN-SUFFIX,weibomingzi.com => REJECT",
+    "27": "DOMAIN-SUFFIX,sdkapp.uve.weibo.com => REJECT",
+    "28": "DOMAIN-SUFFIX,promote.biz.weibo.cn => REJECT",
+    "29": "DOMAIN-SUFFIX,gw5.push.mcp.weibo.cn => REJECT",
+    "30": "DOMAIN-SUFFIX,gw6.push.mcp.weibo.cn => REJECT",
+    "31": "DOMAIN-SUFFIX,game.weibo.cn => REJECT",
+    "32": "DOMAIN-SUFFIX,adimg.uve.weibo.com => REJECT",
+    "33": "DOMAIN-SUFFIX,game.weibo.com => REJECT",
+    "34": "DOMAIN-SUFFIX,ads.viber.com => REJECT",
+    "35": "DOMAIN-SUFFIX,ads-d.viber.com => REJECT",
+    "36": "DOMAIN-SUFFIX,ads.aws.viber.com => REJECT",
+    "37": "DOMAIN-SUFFIX,alitui.weibo.com => REJECT",
+    "38": "DOMAIN-SUFFIX,dp.im.weibo.cn => REJECT",
+    "39": "DOMAIN-SUFFIX,biz.weibo.com.cn => REJECT",
+    "40": "DOMAIN-SUFFIX,biz.weibo.com => REJECT",
+    "41": "DOMAIN-SUFFIX,click.uve.weibo.com => REJECT",
+    "42": "DOMAIN-SUFFIX,wax.weibo.com => REJECT",
+    "43": "DOMAIN-SUFFIX,wbapp.uve.weibo.com => REJECT",
+    "44": "DOMAIN-SUFFIX,widget.weibo.com => REJECT",
+    "45": "DOMAIN-SUFFIX,dsp.edm.weibo.cn => REJECT",
+    "46": "DOMAIN-SUFFIX,alitui.weibo.com.cn => REJECT",
+    "47": "DOMAIN-SUFFIX,tui.weibo.com => REJECT",
+    "48": "DOMAIN-SUFFIX,wax.weibo.com.cn => REJECT",
+    "49": "DOMAIN-SUFFIX,ad.weibo.com => REJECT",
+    "51": "DOMAIN,bootpreload.uve.weibo.com => REJECT"
+  },
+  "rule-sets": [],
+  "resources": [
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/template/reject-dict.json",
+      "kind": "map-local",
+      "lines": [
+        58,
+        59,
+        60
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Keywos/rule/master/script/weibo_us/js/index.js",
+      "kind": "script",
+      "lines": [
+        67,
+        68,
+        69
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/template/req_replace_body.js",
+      "kind": "script",
+      "lines": [
+        87
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/weibo/weibo_ads.js",
+      "kind": "script",
+      "lines": [
+        96,
+        99,
+        102,
+        105,
+        108,
+        111,
+        112,
+        115,
+        118,
+        119,
+        122
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/weibo/weibo_main.js",
+      "kind": "script",
+      "lines": [
+        125
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zmqcherish/proxy-script/main/weibo_launch.js",
+      "kind": "script",
+      "lines": [
+        131
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zmqcherish/proxy-script/main/weibo_main.js",
+      "kind": "script",
+      "lines": [
+        134,
+        137
+      ]
+    },
+    {
+      "url": "https://github.com/fmz200/wool_scripts/raw/main/Scripts/weibo/weibo_vip.js",
+      "kind": "script",
+      "lines": [
+        140
+      ]
+    }
+  ],
+  "network": {},
+  "declared-scripts": [
+    67,
+    68,
+    69,
+    87,
+    96,
+    99,
+    102,
+    105,
+    108,
+    111,
+    112,
+    115,
+    118,
+    119,
+    122,
+    125,
+    131,
+    134,
+    137,
+    140
+  ],
+  "ignored": []
+}

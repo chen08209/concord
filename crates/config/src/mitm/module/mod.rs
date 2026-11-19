@@ -26,10 +26,14 @@ impl From<&str> for Unreadable {
 mod arguments;
 mod loon;
 mod network;
+mod qx;
+#[cfg(test)]
+mod qx_stash_tests;
 mod requirement;
 mod resource;
 mod rule;
 mod source;
+mod stash;
 mod surge;
 
 use std::collections::BTreeMap;
@@ -305,5 +309,8 @@ pub fn lines(text: &str) -> Vec<&str> {
 
 /// Reads `text` in the format it is written in.
 pub fn read_module(text: &str, input: &ModuleInput<'_>) -> ModuleDef {
-    surge::read(text, input)
+    match stash::document(text) {
+        Some(document) => stash::read(&document, text, input),
+        None => surge::read(text, input),
+    }
 }
