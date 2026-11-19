@@ -42,6 +42,8 @@ pub struct Demands {
     pub ip: bool,
     pub resolve_ip: bool,
     pub process: bool,
+    /// Some rule reads an HTTP request: URL-REGEX or USER-AGENT.
+    pub http: bool,
 }
 
 impl Demands {
@@ -50,6 +52,7 @@ impl Demands {
         self.ip |= other.ip;
         self.resolve_ip |= other.resolve_ip;
         self.process |= other.process;
+        self.http |= other.http;
     }
 }
 

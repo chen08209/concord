@@ -821,6 +821,7 @@ fn demands_and_rule_info() {
             ip: true,
             resolve_ip: true,
             process: true,
+            http: false,
         }
     );
     assert_eq!(program.len(), 3);
@@ -916,5 +917,142 @@ fn rematch_restarts_a_named_list_and_keeps_its_rule_identity() {
         };
         assert_eq!(target, "MAIN");
         assert_eq!(program.rule_at(rule).payload, "Next");
+    }
+}
+
+fn request(host: &'static str, url: &'static str, agent: Option<&'static str>) -> Flow {
+    Flow {
+        http: Some((url, agent)),
+        ..Flow::domain(host)
+    }
+}
+
+#[test]
+fn http_rules_wait_for_the_request_and_match_it_in_list_order() {
+    let kit = Kit::new();
+    let lines = [
+        r"URL-REGEX,^https://a\.test/ok,DIRECT",
+        "DOMAIN,a.test,REJECT",
+        "USER-AGENT,Foo*,NODE",
+        "MATCH,PROXY",
+    ];
+    for merge in MERGES {
+        let program = kit.compile(&lines, merge);
+        let connection = drive(&program, &kit.geo, &Flow::domain("a.test"), true);
+        assert_eq!(connection.accepted, pick(1, "REJECT"));
+        assert!(connection.http_pending);
+        let allowed = request("a.test", "https://a.test/ok?x=1", None);
+        assert_eq!(accepted(&kit, &program, &allowed), pick(0, "DIRECT"));
+        let other = request("a.test", "https://a.test/ad", Some("Foo/1"));
+        assert_eq!(accepted(&kit, &program, &other), pick(1, "REJECT"));
+        let agent = request("b.test", "https://b.test/", Some("Foo/1"));
+        assert_eq!(accepted(&kit, &program, &agent), pick(2, "NODE"));
+        let no_agent = request("b.test", "https://b.test/", None);
+        assert_eq!(accepted(&kit, &program, &no_agent), pick(3, "PROXY"));
+    }
+}
+
+#[test]
+fn a_rule_decided_without_the_request_is_not_pending() {
+    let kit = Kit::new();
+    let program = kit.compile(
+        &[
+            "AND,((DOMAIN,x.test),(URL-REGEX,/ad)),REJECT",
+            "DOMAIN-SUFFIX,test,PROXY",
+        ],
+        8,
+    );
+    let other = drive(&program, &kit.geo, &Flow::domain("y.test"), true);
+    assert_eq!(other.accepted, pick(1, "PROXY"));
+    assert!(!other.http_pending);
+    let listed = drive(&program, &kit.geo, &Flow::domain("x.test"), true);
+    assert_eq!(listed.accepted, pick(1, "PROXY"));
+    assert!(listed.http_pending);
+    let program = kit.compile(&["DOMAIN,a.test,DIRECT", "URL-REGEX,/ad,REJECT"], 8);
+    let decided = drive(&program, &kit.geo, &Flow::domain("a.test"), true);
+    assert_eq!(decided.accepted, pick(0, "DIRECT"));
+    assert!(!decided.http_pending);
+}
+
+#[test]
+fn logic_over_an_unread_request_stays_undecided() {
+    let kit = Kit::new();
+    let program = kit.compile(
+        &[
+            "NOT,((URL-REGEX,/keep)),REJECT",
+            "OR,((DOMAIN,a.test),(USER-AGENT,Bot*)),A",
+            r#"AND,((URL-REGEX,"^http:\/\/(a|b)\.test\/d\?"),(USER-AGENT,"Ali*")),B"#,
+            "MATCH,PROXY",
+        ],
+        8,
+    );
+    let unread = drive(&program, &kit.geo, &Flow::domain("b.test"), true);
+    assert_eq!(unread.accepted, pick(3, "PROXY"));
+    assert!(unread.http_pending);
+    assert_eq!(
+        accepted(&kit, &program, &Flow::domain("a.test")),
+        pick(1, "A")
+    );
+    let kept = request("b.test", "http://b.test/keep", Some("Ali/2"));
+    assert_eq!(accepted(&kit, &program, &kept), pick(3, "PROXY"));
+    let dropped = request("b.test", "http://b.test/x", None);
+    assert_eq!(accepted(&kit, &program, &dropped), pick(0, "REJECT"));
+    let both = request("b.test", "http://b.test/d?dn=x/keep", Some("Ali/2"));
+    assert_eq!(accepted(&kit, &program, &both), pick(2, "B"));
+}
+
+#[test]
+fn http_rules_in_a_classical_set_wait_for_the_request() {
+    let kit = Kit::new();
+    fill(
+        &kit,
+        "http",
+        Behavior::Classical,
+        &[r#"URL-REGEX,"^https://a\.test/(x|y),z""#, "USER-AGENT,Bot*"],
+    );
+    let program = kit.compile(&["RULE-SET,http,REJECT", "MATCH,PROXY"], 8);
+    assert!(program.demands().http);
+    let unread = drive(&program, &kit.geo, &Flow::domain("a.test"), true);
+    assert_eq!(unread.accepted, pick(1, "PROXY"));
+    assert!(unread.http_pending);
+    let hit = request("a.test", "https://a.test/y,z", None);
+    assert_eq!(accepted(&kit, &program, &hit), pick(0, "REJECT"));
+    let bot = request("a.test", "https://a.test/", Some("Bot"));
+    assert_eq!(accepted(&kit, &program, &bot), pick(0, "REJECT"));
+}
+
+#[test]
+fn user_agent_reads_the_proxy_connect_while_no_request_is_read() {
+    let kit = Kit::new();
+    let lines = [
+        "USER-AGENT,Foo*,NODE",
+        "URL-REGEX,/ad,REJECT",
+        "MATCH,PROXY",
+    ];
+    for merge in MERGES {
+        let program = kit.compile(&lines, merge);
+        let connect = |agent| Flow {
+            kind: concord_common::InboundKind::Https,
+            connect_agent: Some(agent),
+            ..Flow::domain("a.test")
+        };
+        let matched = drive(&program, &kit.geo, &connect("Foo/1"), true);
+        assert_eq!(matched.accepted, pick(0, "NODE"));
+        assert!(!matched.http_pending);
+        let other = drive(&program, &kit.geo, &connect("Bar/1"), true);
+        assert_eq!(other.accepted, pick(2, "PROXY"));
+        assert!(
+            other.http_pending,
+            "the URL-REGEX still waits for the request"
+        );
+        let read = Flow {
+            http: Some(("https://a.test/", Some("Bar/2"))),
+            ..connect("Foo/1")
+        };
+        assert_eq!(
+            accepted(&kit, &program, &read),
+            pick(2, "PROXY"),
+            "a request read speaks for itself"
+        );
     }
 }

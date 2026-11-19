@@ -217,13 +217,30 @@ pub(crate) async fn dial_traced(
     runtime: &Arc<Runtime>,
     flow: &mut FlowState,
 ) -> Result<(BoxStream, Decision), FailedDial> {
+    let decision = route_traced(inner, runtime, flow).await?;
+    dial_decided(inner, runtime, flow, decision).await
+}
+
+pub(crate) async fn route_traced(
+    inner: &Arc<Inner>,
+    runtime: &Arc<Runtime>,
+    flow: &mut FlowState,
+) -> io::Result<Decision> {
     let live = inner.live();
-    let decision = route(flow, runtime, &live, Touch::Yes)
+    route(flow, runtime, &live, Touch::Yes)
         .await
         .inspect_err(|err| {
             tracing::warn!("[Metadata] parse failed: {err}");
-        })?;
+        })
+}
 
+/// Dials what [route_traced] decided for `flow`.
+pub(crate) async fn dial_decided(
+    inner: &Arc<Inner>,
+    runtime: &Arc<Runtime>,
+    flow: &mut FlowState,
+    decision: Decision,
+) -> Result<(BoxStream, Decision), FailedDial> {
     let mut dst = flow.remote_address();
     if let Some(host) = flow.host.clone()
         && let (Some(node), true) = runtime.dns.hosts().search(&host, false)

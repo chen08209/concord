@@ -170,6 +170,7 @@ impl NodeFactory for FakeFactory {
         let (name, kind) = match which {
             Builtin::Direct => ("DIRECT", OutboundKind::Direct),
             Builtin::Reject => ("REJECT", OutboundKind::Reject),
+            Builtin::RejectReply(name) => (name, OutboundKind::Reject),
             Builtin::RejectDrop => ("REJECT-DROP", OutboundKind::RejectDrop),
             Builtin::Compatible => ("COMPATIBLE", OutboundKind::Compatible),
             Builtin::Pass => ("PASS", OutboundKind::Pass),

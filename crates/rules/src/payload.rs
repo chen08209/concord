@@ -72,6 +72,8 @@ pub(crate) fn cond_payload(cond: &Cond) -> String {
         | Cond::ProcessPathRegex(p)
         | Cond::ProcessNameWildcard(p)
         | Cond::ProcessPathWildcard(p)
+        | Cond::UrlRegex(p)
+        | Cond::UserAgent(p)
         | Cond::RuleSet(p) => p.clone(),
         Cond::IpCidr(c)
         | Cond::IpCidr6(c)
@@ -108,9 +110,13 @@ pub(crate) fn rule_payload(def: &RuleDef) -> String {
         Cond::InType(_) => raw.to_uppercase(),
         Cond::DomainWildcard(p) => p.clone(),
         Cond::IpCidr(c) | Cond::IpCidr6(c) | Cond::SrcIpCidr(c) => c.to_string(),
-        Cond::Network(_) | Cond::And(_) | Cond::Or(_) | Cond::Not(_) | Cond::Match => {
-            cond_payload(&def.cond)
-        }
+        Cond::Network(_)
+        | Cond::UrlRegex(_)
+        | Cond::UserAgent(_)
+        | Cond::And(_)
+        | Cond::Or(_)
+        | Cond::Not(_)
+        | Cond::Match => cond_payload(&def.cond),
         _ if raw.is_empty() => cond_payload(&def.cond),
         _ => raw,
     }

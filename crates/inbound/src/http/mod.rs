@@ -205,12 +205,17 @@ async fn connect<S: Stream>(
         ..
     } = session;
     let stream = rd.unsplit(wr);
-    let meta = ctx.tcp_meta(
+    let mut meta = ctx.tcp_meta(
         InboundKind::Https,
         &peer,
         dst_address(&host, port.unwrap_or(80)),
         client,
     );
+    meta.inbound.user_agent = head
+        .headers
+        .get("User-Agent")
+        .and_then(|agent| std::str::from_utf8(agent).ok())
+        .map(Arc::from);
     if rbuf.is_empty() {
         ctx.hand_off(meta, Box::new(stream));
     } else {

@@ -10,8 +10,8 @@ use std::time::Duration;
 use async_trait::async_trait;
 use bytes::Bytes;
 use concord_common::intercept::{
-    ConnInterceptor, ConnMark, DialFailure, HeldConn, InterceptFlow, Offer, RuleLabel, Upstream,
-    UpstreamDialer, UpstreamRequest,
+    ConnInterceptor, ConnMark, DialFailure, HeldConn, InterceptFlow, Offer, Reject, Route,
+    RuleLabel, Upstream, UpstreamDialer, UpstreamRequest,
 };
 use concord_common::sync::lock;
 use concord_common::{Address, FlowMeta, InboundInfo, InboundKind, Network};
@@ -308,8 +308,13 @@ pub(crate) struct TestDialer {
     pub flows: Mutex<Vec<(InterceptFlow, bool)>>,
     pub closed: Mutex<Vec<(String, Vec<String>)>>,
     pub closed_ids: Mutex<Vec<String>>,
+    pub closed_rules: Mutex<Vec<Option<String>>>,
     rejected: Mutex<HashSet<String>>,
     routes: Mutex<HashMap<String, SocketAddr>>,
+    /// URL substring, chain name, and the server it dials or none to reject.
+    url_routes: Mutex<Vec<(String, String, Option<SocketAddr>)>>,
+    /// The URL of every request routed, none for one routed without a request.
+    pub routed: Mutex<Vec<Option<String>>>,
     pub held: Mutex<Vec<Arc<TestHeld>>>,
     next: AtomicUsize,
 }
@@ -321,8 +326,11 @@ impl TestDialer {
             flows: Mutex::default(),
             closed: Mutex::default(),
             closed_ids: Mutex::default(),
+            closed_rules: Mutex::default(),
             rejected: Mutex::default(),
             routes: Mutex::default(),
+            url_routes: Mutex::default(),
+            routed: Mutex::default(),
             held: Mutex::default(),
             next: AtomicUsize::new(1),
         })
@@ -334,6 +342,11 @@ impl TestDialer {
 
     pub fn route(&self, host: &str, target: SocketAddr) {
         lock(&self.routes).insert(host.to_string(), target);
+    }
+
+    /// Routes a request whose URL holds `needle` through `name`, rejecting it without a target.
+    pub fn route_url(&self, needle: &str, name: &str, target: Option<SocketAddr>) {
+        lock(&self.url_routes).push((needle.to_string(), name.to_string(), target));
     }
 
     pub fn dialed(&self) -> Vec<(String, u16)> {
@@ -353,26 +366,79 @@ impl TestDialer {
 
 #[async_trait]
 impl UpstreamDialer for TestDialer {
+    async fn route(&self, request: &UpstreamRequest) -> Result<Route, DialFailure> {
+        let host = crate::engine::host_of(&request.flow);
+        let url = request.http.as_ref().map(|http| http.url.to_string());
+        lock(&self.routed).push(url.clone());
+        let by_url = url.as_deref().and_then(|url| {
+            lock(&self.url_routes)
+                .iter()
+                .find(|(needle, ..)| url.contains(needle.as_str()))
+                .cloned()
+        });
+        if let Some((needle, name, target)) = by_url {
+            let rule = Some(RuleLabel {
+                name: Arc::from("URLRegex"),
+                payload: Arc::from(needle.as_str()),
+            });
+            let reject = match (target, name.as_str()) {
+                (Some(_), _) => None,
+                (None, "REJECT-DROP") => Some(Reject::Drop),
+                (None, _) => Some(Reject::Reply),
+            };
+            return Ok(Route::new(
+                Arc::from([Arc::from(name.as_str())]),
+                rule,
+                reject,
+                false,
+                Box::new(target),
+            ));
+        }
+        let pending = !lock(&self.url_routes).is_empty() && url.is_none();
+        if lock(&self.rejected).contains(&host) {
+            lock(&self.flows).push((request.flow.clone(), request.hold));
+            let rule = Some(RuleLabel {
+                name: Arc::from("DOMAIN"),
+                payload: Arc::from(host.as_str()),
+            });
+            return Ok(Route::new(
+                Arc::from([Arc::from("REJECT")]),
+                rule,
+                Some(Reject::Reply),
+                pending,
+                Box::new(None::<SocketAddr>),
+            ));
+        }
+        let target = lock(&self.routes).get(&host).copied();
+        Ok(Route::new(
+            Arc::from([Arc::from("DIRECT")]),
+            None,
+            None,
+            pending,
+            Box::new(Some(target.unwrap_or(self.target))),
+        ))
+    }
+
     #[allow(
         clippy::disallowed_methods,
         reason = "the test dialer reaches a loopback server"
     )]
-    async fn dial(&self, request: UpstreamRequest) -> Result<Upstream, DialFailure> {
-        let host = crate::engine::host_of(&request.flow);
-        lock(&self.flows).push((request.flow.clone(), request.hold));
-        if lock(&self.rejected).contains(&host) {
+    async fn dial_routed(
+        &self,
+        request: UpstreamRequest,
+        mut route: Route,
+    ) -> Result<Upstream, DialFailure> {
+        if route.reject.is_some() {
             return Err(DialFailure {
-                chain: vec![Arc::from("REJECT")],
-                rule: Some(RuleLabel {
-                    name: Arc::from("DOMAIN"),
-                    payload: Arc::from(host.as_str()),
-                }),
                 error: io::Error::other("rejected by the rules"),
+                ..route.rejected()
             });
         }
-        let target = lock(&self.routes)
-            .get(&host)
-            .copied()
+        lock(&self.flows).push((request.flow.clone(), request.hold));
+        let target = route
+            .take_plan()
+            .and_then(|plan| plan.downcast::<Option<SocketAddr>>().ok())
+            .and_then(|target| *target)
             .unwrap_or(self.target);
         let stream = tokio::net::TcpStream::connect(target).await?;
         let id = format!("conn-{}", self.next.fetch_add(1, Ordering::SeqCst));
@@ -391,11 +457,15 @@ impl UpstreamDialer for TestDialer {
         })
     }
 
+    fn reads_http(&self, _flow: &InterceptFlow) -> bool {
+        !lock(&self.url_routes).is_empty()
+    }
+
     fn record_closed(
         &self,
         flow: &InterceptFlow,
         chain: &[Arc<str>],
-        _rule: Option<&RuleLabel>,
+        rule: Option<&RuleLabel>,
     ) -> Option<Arc<str>> {
         let id = format!("closed-{}", self.next.fetch_add(1, Ordering::SeqCst));
         lock(&self.closed).push((
@@ -403,6 +473,7 @@ impl UpstreamDialer for TestDialer {
             chain.iter().map(ToString::to_string).collect(),
         ));
         lock(&self.closed_ids).push(id.clone());
+        lock(&self.closed_rules).push(rule.map(|rule| format!("{},{}", rule.name, rule.payload)));
         Some(Arc::from(id.as_str()))
     }
 }

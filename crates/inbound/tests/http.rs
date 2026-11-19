@@ -51,6 +51,7 @@ async fn connect_replies_200_and_hands_over_the_stream_with_early_bytes() {
     assert_eq!(&*meta.inbound.name, "DEFAULT-HTTP");
     assert_eq!(meta.dst, Address::new("example.com", 443));
     assert_eq!(meta.src, stream.local_addr().unwrap());
+    assert_eq!(meta.inbound.user_agent, None);
 }
 
 #[tokio::test]
@@ -65,6 +66,22 @@ async fn connect_follows_the_request_version_and_defaults_to_port_80() {
     assert_eq!(head, b"HTTP/1.0 200 Connection established\r\n\r\n");
     wait_for(|| run.fake.flow_count() == 1).await;
     assert_eq!(run.fake.flow(0).dst, Address::new("bare.test", 80));
+}
+
+#[tokio::test]
+async fn connect_keeps_its_user_agent_for_the_rules() {
+    let run = start(http_only(), Fake::echo()).await;
+    let mut stream = connect(run.addr(ListenerKind::Http).await).await;
+    stream
+        .write_all(b"CONNECT a.test:443 HTTP/1.1\r\nUser-Agent: Foo/1.0 (x)\r\n\r\n")
+        .await
+        .unwrap();
+    read_until(&mut stream, b"\r\n\r\n").await;
+    wait_for(|| run.fake.flow_count() == 1).await;
+    assert_eq!(
+        run.fake.flow(0).inbound.user_agent.as_deref(),
+        Some("Foo/1.0 (x)")
+    );
 }
 
 #[tokio::test]

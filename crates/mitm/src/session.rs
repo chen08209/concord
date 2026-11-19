@@ -2,12 +2,15 @@ use std::collections::HashMap;
 use std::future::Future;
 use std::io;
 use std::pin::Pin;
-use std::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
 use async_trait::async_trait;
-use concord_common::intercept::{ConnMark, HeldConn, InterceptFlow, UpstreamRequest};
+use concord_common::HttpFacts;
+use concord_common::intercept::{
+    ConnMark, HeldConn, InterceptFlow, Route, RuleLabel, UpstreamRequest,
+};
 use concord_common::sync::lock;
 use concord_common::{BoxStream, Tasks};
 use hyper::client::conn::{http1 as client1, http2 as client2};
@@ -40,6 +43,15 @@ pub(crate) struct PoolKey {
     pub https: bool,
     pub host: String,
     pub port: u16,
+    /// The chain a request routed on its own leaves through; none when the session's
+    /// route holds for it.
+    pub route: Option<Arc<[Arc<str>]>>,
+}
+
+/// A request's own route, still to be dialed, and what it was decided on.
+pub(crate) struct Routed {
+    pub route: Option<Route>,
+    pub http: Arc<HttpFacts>,
 }
 
 pub(crate) enum Sender {
@@ -50,6 +62,23 @@ pub(crate) enum Sender {
 pub(crate) struct UpConn {
     pub sender: Sender,
     pub id: Option<Arc<str>>,
+    pub hop: Arc<Hop>,
+}
+
+/// The route a connection was dialed by.
+#[derive(Debug)]
+pub(crate) struct Hop {
+    pub chain: Arc<[Arc<str>]>,
+    pub rule: Option<RuleLabel>,
+}
+
+impl Hop {
+    fn of(route: &Route) -> Arc<Hop> {
+        Arc::new(Hop {
+            chain: route.chain.clone(),
+            rule: route.rule.clone(),
+        })
+    }
 }
 
 impl UpConn {
@@ -69,6 +98,7 @@ impl UpConn {
             Sender::H2(sender) => Some(UpConn {
                 sender: Sender::H2(sender.clone()),
                 id: self.id.clone(),
+                hop: self.hop.clone(),
             }),
             Sender::H1(_) => None,
         }
@@ -80,6 +110,7 @@ struct Ready {
     host: String,
     port: u16,
     id: Option<Arc<str>>,
+    hop: Arc<Hop>,
 }
 
 #[derive(Default)]
@@ -110,6 +141,8 @@ pub(crate) struct Session {
     key_locks: Mutex<HashMap<PoolKey, Arc<tokio::sync::Mutex<()>>>>,
     ready: Mutex<Option<Ready>>,
     held: Mutex<Option<Arc<dyn HeldConn>>>,
+    /// The rules may route this session's requests apart, by their URL or User-Agent.
+    per_request: AtomicBool,
     /// The h2 streams, upstream drivers and upgrades of this client connection. They end when
     /// it is served, when the session drops, or when the engine stops.
     tasks: Tasks,
@@ -123,6 +156,7 @@ impl Session {
     pub fn new(core: Arc<Core>, scheme: Scheme, host: String, flow: InterceptFlow) -> Arc<Session> {
         let ended = core.tasks.child_token();
         let tasks = core.tasks.with_stop(ended.clone());
+        let per_request = scheme == Scheme::Http && core.shared.dialer.reads_http(&flow);
         Arc::new(Session {
             core,
             scheme,
@@ -132,6 +166,7 @@ impl Session {
             key_locks: Mutex::default(),
             ready: Mutex::new(None),
             held: Mutex::new(None),
+            per_request: AtomicBool::new(per_request),
             tasks,
             ended: ended.clone(),
             relays: Mutex::default(),
@@ -166,17 +201,28 @@ impl Session {
     /// Opens the connection the first request goes out on before the client's
     /// handshake is answered: a server the rules reject, or one that cannot be
     /// reached or verified, leaves the client to the tunnel as if its host were
-    /// not listed.
+    /// not listed. A server rejected only until its requests are read is not dialed,
+    /// and its requests are routed one by one.
     pub async fn connect(&self) -> io::Result<()> {
         let attempt = async {
-            let upstream = self
-                .core
-                .shared
-                .dialer
-                .dial(UpstreamRequest {
-                    flow: self.flow.clone(),
-                    hold: true,
-                })
+            let dialer = &self.core.shared.dialer;
+            let request = UpstreamRequest {
+                flow: self.flow.clone(),
+                hold: true,
+                http: None,
+            };
+            let route = dialer
+                .route(&request)
+                .await
+                .map_err(|failure| failure.error)?;
+            self.per_request
+                .store(route.http_pending, Ordering::Relaxed);
+            if route.reject.is_some() && route.http_pending {
+                return Ok(());
+            }
+            let hop = Hop::of(&route);
+            let upstream = dialer
+                .dial_routed(request, route)
                 .await
                 .map_err(|failure| failure.error)?;
             let id = upstream
@@ -197,6 +243,7 @@ impl Session {
                 host: self.host.clone(),
                 port: self.flow.port,
                 id,
+                hop,
             });
             Ok(())
         };
@@ -247,30 +294,54 @@ impl Session {
         .unwrap_or_else(|_| Err(io::ErrorKind::TimedOut.into()))
     }
 
-    /// Dials the server a request goes to, listing a failed dial under the
-    /// exchange as a connection of its own.
+    /// Whether a request to `host` and `port` is routed on its own: the session's route
+    /// could leave it elsewhere, or it goes to a server a rewrite chose.
+    pub fn routes_apart(&self, host: &str, port: u16) -> bool {
+        self.per_request.load(Ordering::Relaxed)
+            || (port != self.flow.port || !host.eq_ignore_ascii_case(&self.host))
+                && self.core.shared.dialer.reads_http(&self.flow)
+    }
+
+    /// Dials the server a request goes to, by the route decided for it when it has one,
+    /// listing a failed dial under the exchange as a connection of its own.
     async fn dial(
         &self,
         host: &str,
         port: u16,
         cap: &Cap,
-    ) -> io::Result<(BoxStream, Option<Arc<str>>)> {
+        routed: Option<&mut Routed>,
+    ) -> io::Result<(BoxStream, Option<Arc<str>>, Arc<Hop>)> {
         let flow = self.upstream_flow(host, port);
         let dialer = &self.core.shared.dialer;
-        match dialer
-            .dial(UpstreamRequest {
-                flow: flow.clone(),
-                hold: false,
-            })
-            .await
-        {
-            Ok(upstream) => Ok((upstream.stream, upstream.id)),
+        let request = UpstreamRequest {
+            flow: flow.clone(),
+            hold: false,
+            http: routed.as_ref().map(|routed| routed.http.clone()),
+        };
+        let route = match routed.and_then(|routed| routed.route.take()) {
+            Some(route) => Ok(route),
+            None => dialer.route(&request).await,
+        };
+        let dialed = match route {
+            Ok(route) => {
+                let hop = Hop::of(&route);
+                dialer
+                    .dial_routed(request, route)
+                    .await
+                    .map(|upstream| (upstream, hop))
+            }
+            Err(failure) => Err(failure),
+        };
+        match dialed {
+            Ok((upstream, hop)) => Ok((upstream.stream, upstream.id, hop)),
             Err(failure) => {
-                if !failure.chain.is_empty()
-                    && let Some(id) =
+                if !failure.chain.is_empty() {
+                    cap.routed(&failure.chain, failure.rule.as_ref());
+                    if let Some(id) =
                         dialer.record_closed(&flow, &failure.chain, failure.rule.as_ref())
-                {
-                    cap.attach(&id);
+                    {
+                        cap.attach(&id);
+                    }
                 }
                 Err(failure.error)
             }
@@ -291,6 +362,10 @@ impl Session {
         let fits = key.https
             && key.port == ready.port
             && key.host.eq_ignore_ascii_case(&ready.host)
+            && key
+                .route
+                .as_ref()
+                .is_none_or(|chain| *chain == ready.hop.chain)
             && !(http1 && negotiated_h2);
         if fits { slot.take() } else { None }
     }
@@ -302,19 +377,21 @@ impl Session {
         key: &PoolKey,
         http1: bool,
         cap: &Cap,
+        routed: Option<&mut Routed>,
     ) -> io::Result<(UpConn, bool)> {
         let guard = self.key_lock(key);
         let _serialized = guard.lock().await;
         if let Some(found) = self.pooled(key, http1) {
             cap.attach(found.id.as_deref().unwrap_or_default());
+            cap.routed(&found.hop.chain, found.hop.rule.as_ref());
             return Ok((found, true));
         }
         if let Some(ready) = self.take_ready(key, http1) {
             let h2 = ready.tls.get_ref().1.alpn_protocol() == Some(ALPN_H2.as_bytes());
-            let conn = self.start(ready.tls, h2, ready.id).await?;
+            let conn = self.start(ready.tls, h2, ready.id, ready.hop).await?;
             return Ok(self.register(key, conn, cap));
         }
-        let (stream, id) = self.dial(&key.host, key.port, cap).await?;
+        let (stream, id, hop) = self.dial(&key.host, key.port, cap, routed).await?;
         cap.attach(id.as_deref().unwrap_or_default());
         let conn = if key.https {
             let protocols: &[&str] = if http1 {
@@ -326,15 +403,16 @@ impl Session {
                 .tls_connect(stream, &key.host, key.port, protocols)
                 .await?;
             let h2 = tls.get_ref().1.alpn_protocol() == Some(ALPN_H2.as_bytes());
-            self.start(tls, h2, id).await?
+            self.start(tls, h2, id, hop).await?
         } else {
-            self.start(stream, false, id).await?
+            self.start(stream, false, id, hop).await?
         };
         Ok(self.register(key, conn, cap))
     }
 
     fn register(&self, key: &PoolKey, conn: UpConn, cap: &Cap) -> (UpConn, bool) {
         cap.attach(conn.id.as_deref().unwrap_or_default());
+        cap.routed(&conn.hop.chain, conn.hop.rule.as_ref());
         if let Some(shared) = conn.duplicate() {
             lock(&self.pool)
                 .entry(key.clone())
@@ -376,7 +454,13 @@ impl Session {
         }
     }
 
-    async fn start<S>(&self, io: S, h2: bool, id: Option<Arc<str>>) -> io::Result<UpConn>
+    async fn start<S>(
+        &self,
+        io: S,
+        h2: bool,
+        id: Option<Arc<str>>,
+        hop: Arc<Hop>,
+    ) -> io::Result<UpConn>
     where
         S: AsyncRead + AsyncWrite + Unpin + Send + 'static,
     {
@@ -400,7 +484,7 @@ impl Session {
             });
             Sender::H1(sender)
         };
-        Ok(UpConn { sender, id })
+        Ok(UpConn { sender, id, hop })
     }
 
     /// Serves the client connection until it closes, its CA is retired, it sits idle or its
@@ -521,7 +605,11 @@ impl ScriptDial for SessionDial {
             .core
             .shared
             .dialer
-            .dial(UpstreamRequest { flow, hold: false })
+            .dial(UpstreamRequest {
+                flow,
+                hold: false,
+                http: None,
+            })
             .await
             .map(|upstream| upstream.stream)
             .map_err(|failure| failure.error)

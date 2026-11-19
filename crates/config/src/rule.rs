@@ -65,6 +65,11 @@ pub enum Cond {
     InUser(Vec<String>),
     InName(Vec<String>),
     RematchName(Vec<String>),
+    /// Matched against an HTTP request's full URL; a flow whose requests the MITM engine
+    /// does not read leaves it undecided.
+    UrlRegex(String),
+    /// A `*`/`?` pattern over the request's User-Agent header, case-sensitive.
+    UserAgent(String),
     And(Vec<Cond>),
     Or(Vec<Cond>),
     Not(Box<Cond>),
@@ -113,6 +118,8 @@ impl Cond {
             Cond::InUser(_) => "IN-USER",
             Cond::InName(_) => "IN-NAME",
             Cond::RematchName(_) => "REMATCH-NAME",
+            Cond::UrlRegex(_) => "URL-REGEX",
+            Cond::UserAgent(_) => "USER-AGENT",
             Cond::And(_) => "AND",
             Cond::Or(_) => "OR",
             Cond::Not(_) => "NOT",
@@ -253,6 +260,8 @@ pub const T1_RULE_TYPES: &[&str] = &[
     "DSCP",
     "IN-NAME",
     "REMATCH-NAME",
+    "URL-REGEX",
+    "USER-AGENT",
 ];
 
 pub fn rule_type_names() -> impl Iterator<Item = &'static str> {
@@ -266,9 +275,60 @@ struct Parts {
     params: Vec<String>,
 }
 
+/// Types whose payload Surge lets a line double-quote to hold commas.
+const QUOTED_PAYLOAD: &[&str] = &["URL-REGEX", "USER-AGENT"];
+
+/// The quoted payload of a [QUOTED_PAYLOAD] line and the items after it. The closing quote
+/// is the first one followed by a comma or the end of the line.
+fn split_quoted(line: &str) -> Option<(String, Vec<&str>)> {
+    let (_, rest) = line.split_once(',')?;
+    let body = rest.trim_start_matches(' ').strip_prefix('"')?;
+    let close = body.match_indices('"').find_map(|(at, _)| {
+        let after = body.get(at + 1..)?.trim_start_matches(' ');
+        (after.is_empty() || after.starts_with(',')).then_some((at, after))
+    })?;
+    let (at, after) = close;
+    let payload = body.get(..at)?.to_string();
+    let items = after
+        .strip_prefix(',')
+        .map(|tail| tail.split(',').map(|part| part.trim_matches(' ')).collect())
+        .unwrap_or_default();
+    Some((payload, items))
+}
+
+/// A classical rule-set entry of a type whose payload may be quoted, with `target` after its
+/// payload.
+pub fn with_quoted_target(entry: &str, target: &str) -> Option<String> {
+    let kind = entry.split(',').next()?.trim_matches(' ').to_uppercase();
+    if !QUOTED_PAYLOAD.contains(&kind.as_str()) {
+        return None;
+    }
+    let (payload, params) = split_quoted(entry)?;
+    let mut line = format!("{kind},\"{payload}\",{target}");
+    for param in params {
+        line.push(',');
+        line.push_str(param);
+    }
+    Some(line)
+}
+
 fn split_rule(line: &str, need_target: bool) -> Parts {
     let items: Vec<&str> = line.split(',').map(|part| part.trim_matches(' ')).collect();
     let kind = items.first().copied().unwrap_or_default().to_uppercase();
+    if QUOTED_PAYLOAD.contains(&kind.as_str())
+        && let Some((payload, rest)) = split_quoted(line)
+    {
+        let (target, params) = match rest.split_first() {
+            Some((target, params)) if need_target => ((*target).to_string(), params),
+            _ => (String::new(), rest.as_slice()),
+        };
+        return Parts {
+            kind,
+            payload,
+            target,
+            params: params.iter().map(|p| (*p).to_string()).collect(),
+        };
+    }
     let mut parts = Parts {
         kind,
         payload: String::new(),
@@ -488,6 +548,11 @@ fn build_cond(parts: &Parts) -> Result<(Cond, bool, bool)> {
         "IN-USER" => Cond::InUser(slash_list(payload, "in user")?),
         "IN-NAME" => Cond::InName(slash_list(payload, "in name")?),
         "REMATCH-NAME" => Cond::RematchName(slash_list(payload, "rematch name")?),
+        "URL-REGEX" => {
+            crate::mitm::check_pattern(payload).map_err(|err| ConfigError::new(err.to_string()))?;
+            Cond::UrlRegex(owned())
+        }
+        "USER-AGENT" => Cond::UserAgent(owned()),
         "AND" => Cond::And(parse_logic(payload)?),
         "OR" => Cond::Or(parse_logic(payload)?),
         "NOT" => {
@@ -546,8 +611,11 @@ fn parse_logic(payload: &str) -> Result<Vec<Cond>> {
 fn paren_ranges(payload: &str) -> Result<Vec<(usize, usize)>> {
     let mut stack: Vec<usize> = Vec::new();
     let mut ranges = Vec::new();
+    let mut quoted = false;
     for (i, c) in payload.char_indices() {
         match c {
+            '"' => quoted = !quoted,
+            _ if quoted => {}
             '(' => stack.push(i),
             ')' => {
                 let start = stack.pop().ok_or_else(|| ConfigError::new("missing '('"))?;
@@ -614,6 +682,38 @@ mod tests {
             ok("AND,((REMATCH-NAME,first),(NETWORK,tcp)),DIRECT").cond,
             Cond::And(_)
         ));
+    }
+
+    #[test]
+    fn http_rules_take_a_quoted_payload() {
+        let rule = ok(r#"URL-REGEX,"^http:\/\/a\.com\/(x|y),?z",REJECT-TINYGIF"#);
+        assert_eq!(
+            rule.cond,
+            Cond::UrlRegex(r"^http:\/\/a\.com\/(x|y),?z".into())
+        );
+        assert_eq!(rule.target, "REJECT-TINYGIF");
+        let rule = ok(r#"USER-AGENT, "httpdns*", REJECT"#);
+        assert_eq!(rule.cond, Cond::UserAgent("httpdns*".into()));
+        assert_eq!(rule.target, "REJECT");
+        assert_eq!(
+            ok("USER-AGENT,Apple*,DIRECT").cond,
+            Cond::UserAgent("Apple*".into())
+        );
+        let rule =
+            ok(r#"AND,((URL-REGEX,"^http:\/\/.+\/amdc\/(a|b)\)"),(USER-AGENT,"Alibaba*")),REJECT"#);
+        assert_eq!(
+            rule.cond,
+            Cond::And(vec![
+                Cond::UrlRegex(r"^http:\/\/.+\/amdc\/(a|b)\)".into()),
+                Cond::UserAgent("Alibaba*".into()),
+            ])
+        );
+        assert!(parse_rule("URL-REGEX,^a(b,DIRECT").is_err());
+        assert_eq!(
+            with_quoted_target(r#"URL-REGEX,"a,b",extended-matching"#, "DIRECT").as_deref(),
+            Some(r#"URL-REGEX,"a,b",DIRECT,extended-matching"#)
+        );
+        assert_eq!(with_quoted_target("DOMAIN,a.com", "DIRECT"), None);
     }
 
     #[test]
@@ -800,7 +900,7 @@ mod tests {
     }
 
     #[test]
-    fn thirty_seven_types_are_known() {
-        assert_eq!(rule_type_names().count(), 37);
+    fn thirty_nine_types_are_known() {
+        assert_eq!(rule_type_names().count(), 39);
     }
 }

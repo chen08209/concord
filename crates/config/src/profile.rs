@@ -4,6 +4,7 @@ use indexmap::IndexMap;
 use serde_json::Value;
 
 use crate::Map;
+use crate::builtin::{self, is_builtin};
 use crate::dns::DnsConfig;
 use crate::error::{ConfigError, Result};
 use crate::general::General;
@@ -22,15 +23,6 @@ use crate::sniffer::SnifferConfig;
 use crate::tls::TlsConfig;
 use crate::tun::TunConfig;
 
-const BUILTIN_TARGETS: [&str; 7] = [
-    "DIRECT",
-    "REJECT",
-    "REJECT-DROP",
-    "PASS",
-    "PASS-RULE",
-    "COMPATIBLE",
-    "GLOBAL",
-];
 const RESERVED_PROVIDER: &str = "default";
 const DEFAULT_TEST_URL: &str = "https://www.gstatic.com/generate_204";
 
@@ -318,7 +310,7 @@ fn resolve_groups(
             group.empty_fallback = "COMPATIBLE".to_string();
         }
         let fallback = group.empty_fallback.clone();
-        let fallback_ok = (BUILTIN_TARGETS.contains(&fallback.as_str()) && fallback != "GLOBAL")
+        let fallback_ok = (is_builtin(&fallback) && fallback != "GLOBAL")
             || (names.resolves(&fallback) && !names.groups.contains(&fallback));
         if !fallback_ok {
             return Err(fail(format!(
@@ -355,7 +347,7 @@ fn resolve_groups(
         let had_proxies = !group.proxies.is_empty();
         let mut kept = Vec::with_capacity(group.proxies.len());
         for proxy in std::mem::take(&mut group.proxies) {
-            let builtin = BUILTIN_TARGETS.contains(&proxy.as_str()) && proxy != "GLOBAL";
+            let builtin = is_builtin(&proxy) && proxy != "GLOBAL";
             if names.known.contains(&proxy) || builtin {
                 kept.push(proxy);
             } else if names.quarantined.contains(&proxy) {
@@ -490,8 +482,7 @@ fn each_checked_rule<'a>(
                 "rule type {unsupported} is not supported by this core"
             )));
         }
-        let proxy =
-            BUILTIN_TARGETS.contains(&rule.target.as_str()) || ctx.names.resolves(&rule.target);
+        let proxy = is_builtin(&rule.target) || ctx.names.resolves(&rule.target);
         if !matches!(rule.cond, Cond::SubRule(_)) {
             if !proxy {
                 return Err(fail(&format!("proxy [{}] not found", rule.target)));
@@ -657,10 +648,9 @@ pub fn load_raw(mut raw: RawConfig, options: &LoadOptions) -> Result<Profile> {
     }
 
     let mut names = Names {
-        known: BUILTIN_TARGETS
-            .iter()
-            .filter(|name| **name != "GLOBAL")
-            .map(|s| (*s).to_string())
+        known: builtin::names()
+            .filter(|name| *name != "GLOBAL")
+            .map(str::to_string)
             .collect(),
         groups: HashSet::new(),
         quarantined: HashSet::new(),
@@ -675,9 +665,7 @@ pub fn load_raw(mut raw: RawConfig, options: &LoadOptions) -> Result<Profile> {
             ProxyParse::Ok(def) => def.name.clone(),
             ProxyParse::Quarantined { name, .. } => name.clone(),
         };
-        if names.known.contains(&name) && !BUILTIN_TARGETS.contains(&name.as_str())
-            || names.quarantined.contains(&name)
-        {
+        if names.known.contains(&name) && !is_builtin(&name) || names.quarantined.contains(&name) {
             return Err(
                 ConfigError::new(format!("proxy {name} is the duplicate name")).with_line(line),
             );

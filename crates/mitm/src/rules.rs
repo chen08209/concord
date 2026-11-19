@@ -90,6 +90,18 @@ pub struct Rules {
     indexes: index::Indexes,
 }
 
+impl UrlRewrite {
+    pub(crate) fn source(&self) -> &str {
+        self.pattern.source()
+    }
+}
+
+impl MapLocal {
+    pub(crate) fn source(&self) -> &str {
+        self.pattern.source()
+    }
+}
+
 pub fn tiny_gif() -> Vec<u8> {
     decode_base64(TINY_GIF_BASE64).unwrap_or_default()
 }

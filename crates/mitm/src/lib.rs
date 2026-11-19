@@ -22,6 +22,8 @@ mod module_view;
 mod pattern;
 #[cfg(feature = "script")]
 mod quickjs;
+#[cfg(test)]
+mod routing_tests;
 mod rules;
 mod script;
 #[cfg(test)]
@@ -38,7 +40,7 @@ mod view;
 mod view_tests;
 
 pub use ca::{Authority, Ca, CaError, CertificateInfo};
-pub use capture::{Action, Body, Exchange, ExchangeList, ExchangeSummary};
+pub use capture::{Action, Body, Exchange, ExchangeList, ExchangeSummary, RouteNote};
 pub use concord_config::mitm::{IssueKind, LineError};
 pub use config::{Config, Issue, LineEntry, RawConfig, Validation};
 pub use cron::{LocalClock, UtcClock};

@@ -234,6 +234,7 @@ fn dispatch(
         addr: local,
         user,
         host: false,
+        user_agent: None,
     };
     let flow = UdpFlow {
         inbound: &inbound,

@@ -88,6 +88,7 @@ impl Table {
             addr: local,
             user: None,
             host: false,
+            user_agent: None,
         };
         let flow = UdpFlow {
             inbound: &inbound,

@@ -408,7 +408,9 @@
       "DOMAIN-WILDCARD",
       "DSCP",
       "IN-NAME",
-      "REMATCH-NAME"
+      "REMATCH-NAME",
+      "URL-REGEX",
+      "USER-AGENT"
     ],
     "t2": []
   },

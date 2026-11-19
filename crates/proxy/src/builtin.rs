@@ -40,6 +40,11 @@ pub fn reject() -> Arc<dyn Outbound> {
     Arc::new(Reject::new("REJECT", OutboundKind::Reject))
 }
 
+/// A `REJECT` under another name, which only the MITM engine tells apart.
+pub fn reject_named(name: &str) -> Arc<dyn Outbound> {
+    Arc::new(Reject::new(name, OutboundKind::Reject))
+}
+
 pub fn reject_drop() -> Arc<dyn Outbound> {
     Arc::new(Reject::new("REJECT-DROP", OutboundKind::RejectDrop))
 }

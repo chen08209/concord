@@ -77,6 +77,7 @@ impl ScriptDial for TaskDial {
             .dial(UpstreamRequest {
                 flow: task_flow(host, port),
                 hold: false,
+                http: None,
             })
             .await
             .map(|upstream| upstream.stream)

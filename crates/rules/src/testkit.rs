@@ -72,6 +72,9 @@ pub(crate) struct Flow {
     pub resolves_to: Option<IpAddr>,
     pub process: Option<(&'static str, &'static str, u32)>,
     pub dscp: u8,
+    /// The request's URL and User-Agent, once read.
+    pub http: Option<(&'static str, Option<&'static str>)>,
+    pub connect_agent: Option<&'static str>,
 }
 
 impl Flow {
@@ -89,6 +92,8 @@ impl Flow {
             resolves_to: None,
             process: None,
             dscp: 0,
+            http: None,
+            connect_agent: None,
         }
     }
 
@@ -104,6 +109,7 @@ impl Flow {
         let mut inbound = InboundInfo::new(self.kind);
         inbound.name = Arc::from(self.inbound_name);
         inbound.user = self.user.map(Arc::from);
+        inbound.user_agent = self.connect_agent.map(Arc::from);
         inbound.addr = Some(SocketAddr::from(([127, 0, 0, 1], self.in_port)));
         let dst = match (self.literal_ip, self.host) {
             (Some(ip), _) => Address::Socket(SocketAddr::new(ip, self.dst_port)),
@@ -127,6 +133,7 @@ pub(crate) struct Trace {
     pub ip_lookups: u32,
     pub process_lookups: u32,
     pub observed: crate::Observed,
+    pub http_pending: bool,
 }
 
 /// Drives a program like the tunnel does. Targets `PASS` and `PASS-RULE` are
@@ -140,6 +147,12 @@ pub(crate) fn drive(
 ) -> Trace {
     let meta = flow.meta();
     let mut state = RouteState::seed(&meta.dst);
+    state.http = flow.http.map(|(url, user_agent)| {
+        Arc::new(concord_common::HttpFacts {
+            url: url.into(),
+            user_agent: user_agent.map(Into::into),
+        })
+    });
     let mut ctx = MatchCtx::new(geo);
     ctx.dscp = flow.dscp;
     let mut trace = Trace::default();
@@ -151,6 +164,7 @@ pub(crate) fn drive(
         match run.step(&meta, &state, &ctx) {
             Step::Done => {
                 trace.observed = run.take_observed();
+                trace.http_pending = run.http_pending();
                 return trace;
             }
             Step::NeedIp => {
@@ -177,6 +191,7 @@ pub(crate) fn drive(
                     _ if accept_first => {
                         trace.accepted = trace.candidates.last().cloned();
                         trace.observed = run.take_observed();
+                        trace.http_pending = run.http_pending();
                         return trace;
                     }
                     _ => run.skip(),

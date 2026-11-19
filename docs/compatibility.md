@@ -71,6 +71,16 @@ shorter positive keepalive period for that peer. quic-go applies the cap to the 
 previous value. `REMATCH-NAME` matches case-sensitive names separated by `/`. Matching restarts after selecting a
 rematch node, including through a group; unknown sub-rule names use the main rules, and cycles close the flow.
 
+`URL-REGEX` and `USER-AGENT`, which mihomo does not have, match an HTTP request as Surge's do: the first finds its
+regex, read as MITM patterns are, anywhere in the full URL, and the second matches the User-Agent header against a
+case-sensitive `*` and `?` pattern. Either payload may be double-quoted to hold commas. Until a request is read
+they are undecided: they do not match, a `NOT` around one does not turn that into a match, and matching goes on
+to the rules after them.
+
+Surge's and Loon's REJECT variants are built-in policies: `REJECT-NO-DROP`, `REJECT-TINYGIF`, `REJECT-IMG`,
+`REJECT-DICT`, `REJECT-ARRAY`, `REJECT-200` and `REJECT-VIDEO` reject a connection as `REJECT` does, and keep
+their names in the connection's chain. They are not listed among the proxies.
+
 ## External Controller
 
 Concord serves the Clash REST and WebSocket API, in mihomo's shapes, for dashboards such as metacubexd, zashboard and yacd, with the same
@@ -200,6 +210,15 @@ The rules of a phase are picked as it begins, so a rewrite earlier in the phase 
 the host a request goes to (a `Host` line naming another host is put back), `Content-Length` or `Transfer-Encoding`; a
 result that is not a head leaves the head as it was. A body rewrite whose first regex is literally `request-head` or
 `response-head` reads as a condition; write it another way, such as `request-hea[d]`.
+On a connection opened by an HTTP proxy CONNECT, USER-AGENT reads the CONNECT request's User-Agent until a
+request is read, as Surge does, so it decides such a connection without decryption.
+Requests the MITM engine reads are routed one by one when the rules may tell them apart: when a URL-REGEX or
+USER-AGENT rule ahead of the one that decided the connection was undecided, or when a rewrite sends a request to
+another server while the rules read requests. Each such request is routed with its URL, as rewrites, Map Local and
+the request script left it, and its User-Agent; it reuses only a connection that leaves through the same chain. A
+host the rules reject only until its requests are read is still decrypted, and a request a REJECT variant decides
+gets the variant's reply (`REJECT-TINYGIF` a GIF, `REJECT-DICT` `{}`, `REJECT-DROP` no answer). While the rules
+read requests, plain HTTP on port 80 is read for any host.
 A `map-local` line takes `request-head <re>` after its URL as well. `request-body-mock`, a list of Concord's own for
 Loon's `mock-request-body`, takes `map-local`'s parameters but `status-code`: the first line whose URL and condition
 match sends its data upstream in place of the request's body, a request that had none included, with `header=`

@@ -22,6 +22,10 @@ use tokio::time::timeout;
 #[path = "e2e/mitm.rs"]
 mod mitm;
 
+#[cfg(feature = "mitm")]
+#[path = "e2e/http_rules.rs"]
+mod http_rules;
+
 #[path = "e2e/rematch.rs"]
 mod rematch;
 

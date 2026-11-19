@@ -306,6 +306,12 @@ impl Outbounds {
             );
             node_order.push(name);
         }
+        for name in concord_config::builtin::REJECT_REPLIES {
+            table.insert(
+                Arc::from(name),
+                Entry::Leaf(Leaf::new(factory.builtin(Builtin::RejectReply(name)), None)),
+            );
+        }
         for def in std::mem::take(&mut profile.proxies) {
             let name: Arc<str> = Arc::from(def.name.as_str());
             if table.contains_key(&name) {

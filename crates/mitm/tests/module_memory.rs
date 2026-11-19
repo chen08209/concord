@@ -12,7 +12,7 @@ use std::sync::atomic::{AtomicIsize, Ordering};
 
 use async_trait::async_trait;
 use concord_common::intercept::{
-    DialFailure, InterceptFlow, RuleLabel, Upstream, UpstreamDialer, UpstreamRequest,
+    DialFailure, InterceptFlow, Route, RuleLabel, Upstream, UpstreamDialer, UpstreamRequest,
 };
 use concord_mitm::{Mitm, MitmEnv, RawConfig, UtcClock};
 use concord_platform::HomeDir;
@@ -54,7 +54,11 @@ struct NoDial;
 
 #[async_trait]
 impl UpstreamDialer for NoDial {
-    async fn dial(&self, _: UpstreamRequest) -> Result<Upstream, DialFailure> {
+    async fn route(&self, _: &UpstreamRequest) -> Result<Route, DialFailure> {
+        Err(io::Error::other("these tests send no traffic").into())
+    }
+
+    async fn dial_routed(&self, _: UpstreamRequest, _: Route) -> Result<Upstream, DialFailure> {
         Err(io::Error::other("these tests send no traffic").into())
     }
 

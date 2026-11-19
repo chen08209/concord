@@ -1,8 +1,9 @@
+use std::any::Any;
 use std::io;
 use std::net::IpAddr;
 use std::sync::Arc;
 
-use crate::{Address, BoxStream, FlowMeta, Host, InboundKind};
+use crate::{Address, BoxStream, CoreError, FlowMeta, Host, HttpFacts, InboundKind};
 use async_trait::async_trait;
 
 #[derive(Clone, Debug)]
@@ -75,6 +76,61 @@ pub struct UpstreamRequest {
     pub flow: InterceptFlow,
     /// Keep the connection out of the table until `Upstream::held` is released.
     pub hold: bool,
+    /// The request the connection is for, read in the clear, for the HTTP rules.
+    pub http: Option<Arc<HttpFacts>>,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Reject {
+    /// Answered: an HTTP request gets a local reply.
+    Reply,
+    /// Dropped without an answer.
+    Drop,
+}
+
+/// Where the rules send a request, decided before it is dialed so that connections can
+/// be pooled by it.
+pub struct Route {
+    /// The outbounds the connection leaves through, exit first. Requests with equal
+    /// chains may share a connection.
+    pub chain: Arc<[Arc<str>]>,
+    pub rule: Option<RuleLabel>,
+    pub reject: Option<Reject>,
+    /// A rule ahead of the deciding one was left undecided for want of the request, so
+    /// routing again with it may end elsewhere.
+    pub http_pending: bool,
+    plan: Option<Box<dyn Any + Send + Sync>>,
+}
+
+impl Route {
+    /// `plan` is what the dialer needs to dial the route it decided.
+    pub fn new(
+        chain: Arc<[Arc<str>]>,
+        rule: Option<RuleLabel>,
+        reject: Option<Reject>,
+        http_pending: bool,
+        plan: Box<dyn Any + Send + Sync>,
+    ) -> Route {
+        Route {
+            chain,
+            rule,
+            reject,
+            http_pending,
+            plan: Some(plan),
+        }
+    }
+
+    pub fn take_plan(&mut self) -> Option<Box<dyn Any + Send + Sync>> {
+        self.plan.take()
+    }
+
+    pub fn rejected(&self) -> DialFailure {
+        DialFailure {
+            chain: self.chain.to_vec(),
+            rule: self.rule.clone(),
+            error: CoreError::Rejected("rejected by the rules".to_string()).into(),
+        }
+    }
 }
 
 pub struct Upstream {
@@ -108,7 +164,25 @@ impl From<io::Error> for DialFailure {
 
 #[async_trait]
 pub trait UpstreamDialer: Send + Sync {
-    async fn dial(&self, request: UpstreamRequest) -> Result<Upstream, DialFailure>;
+    async fn route(&self, request: &UpstreamRequest) -> Result<Route, DialFailure>;
+
+    /// Dials a route `route` decided for the same request; a rejecting route fails.
+    async fn dial_routed(
+        &self,
+        request: UpstreamRequest,
+        route: Route,
+    ) -> Result<Upstream, DialFailure>;
+
+    async fn dial(&self, request: UpstreamRequest) -> Result<Upstream, DialFailure> {
+        let route = self.route(&request).await?;
+        self.dial_routed(request, route).await
+    }
+
+    /// The rules `flow` is routed by read HTTP requests, so each of its requests needs a
+    /// route of its own.
+    fn reads_http(&self, _flow: &InterceptFlow) -> bool {
+        false
+    }
 
     /// Lists a closed `mitm` connection for a request that went out on none of its own.
     fn record_closed(

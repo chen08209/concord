@@ -1,6 +1,8 @@
 use std::sync::Arc;
 
-use http::header::{CONTENT_LENGTH, CONTENT_TYPE, HOST, LOCATION, UPGRADE};
+use concord_common::HttpFacts;
+use concord_common::intercept::{Reject, Route, RuleLabel, UpstreamRequest};
+use http::header::{CONTENT_LENGTH, CONTENT_TYPE, HOST, LOCATION, UPGRADE, USER_AGENT};
 use http::{Extensions, HeaderMap, HeaderValue, Method, Request, Response, StatusCode, Version};
 use http_body_util::BodyExt;
 use hyper::body::{Body as HttpBody, Incoming};
@@ -14,13 +16,16 @@ use crate::capture::Cap;
 use crate::headers::{remove_hop_by_hop, request_head, text, to_list, version_text, with_host};
 use crate::heads::Heads;
 use crate::rules::{UrlAction, tiny_gif};
-use crate::session::{ActivityGuard, Session};
+use crate::session::{ActivityGuard, Routed, Session};
 use crate::target::{TargetUrl, default_port};
 
 pub(crate) const ANSWER_REJECT: &str = "REJECT";
 pub(crate) const ANSWER_REDIRECT: &str = "REDIRECT";
 pub(crate) const ANSWER_MAP_LOCAL: &str = "MAP-LOCAL";
 pub(crate) const ANSWER_SCRIPT: &str = "SCRIPT";
+pub(crate) const RULE_URL_REWRITE: &str = "URL-REWRITE";
+pub(crate) const RULE_MAP_LOCAL: &str = "MAP-LOCAL";
+pub(crate) const RULE_SCRIPT: &str = "SCRIPT";
 
 #[derive(Debug)]
 pub(crate) struct Abort;
@@ -157,6 +162,38 @@ fn local(
     response
 }
 
+/// The reply a REJECT variant asks for, by the name it leaves in the chain.
+fn reject_action(route: &Route) -> UrlAction {
+    match route.chain.first().map(|exit| &**exit) {
+        Some("REJECT-TINYGIF" | "REJECT-IMG") => UrlAction::RejectImg,
+        Some("REJECT-DICT") => UrlAction::RejectDict,
+        Some("REJECT-ARRAY") => UrlAction::RejectArray,
+        Some("REJECT-200" | "REJECT-VIDEO") => UrlAction::Reject200,
+        _ => UrlAction::Reject,
+    }
+}
+
+/// What the request shows the rules once the rules before the dial have run.
+fn http_facts(out: &OutRequest) -> Arc<HttpFacts> {
+    Arc::new(HttpFacts {
+        url: out.url.raw.as_str().into(),
+        user_agent: out
+            .headers
+            .get(USER_AGENT)
+            .and_then(|agent| agent.to_str().ok())
+            .map(Into::into),
+    })
+}
+
+/// Why a request did not go upstream.
+pub(crate) enum Unsent {
+    /// The rules rejected it with this reply.
+    Answer(StatusCode, HeaderMap, Vec<u8>),
+    /// The rules rejected it without one.
+    Drop,
+    Failed(String),
+}
+
 fn reject_response(action: UrlAction) -> (StatusCode, Option<&'static str>, Vec<u8>) {
     match action {
         UrlAction::Reject => (StatusCode::NOT_FOUND, None, Vec::new()),
@@ -182,15 +219,119 @@ impl Session {
         TargetUrl::from_request(self.https(), &authority, path)
     }
 
-    /// Lists a request that went out on no connection, as one closed at once.
-    pub(crate) fn answered(&self, target: &Target, chain: &str) {
+    /// Lists a request that went out on no connection, as one closed at once, under the
+    /// rule that answered it.
+    pub(crate) fn answered(&self, target: &Target, chain: &str, rule: &str, payload: &str) {
         if !target.cap.is_some() {
             return;
         }
         let flow = self.upstream_flow(&target.url.host, target.url.port);
         let chain = [Arc::<str>::from(chain)];
-        if let Some(id) = self.core.shared.dialer.record_closed(&flow, &chain, None) {
+        let rule = RuleLabel {
+            name: rule.into(),
+            payload: payload.into(),
+        };
+        target.cap.routed(&chain, Some(&rule));
+        if let Some(id) = self
+            .core
+            .shared
+            .dialer
+            .record_closed(&flow, &chain, Some(&rule))
+        {
             target.cap.attach(&id);
+        }
+    }
+
+    /// Routes a request the session's route may not hold for; `None` leaves it to the
+    /// session's.
+    pub(crate) fn route_request<'a>(
+        &'a self,
+        out: &OutRequest,
+        target: &'a Target,
+    ) -> impl Future<Output = Result<Option<Routed>, Unsent>> + Send + 'a {
+        let apart = self
+            .routes_apart(&out.url.host, out.url.port)
+            .then(|| (out.url.clone(), http_facts(out)));
+        async move {
+            match apart {
+                Some((url, http)) => self.routed(&url, http, target).await,
+                None => Ok(None),
+            }
+        }
+    }
+
+    async fn routed(
+        &self,
+        url: &TargetUrl,
+        http: Arc<HttpFacts>,
+        target: &Target,
+    ) -> Result<Option<Routed>, Unsent> {
+        let flow = self.upstream_flow(&url.host, url.port);
+        let dialer = &self.core.shared.dialer;
+        let request = UpstreamRequest {
+            flow: flow.clone(),
+            hold: false,
+            http: Some(http.clone()),
+        };
+        let route = match dialer.route(&request).await {
+            Ok(route) => route,
+            Err(failure) => {
+                if !failure.chain.is_empty() {
+                    target.cap.routed(&failure.chain, failure.rule.as_ref());
+                    if let Some(id) =
+                        dialer.record_closed(&flow, &failure.chain, failure.rule.as_ref())
+                    {
+                        target.cap.attach(&id);
+                    }
+                }
+                return Err(Unsent::Failed(failure.error.to_string()));
+            }
+        };
+        let Some(reject) = route.reject else {
+            return Ok(Some(Routed {
+                route: Some(route),
+                http,
+            }));
+        };
+        target.cap.routed(&route.chain, route.rule.as_ref());
+        if let Some(id) = dialer.record_closed(&flow, &route.chain, route.rule.as_ref()) {
+            target.cap.attach(&id);
+        }
+        let exit = route.chain.first().map_or("", |exit| &**exit);
+        match &route.rule {
+            Some(rule) => tracing::info!(
+                "[MITM] {exit} {} (match {}/{})",
+                url.raw,
+                rule.name,
+                rule.payload
+            ),
+            None => tracing::info!("[MITM] {exit} {}", url.raw),
+        }
+        if reject == Reject::Drop {
+            return Err(Unsent::Drop);
+        }
+        let (status, content_type, data) = reject_response(reject_action(&route));
+        let mut headers = HeaderMap::new();
+        if let Some(content_type) = content_type {
+            headers.insert(CONTENT_TYPE, HeaderValue::from_static(content_type));
+        }
+        Err(Unsent::Answer(status, headers, data))
+    }
+
+    fn unsent(
+        &self,
+        unsent: Unsent,
+        cap: &Cap,
+        guard: ActivityGuard,
+    ) -> Result<Response<Body>, Abort> {
+        match unsent {
+            Unsent::Answer(status, headers, data) => Ok(local(cap, status, headers, data, guard)),
+            Unsent::Drop => {
+                cap.fail("rejected by the rules");
+                cap.finish();
+                Err(Abort)
+            }
+            Unsent::Failed(message) => self.proxy_error(cap, &message, guard),
         }
     }
 
@@ -206,7 +347,7 @@ impl Session {
             match rule.action {
                 UrlAction::Redirect302 | UrlAction::Redirect307 => {
                     target.cap.note("url-rewrite", "", rule.action.name());
-                    self.answered(target, ANSWER_REDIRECT);
+                    self.answered(target, ANSWER_REDIRECT, RULE_URL_REWRITE, rule.source());
                     tracing::info!(
                         "[MITM] {} {} --> {replaced}",
                         rule.action.name(),
@@ -237,7 +378,7 @@ impl Session {
                 },
                 action => {
                     target.cap.note("url-rewrite", "", action.name());
-                    self.answered(target, ANSWER_REJECT);
+                    self.answered(target, ANSWER_REJECT, RULE_URL_REWRITE, rule.source());
                     tracing::info!("[MITM] {} {}", action.name(), target.url.raw);
                     let (status, content_type, data) = reject_response(action);
                     let mut headers = HeaderMap::new();
@@ -250,7 +391,7 @@ impl Session {
         }
         let rule = rules.map_local(&target.url.raw, heads)?;
         target.cap.note("map-local", "", "");
-        self.answered(target, ANSWER_MAP_LOCAL);
+        self.answered(target, ANSWER_MAP_LOCAL, RULE_MAP_LOCAL, rule.source());
         tracing::info!("[MITM] map local {}", target.url.raw);
         Some((rule.status, rule.header.clone(), rule.body.clone()))
     }
@@ -346,7 +487,7 @@ impl Session {
             None => {
                 let (response, upgrade) = match self.round_trip(out, &target).await {
                     Ok(reply) => reply,
-                    Err(err) => return self.proxy_error(&cap, &err.to_string(), guard),
+                    Err(unsent) => return self.unsent(unsent, &cap, guard),
                 };
                 let (mut head, incoming) = response.into_parts();
                 let mut body = from_incoming(incoming);

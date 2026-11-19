@@ -51,7 +51,8 @@ pub const PRODUCT_NAME: &str = match option_env!("CONCORD_PRODUCT_NAME") {
 pub use addr::{Address, Host, IpVersion, Network, ip4p_target};
 pub use clock::ClockOffset;
 pub use meta::{
-    DnsMode, FlowKey, FlowMeta, InboundInfo, InboundKind, ProcessInfo, RouteState, UdpFlow,
+    DnsMode, FlowKey, FlowMeta, HttpFacts, InboundInfo, InboundKind, ProcessInfo, RouteState,
+    UdpFlow,
 };
 pub use options::{CoreOptions, FindProcessMode, LogLevel, TunnelMode};
 

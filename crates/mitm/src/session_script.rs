@@ -6,7 +6,8 @@ use http::{HeaderMap, StatusCode};
 use crate::body::{Body, Buffered, buffer_body, empty, failing, full};
 use crate::capture::{PHASE_REQUEST, PHASE_RESPONSE};
 use crate::exchange::{
-    ANSWER_SCRIPT, Answer, OutRequest, ReplyError, Sent, Target, has_response_body, set_length,
+    ANSWER_SCRIPT, Answer, OutRequest, RULE_SCRIPT, ReplyError, Sent, Target, has_response_body,
+    set_length,
 };
 use crate::headers::{is_grpc, script_header, to_list, with_host};
 use crate::limits::PRESSURE_NO_SCRIPTS;
@@ -108,13 +109,13 @@ impl Session {
         target.cap.note("script", PHASE_REQUEST, &script.name);
         if result.abort {
             target.abort = true;
-            self.answered(target, ANSWER_SCRIPT);
+            self.answered(target, ANSWER_SCRIPT, RULE_SCRIPT, &script.name);
             tracing::info!("[MITM] script {} aborted {address}", script.name);
             return;
         }
         if let Some(response) = result.response {
             target.answer = Some(script_answer(response));
-            self.answered(target, ANSWER_SCRIPT);
+            self.answered(target, ANSWER_SCRIPT, RULE_SCRIPT, &script.name);
             tracing::info!("[MITM] script {} answered {address}", script.name);
             return;
         }

@@ -28,6 +28,8 @@ pub(crate) struct Decision {
     pub provider_chain: Box<[Arc<str>]>,
     pub exit_group: Option<Arc<str>>,
     pub rule: Option<MatchedRule>,
+    /// A rule ahead of the deciding one waited for an HTTP request the flow does not carry.
+    pub http_pending: bool,
 }
 
 impl Decision {
@@ -46,6 +48,7 @@ impl Decision {
                 provider_chain,
                 exit_group,
                 rule,
+                http_pending: false,
             }),
             Resolved::Rematch(leaf) => Ok(rematch_decision(target, leaf, rule)),
             Resolved::Rejected(reason) => Err(CoreError::Rejected(reason.to_string()).into()),
@@ -53,6 +56,11 @@ impl Decision {
                 Err(CoreError::UnknownNode(target.to_string()).into())
             }
         }
+    }
+
+    fn pending(mut self, http_pending: bool) -> Self {
+        self.http_pending = http_pending;
+        self
     }
 
     /// `exitName`: a load balancer is the exit, since it spreads connections without
@@ -203,7 +211,8 @@ async fn match_rules(
                 let resolved = runtime
                     .outbounds
                     .resolve("DIRECT", &flow.meta, host_key, touch);
-                return Decision::of("DIRECT", resolved, None);
+                return Decision::of("DIRECT", resolved, None)
+                    .map(|decision| decision.pending(run.http_pending()));
             }
             Step::NeedIp => {
                 resolve_rule_ip(flow, runtime).await;
@@ -231,7 +240,8 @@ async fn match_rules(
                             &name,
                             leaf,
                             Some(matched_rule(runtime.program.rule_at(rule))),
-                        ));
+                        )
+                        .pending(run.http_pending()));
                     }
                     Resolved::Unknown | Resolved::Pass => {
                         run.skip();
@@ -263,7 +273,8 @@ async fn match_rules(
                 };
                 flow.observed = run.take_observed();
                 let matched = matched_rule(runtime.program.rule_at(rule));
-                return Decision::of(target, resolved, Some(matched));
+                return Decision::of(target, resolved, Some(matched))
+                    .map(|decision| decision.pending(run.http_pending()));
             }
         }
     }
@@ -291,6 +302,7 @@ fn rematch_decision(target: &str, leaf: Arc<dyn Outbound>, rule: Option<MatchedR
         chain: vec![name].into(),
         exit_group: None,
         rule,
+        http_pending: false,
     }
 }
 

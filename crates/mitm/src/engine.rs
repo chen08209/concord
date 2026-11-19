@@ -215,7 +215,7 @@ impl Core {
         let hosts = &self.config.hosts;
         let port = flow.port;
         let domain = domain_of(flow);
-        if port == HTTP_PORT && self.config.plain_http {
+        if port == HTTP_PORT && (self.config.plain_http || self.shared.dialer.reads_http(flow)) {
             return match (domain, flow.dst_ip) {
                 ("", Some(ip)) => !hosts.excludes(&ip.to_string(), port),
                 (domain, _) => !hosts.excludes(domain, port),

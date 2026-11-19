@@ -354,3 +354,24 @@ proxy-groups:
     tokio::time::sleep(Duration::from_secs(1)).await;
     assert_eq!((connects(&rig, "a"), connects(&rig, "n1")), (1, 1));
 }
+
+#[tokio::test(start_paused = true)]
+async fn a_reject_variant_is_built_in_and_keeps_its_name() {
+    let rig = Rig::new(
+        "proxy-groups:
+  - {name: ads, type: select, proxies: [REJECT-TINYGIF, DIRECT]}
+",
+    );
+    for name in concord_config::builtin::REJECT_REPLIES {
+        let Resolved::Route { leaf, chain, .. } = rig.resolve(name) else {
+            panic!("{name} does not resolve to a route");
+        };
+        assert_eq!(leaf.info().kind, OutboundKind::Reject);
+        assert_eq!(&*leaf.info().name, name);
+        assert_eq!(chain.first().map(|exit| &**exit), Some(name));
+    }
+    let Resolved::Route { chain, .. } = rig.resolve("ads") else {
+        panic!("ads does not resolve to a route");
+    };
+    assert_eq!(&*chain[0], "REJECT-TINYGIF");
+}

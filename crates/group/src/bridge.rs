@@ -26,6 +26,7 @@ impl NodeFactory for ProxyFactory {
                 builtin::direct_with("DIRECT", self.ctx.loopback.clone(), self.ctx.tasks.clone())
             }
             Builtin::Reject => builtin::reject(),
+            Builtin::RejectReply(name) => builtin::reject_named(name),
             Builtin::RejectDrop => builtin::reject_drop(),
             Builtin::Compatible => {
                 builtin::compatible_with(self.ctx.loopback.clone(), self.ctx.tasks.clone())

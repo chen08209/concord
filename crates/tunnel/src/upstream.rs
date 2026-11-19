@@ -3,17 +3,17 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Weak};
 
 use async_trait::async_trait;
-use concord_common::{ConnRecord, CoreError, OutboundKind, io_error};
+use concord_common::{ConnRecord, OutboundKind, io_error};
 
 use crate::flow::FlowState;
 use crate::intercept::{
-    ConnMark, DialFailure, HeldConn, InterceptFlow, RuleLabel, Upstream, UpstreamDialer,
-    UpstreamRequest,
+    ConnMark, DialFailure, HeldConn, InterceptFlow, Reject, Route, RuleLabel, Upstream,
+    UpstreamDialer, UpstreamRequest,
 };
 use crate::route::Decision;
-use crate::runtime::Inner;
+use crate::runtime::{Inner, Runtime};
 use crate::table::{ConnTable, Tracked};
-use crate::tcp::{FailedDial, MeteredStream, dial_traced, record_of};
+use crate::tcp::{FailedDial, MeteredStream, dial_decided, record_of, route_traced};
 
 /// `dialMITM`. It holds the tunnel weakly, because the tunnel's interceptor holds this.
 pub(crate) struct TunnelUpstream {
@@ -86,9 +86,17 @@ impl Drop for Held {
     }
 }
 
+/// What [TunnelUpstream::route] decided, kept for the dial.
+struct Plan {
+    flow: FlowState,
+    decision: Decision,
+    runtime: Arc<Runtime>,
+    closes: u64,
+}
+
 #[async_trait]
 impl UpstreamDialer for TunnelUpstream {
-    async fn dial(&self, request: UpstreamRequest) -> Result<Upstream, DialFailure> {
+    async fn route(&self, request: &UpstreamRequest) -> Result<Route, DialFailure> {
         let inner = self
             .inner
             .upgrade()
@@ -98,15 +106,53 @@ impl UpstreamDialer for TunnelUpstream {
             .runtime_for(request.flow.meta.inbound.kind)
             .ok_or_else(|| io_error("the core is not running"))?;
         let mut flow = FlowState::of_intercept(&request.flow);
-        let (remote, decision) = dial_traced(&inner, &runtime, &mut flow).await?;
-        let kind = decision.leaf.info().kind;
-        if matches!(kind, OutboundKind::Reject | OutboundKind::RejectDrop) {
-            return Err(DialFailure {
-                chain: decision.chain.to_vec(),
-                rule: label_of(&decision),
-                error: CoreError::Rejected("rejected by the rules".to_string()).into(),
-            });
+        flow.http = request.http.clone();
+        let decision = route_traced(&inner, &runtime, &mut flow).await?;
+        let reject = match decision.leaf.info().kind {
+            OutboundKind::Reject => Some(Reject::Reply),
+            OutboundKind::RejectDrop => Some(Reject::Drop),
+            _ => None,
+        };
+        let chain = Arc::from(decision.chain.clone());
+        let rule = label_of(&decision);
+        let http_pending = decision.http_pending;
+        let plan = Plan {
+            flow,
+            decision,
+            runtime,
+            closes,
+        };
+        Ok(Route::new(
+            chain,
+            rule,
+            reject,
+            http_pending,
+            Box::new(plan),
+        ))
+    }
+
+    async fn dial_routed(
+        &self,
+        request: UpstreamRequest,
+        mut route: Route,
+    ) -> Result<Upstream, DialFailure> {
+        if route.reject.is_some() {
+            return Err(route.rejected());
         }
+        let Plan {
+            mut flow,
+            decision,
+            runtime,
+            closes,
+        } = *route
+            .take_plan()
+            .and_then(|plan| plan.downcast::<Plan>().ok())
+            .ok_or_else(|| io_error("a route is dialed once"))?;
+        let inner = self
+            .inner
+            .upgrade()
+            .ok_or_else(|| io_error("the tunnel is gone"))?;
+        let (remote, decision) = dial_decided(&inner, &runtime, &mut flow, decision).await?;
         tracing::info!("{}", decision.match_text(&flow, &inner.live()));
         let record = record_of(&flow, &decision, &remote);
         let all_closed = || DialFailure {
@@ -144,6 +190,13 @@ impl UpstreamDialer for TunnelUpstream {
             id: Some(id),
             held: None,
         })
+    }
+
+    fn reads_http(&self, flow: &InterceptFlow) -> bool {
+        self.inner
+            .upgrade()
+            .and_then(|inner| inner.runtime_for(flow.meta.inbound.kind))
+            .is_some_and(|runtime| runtime.program.demands().http)
     }
 
     fn record_closed(

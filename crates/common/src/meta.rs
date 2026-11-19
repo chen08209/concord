@@ -52,6 +52,8 @@ pub struct InboundInfo {
     pub user: Option<Arc<str>>,
     /// The host's own request, as its credential on a proxy listener proved.
     pub host: bool,
+    /// The User-Agent of the HTTP proxy CONNECT request that opened the flow.
+    pub user_agent: Option<Arc<str>>,
 }
 
 impl InboundInfo {
@@ -62,6 +64,7 @@ impl InboundInfo {
             addr: None,
             user: None,
             host: false,
+            user_agent: None,
         }
     }
 }
@@ -133,6 +136,15 @@ pub struct FlowKey {
     pub dst: SocketAddr,
 }
 
+/// The HTTP request a flow carries, once the MITM engine reads it in the clear. Without
+/// it, URL-REGEX and USER-AGENT rules are undecided.
+#[derive(Clone, Debug)]
+pub struct HttpFacts {
+    pub url: Box<str>,
+    /// Absent when the request has no User-Agent header.
+    pub user_agent: Option<Box<str>>,
+}
+
 /// Filled in as routing progresses, each item computed at most once.
 #[derive(Clone, Debug, Default)]
 pub struct RouteState {
@@ -143,6 +155,7 @@ pub struct RouteState {
     pub process_looked_up: bool,
     pub special_rules: Option<Arc<str>>,
     pub rematch_name: Option<Arc<str>>,
+    pub http: Option<Arc<HttpFacts>>,
 }
 
 impl RouteState {

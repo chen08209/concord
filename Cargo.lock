@@ -1477,6 +1477,7 @@ dependencies = [
  "concord-common",
  "concord-config",
  "concord-platform",
+ "fancy-regex",
  "indexmap",
  "maxminddb",
  "prost",

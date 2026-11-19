@@ -40,6 +40,8 @@ impl TestDefaults for NoDefaults {}
 pub enum Builtin {
     Direct,
     Reject,
+    /// One of [concord_config::builtin::REJECT_REPLIES], named so.
+    RejectReply(&'static str),
     RejectDrop,
     Compatible,
     Pass,

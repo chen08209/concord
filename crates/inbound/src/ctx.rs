@@ -112,6 +112,7 @@ impl ListenCtx {
                 addr: Some(peer.local),
                 user: client.user,
                 host: client.host,
+                user_agent: None,
             },
             src: peer.src,
             dst,

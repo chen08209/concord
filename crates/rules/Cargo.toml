@@ -15,6 +15,7 @@ doctest = false
 concord-common = { workspace = true }
 concord-config = { workspace = true }
 regex = { workspace = true }
+fancy-regex = { workspace = true }
 aho-corasick = { workspace = true }
 maxminddb = { workspace = true }
 prost = { workspace = true }

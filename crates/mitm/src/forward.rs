@@ -12,7 +12,9 @@ use hyper::upgrade::OnUpgrade;
 
 use crate::body::{Body, Buffered, Tap, buffer_body, empty, failing, full};
 use crate::capture::{PHASE_REQUEST, PHASE_RESPONSE};
-use crate::exchange::{OutRequest, ReplyError, Sent, Target, has_response_body, set_length};
+use crate::exchange::{
+    OutRequest, ReplyError, Sent, Target, Unsent, has_response_body, set_length,
+};
 use crate::headers::{
     head_text, is_grpc, parse_head, remove_hop_by_hop, response_head, text, version_text, with_host,
 };
@@ -21,7 +23,7 @@ use crate::limits::{BODY_WAIT, PRESSURE_NO_BODIES};
 use crate::pattern::Pattern;
 use crate::rules::BodyRewrite;
 use crate::script::DEFAULT_SCRIPT_TIMEOUT;
-use crate::session::{PoolKey, Sender, Session};
+use crate::session::{PoolKey, Routed, Sender, Session};
 use crate::target::TargetUrl;
 use http_body_util::BodyExt;
 
@@ -234,15 +236,32 @@ impl Session {
 
     /// Sends the request to its server on a connection from the pool, a fresh
     /// one if a reused one turns out to be gone.
+    /// Sends a request upstream by its own route when it needs one.
     pub(crate) async fn round_trip(
         &self,
         out: OutRequest,
         target: &Target,
+    ) -> Result<(Response<Incoming>, Option<OnUpgrade>), Unsent> {
+        let routed = self.route_request(&out, target).await?;
+        self.send_upstream(out, target, routed)
+            .await
+            .map_err(|err| Unsent::Failed(err.to_string()))
+    }
+
+    async fn send_upstream(
+        &self,
+        out: OutRequest,
+        target: &Target,
+        mut routed: Option<Routed>,
     ) -> io::Result<(Response<Incoming>, Option<OnUpgrade>)> {
         let key = PoolKey {
             https: out.url.https,
             host: out.url.host.to_ascii_lowercase(),
             port: out.url.port,
+            route: routed
+                .as_ref()
+                .and_then(|routed| routed.route.as_ref())
+                .map(|route| route.chain.clone()),
         };
         let cap = &target.cap;
         let authority = out.host_header();
@@ -251,7 +270,9 @@ impl Session {
         let mut request = build_request(out, target.http1)?;
         let mut attempt = 0;
         loop {
-            let (mut conn, reused) = self.connection_for(&key, target.http1, cap).await?;
+            let (mut conn, reused) = self
+                .connection_for(&key, target.http1, cap, routed.as_mut())
+                .await?;
             adapt(&mut request, conn.is_h2(), https, &authority, &path)?;
             let sent = match &mut conn.sender {
                 Sender::H1(sender) => sender.try_send_request(request).await,

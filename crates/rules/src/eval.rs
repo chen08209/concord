@@ -83,6 +83,8 @@ pub(crate) enum Node {
     InName(Box<[Box<str>]>),
     RematchName(Box<[Box<str>]>),
     InType(u8),
+    Url(Box<fancy_regex::Regex>),
+    UserAgent(Box<[u8]>),
     Process {
         by_name: bool,
         mode: ProcessMode,
@@ -127,8 +129,11 @@ pub(crate) struct Ev<'a> {
     quiet: bool,
     budget: u32,
     counted: u32,
-    /// The last `false` came from a geo database still loading, so `NOT` keeps it from matching.
+    /// The last `false` came from a geo database still loading or an HTTP request not read,
+    /// so `NOT` keeps it from matching.
     pub(crate) unknown: bool,
+    /// An HTTP rule was left undecided for want of the request.
+    pub(crate) http_gap: bool,
 }
 
 impl<'a> Ev<'a> {
@@ -152,6 +157,7 @@ impl<'a> Ev<'a> {
             budget: replay,
             counted: 0,
             unknown: false,
+            http_gap: false,
         }
     }
 
@@ -300,6 +306,7 @@ impl<'a> Ev<'a> {
                 names.iter().any(|n| &**n == name)
             }
             Node::InType(mask) => mask & inbound_bit(self.flow.inbound.kind) != 0,
+            Node::Url(_) | Node::UserAgent(_) => self.http_rule(node),
             Node::Process { by_name, mode } => {
                 let (name, path, _) = self.process()?;
                 let target = if *by_name { name } else { path };
@@ -369,6 +376,35 @@ impl<'a> Ev<'a> {
                 !matched && !self.unknown
             }
         })
+    }
+}
+
+impl Ev<'_> {
+    /// URL-REGEX and USER-AGENT read the request once it is read; before then USER-AGENT reads
+    /// the proxy CONNECT's User-Agent when there was one, and either is undecided otherwise.
+    fn http_rule(&mut self, node: &Node) -> bool {
+        let (state, flow) = (self.state, self.flow);
+        match node {
+            Node::Url(regex) => match &state.http {
+                Some(http) => regex.is_match(&*http.url).unwrap_or(false),
+                None => self.undecided_http(),
+            },
+            Node::UserAgent(pattern) => {
+                let agent = match (&state.http, &flow.inbound.user_agent) {
+                    (Some(http), _) => http.user_agent.as_deref(),
+                    (None, Some(agent)) => Some(&**agent),
+                    (None, None) => return self.undecided_http(),
+                };
+                agent.is_some_and(|agent| wildcard_match(pattern, agent.as_bytes(), false))
+            }
+            _ => false,
+        }
+    }
+
+    fn undecided_http(&mut self) -> bool {
+        self.unknown = true;
+        self.http_gap = true;
+        false
     }
 }
 

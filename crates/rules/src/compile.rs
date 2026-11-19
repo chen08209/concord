@@ -5,6 +5,7 @@ use std::sync::Arc;
 
 use concord_common::{InboundKind, Network};
 use concord_config::filter::{Matcher, compile_pattern};
+use concord_config::mitm::regex_source;
 use concord_config::rule::{Cond, NetworkKind, RuleDef, RuleLines, parse_rule};
 use indexmap::IndexMap;
 
@@ -608,6 +609,16 @@ fn node_for_cond(
         Cond::RematchName(items) => {
             Node::RematchName(items.iter().map(|i| i.as_str().into()).collect())
         }
+        Cond::UrlRegex(pattern) => {
+            cx.demands.http = true;
+            let regex = fancy_regex::Regex::new(&regex_source(pattern))
+                .map_err(|err| loc.invalid(err.to_string()))?;
+            Node::Url(Box::new(regex))
+        }
+        Cond::UserAgent(pattern) => {
+            cx.demands.http = true;
+            Node::UserAgent(pattern.as_bytes().into())
+        }
         Cond::And(children) => Node::And(children_of(cx, children, loc)?),
         Cond::Or(children) => Node::Or(children_of(cx, children, loc)?),
         Cond::Not(child) => Node::Not(Box::new(node_for_cond(cx, child, false, true, loc)?)),
@@ -715,6 +726,9 @@ const COMMA_IN_PAYLOAD: &[&str] = &[
 ];
 
 fn classical_rule(entry: &str) -> Result<RuleDef, String> {
+    if let Some(line) = concord_config::rule::with_quoted_target(entry, "DIRECT") {
+        return parse_rule(&line).map_err(|err| err.message);
+    }
     let items: Vec<&str> = entry
         .split(',')
         .map(|part| part.trim_matches(' '))

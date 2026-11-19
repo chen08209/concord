@@ -3,6 +3,7 @@ use std::sync::atomic::{AtomicBool, AtomicI64, Ordering};
 use std::sync::{Arc, Mutex};
 use std::time::Instant;
 
+use concord_common::intercept::RuleLabel;
 use concord_common::sync::lock;
 use serde::{Serialize, Serializer};
 use time::OffsetDateTime;
@@ -62,6 +63,19 @@ pub struct Exchange {
     #[serde(rename = "response-header")]
     pub response_header: Option<HeaderList>,
     pub actions: Vec<Action>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub route: Option<RouteNote>,
+}
+
+/// The rule that decided the request and the chain it left through, exit first, as a
+/// connection lists them.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize)]
+pub struct RouteNote {
+    #[serde(skip_serializing_if = "is_empty")]
+    pub rule: String,
+    #[serde(rename = "rule-payload", skip_serializing_if = "is_empty")]
+    pub rule_payload: String,
+    pub chains: Vec<String>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
@@ -323,6 +337,7 @@ impl CaptureStore {
             request_header,
             response_header: None,
             actions: Vec::new(),
+            route: None,
         };
         let size = exchange.footprint();
         let capture = Arc::new(Capture {
@@ -410,6 +425,11 @@ impl Exchange {
             .iter()
             .map(|action| action.kind.len() + action.phase.len() + action.detail.len())
             .sum();
+        let route = self.route.as_ref().map_or(0, |route| {
+            route.rule.len()
+                + route.rule_payload.len()
+                + route.chains.iter().map(String::len).sum::<usize>()
+        });
         EXCHANGE_OVERHEAD
             + (self.summary.method.len()
                 + self.summary.url.len()
@@ -417,7 +437,8 @@ impl Exchange {
                 + self.summary.error.len()
                 + header_size(Some(&self.request_header))
                 + header_size(self.response_header.as_ref())
-                + actions) as i64
+                + actions
+                + route) as i64
     }
 }
 
@@ -546,6 +567,17 @@ impl Cap {
                 e.summary.url = url;
                 e.request_header = header;
             });
+        }
+    }
+
+    pub fn routed(&self, chain: &[Arc<str>], rule: Option<&RuleLabel>) {
+        if let Some(c) = &self.0 {
+            let note = RouteNote {
+                rule: rule.map_or_else(String::new, |rule| rule.name.to_string()),
+                rule_payload: rule.map_or_else(String::new, |rule| rule.payload.to_string()),
+                chains: chain.iter().map(ToString::to_string).collect(),
+            };
+            c.update(|e| e.route = Some(note));
         }
     }
 

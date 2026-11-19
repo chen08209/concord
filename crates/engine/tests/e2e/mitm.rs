@@ -320,7 +320,7 @@ async fn mitm_decrypts_a_listed_host_under_its_own_certificate() {
 
 /// An HTTPS origin that keeps its connections open and answers the path and
 /// the `X-Mitm` header of each request.
-async fn tls_echo_server() -> SocketAddr {
+pub(super) async fn tls_echo_server() -> SocketAddr {
     let certified = rcgen::generate_simple_self_signed(vec!["origin.test".to_string()]).unwrap();
     let key =
         rustls_pki_types::PrivateKeyDer::try_from(certified.signing_key.serialize_der()).unwrap();
@@ -665,8 +665,11 @@ async fn mitm_lists_the_requests_it_answers_or_the_rules_reject() {
     assert_eq!(
         listed,
         vec![
-            ("()".to_string(), format!("https://mitm.test:{port}/ad")),
             ("DstPort(1)".to_string(), "https://127.0.0.1:1/".to_string()),
+            (
+                "URL-REWRITE(/ad$)".to_string(),
+                format!("https://mitm.test:{port}/ad")
+            ),
         ]
     );
     rig.engine.shutdown().await;

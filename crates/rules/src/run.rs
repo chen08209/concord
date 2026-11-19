@@ -35,6 +35,7 @@ pub struct Run<'p> {
     pending: Option<Advance>,
     replay: u32,
     observed: Observed,
+    http_pending: bool,
 }
 
 impl<'p> Run<'p> {
@@ -46,7 +47,19 @@ impl<'p> Run<'p> {
             pending: None,
             replay: 0,
             observed: Observed::default(),
+            http_pending: false,
         }
+    }
+
+    /// A rule passed over so far was left undecided for want of an HTTP request: with the
+    /// request read, matching could stop earlier.
+    pub fn http_pending(&self) -> bool {
+        self.http_pending
+    }
+
+    fn passed_over(&mut self, ev: &Ev<'_>) -> Outcome {
+        self.http_pending |= ev.unknown && ev.http_gap;
+        Outcome::Next
     }
 
     /// Restarts at a named list; unknown names use the main list, as `getRules` does.
@@ -102,7 +115,7 @@ impl<'p> Run<'p> {
                 Op::Leaf { idx, node } => match prog.nodes.get(node as usize) {
                     None => Outcome::Next,
                     Some(node) => match ev.eval(node) {
-                        Ok(false) => Outcome::Next,
+                        Ok(false) => self.passed_over(&ev),
                         Ok(true) => match node {
                             Node::SubRule { sub, .. } => Outcome::Enter {
                                 sub: *sub,
