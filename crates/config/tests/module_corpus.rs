@@ -105,11 +105,21 @@ fn rules(lines: &[ModuleLine<ModuleRule>]) -> Value {
 
 fn pinned(entries: Vec<(u32, String)>) -> Value {
     if entries.len() <= LISTED {
-        return entries
-            .into_iter()
-            .map(|(line, text)| (line.to_string(), Value::String(text)))
-            .collect::<serde_json::Map<_, _>>()
-            .into();
+        let mut listed = serde_json::Map::new();
+        let mut previous = (0, 0);
+        for (line, text) in entries {
+            previous = if previous.0 == line {
+                (line, previous.1 + 1)
+            } else {
+                (line, 0)
+            };
+            let key = match previous.1 {
+                0 => line.to_string(),
+                nth => format!("{line}+{nth}"),
+            };
+            listed.insert(key, Value::String(text));
+        }
+        return listed.into();
     }
     let mut hasher = Sha256::new();
     for (line, text) in &entries {

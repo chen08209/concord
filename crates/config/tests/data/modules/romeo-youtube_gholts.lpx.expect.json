@@ -1,0 +1,192 @@
+{
+  "format": "loon",
+  "meta": {
+    "name": "YouTube",
+    "desc": "移除广告, 移除上传&短片按钮, 解锁播放速度&精彩跳转。",
+    "author": "Maasea[https://github.com/Maasea/sgmodule], gholts[https://github.com/gholts/surge], RuCu6[https://github.com/RuCu6]",
+    "icon": "https://rucu6.pages.dev/Icons/app/youtube.png",
+    "homepage": null,
+    "category": null,
+    "system": null,
+    "requirement": null,
+    "argumentsDesc": null
+  },
+  "off": null,
+  "arguments": [
+    {
+      "name": "autoHd",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "false",
+      "label": "自动最高画质",
+      "desc": "自动选择 YouTube 最高画质",
+      "line": 9
+    },
+    {
+      "name": "blockAi",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "false",
+      "label": "隐藏智能助手",
+      "desc": "用于隐藏 YouTube 智能助手",
+      "line": 10
+    },
+    {
+      "name": "blockGames",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "false",
+      "label": "隐藏内置游戏",
+      "desc": "用于隐藏 YouTube 游戏服务",
+      "line": 11
+    },
+    {
+      "name": "blockShorts",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "false",
+      "label": "隐藏短片按钮",
+      "desc": "用于隐藏 YouTube 短片按钮",
+      "line": 12
+    },
+    {
+      "name": "blockStore",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "false",
+      "label": "隐藏商品橱窗",
+      "desc": "用于隐藏视频下方以及 YouTuber 主页中的商品推广",
+      "line": 13
+    },
+    {
+      "name": "blockUpload",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "false",
+      "label": "隐藏上传按钮",
+      "desc": "用于隐藏 YouTube 上传按钮",
+      "line": 14
+    },
+    {
+      "name": "blockVerticalLive",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "false",
+      "label": "隐藏竖屏直播",
+      "desc": "用于隐藏 YouTube 主页中的竖屏直播",
+      "line": 15
+    },
+    {
+      "name": "jumpAhead",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "false",
+      "label": "开启精彩跳转",
+      "desc": "解锁 YouTube Premium Jump Ahead 按钮",
+      "line": 16
+    },
+    {
+      "name": "onTheGo",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "false",
+      "label": "开启通勤模式",
+      "desc": "解锁 YouTube Premium On-the-go 模式",
+      "line": 17
+    }
+  ],
+  "hostname": [
+    {
+      "line": 33,
+      "items": "rr*.googlevideo.com, s.youtube.com, www.youtube.com, youtubei.googleapis.com"
+    }
+  ],
+  "force-http-hostname": [],
+  "skip-server-cert-verify": null,
+  "client-source-address": [],
+  "h2": null,
+  "url-rewrite": {},
+  "header-rewrite": {},
+  "body-rewrite": {},
+  "map-local": {
+    "20": "MapLocalDef { pattern: \"(?i:^https:\\\\/\\\\/s\\\\.youtube\\\\.com\\\\/api\\\\/stats\\\\/ads)\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"\", status: 404, header: {\"content-type\": \"text/plain; charset=utf-8\"}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "21": "MapLocalDef { pattern: \"(?i:^https:\\\\/\\\\/www\\\\.youtube\\\\.com\\\\/(pagead|pcs)\\\\/)\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"\", status: 404, header: {\"content-type\": \"text/plain; charset=utf-8\"}, content_type: \"text/plain; charset=utf-8\", request: false }"
+  },
+  "request-body-mock": {},
+  "script": {
+    "24": "ScriptDef { name: \"youtube_ad-break\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/rucu6/youtube_gholts/rucu6_request_gholts.js\", kind: HttpRequest, pattern: Some(\"(?i:^https:\\\\/\\\\/youtubei\\\\.googleapis\\\\.com\\\\/youtubei\\\\/v1\\\\/player\\\\/ad_break(?:\\\\?.*)?$)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: true, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(20.0), argument: None }",
+    "25": "ScriptDef { name: \"youtube_init\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/rucu6/youtube_gholts/rucu6_request_gholts.js\", kind: HttpRequest, pattern: Some(\"(?i:^https?:\\\\/\\\\/[\\\\w-]+\\\\.googlevideo\\\\.com\\\\/initplayback(?:\\\\?.*)?$)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: true, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(20.0), argument: None }",
+    "27": "ScriptDef { name: \"youtube_log-event\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/rucu6/youtube_gholts/rucu6_request_gholts.js\", kind: HttpRequest, pattern: Some(\"(?i:^https:\\\\/\\\\/youtubei\\\\.googleapis\\\\.com\\\\/youtubei\\\\/v1\\\\/log_event(?:\\\\?.*)?$)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: true, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(20.0), argument: None }",
+    "28": "ScriptDef { name: \"youtube_response\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/rucu6/youtube_gholts/rucu6_response_gholts.js\", kind: HttpResponse, pattern: Some(\"(?i:^https:\\\\/\\\\/youtubei\\\\.googleapis\\\\.com\\\\/youtubei\\\\/v1\\\\/(?:navigation\\\\/resolve_url|browse|next|player|search|reel\\\\/reel_watch_sequence|guide|account\\\\/get_setting|get_watch)(?:\\\\?.*)?$)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: true, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(20.0), argument: Some(Object {\"autoHd\": Bool(false), \"blockAi\": Bool(false), \"blockGames\": Bool(false), \"blockShorts\": Bool(false), \"blockStore\": Bool(false), \"blockUpload\": Bool(false), \"blockVerticalLive\": Bool(false), \"jumpAhead\": Bool(false), \"onTheGo\": Bool(false)}) }",
+    "29": "ScriptDef { name: \"youtube_key\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/rucu6/youtube_gholts/rucu6_key_gholts.js\", kind: HttpResponse, pattern: Some(\"(?i:^https:\\\\/\\\\/youtubei\\\\.googleapis\\\\.com\\\\/youtubei\\\\/v1\\\\/(?:config|log_event)(?:\\\\?.*)?$)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: true, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(20.0), argument: None }",
+    "30": "ScriptDef { name: \"youtube_ump\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/rucu6/youtube_gholts/rucu6_ump_gholts.js\", kind: HttpResponse, pattern: Some(\"(?i:^https?:\\\\/\\\\/[\\\\w-]+\\\\.googlevideo\\\\.com\\\\/initplayback(?:\\\\?.*)?$)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: true, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(20.0), argument: Some(Object {\"autoHd\": Bool(false), \"blockAi\": Bool(false), \"blockGames\": Bool(false), \"blockStore\": Bool(false), \"blockVerticalLive\": Bool(false), \"jumpAhead\": Bool(false), \"onTheGo\": Bool(false)}) }"
+  },
+  "rules": {},
+  "rule-sets": [],
+  "resources": [
+    {
+      "url": "https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/rucu6/youtube_gholts/rucu6_request_gholts.js",
+      "kind": "script",
+      "lines": [
+        24,
+        25,
+        27
+      ]
+    },
+    {
+      "url": "https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/rucu6/youtube_gholts/rucu6_response_gholts.js",
+      "kind": "script",
+      "lines": [
+        28
+      ]
+    },
+    {
+      "url": "https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/rucu6/youtube_gholts/rucu6_key_gholts.js",
+      "kind": "script",
+      "lines": [
+        29
+      ]
+    },
+    {
+      "url": "https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/rucu6/youtube_gholts/rucu6_ump_gholts.js",
+      "kind": "script",
+      "lines": [
+        30
+      ]
+    }
+  ],
+  "network": {},
+  "declared-scripts": [
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30
+  ],
+  "ignored": [
+    {
+      "line": 26,
+      "reason": "disabled"
+    }
+  ]
+}

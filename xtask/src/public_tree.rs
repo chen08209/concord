@@ -4,8 +4,8 @@
 //! third-party modules of the module corpus (whose `SOURCES.md` and `remote.json` are checked) names
 //! a home directory or the project's internal coordination (`internal_marks`), and no tracked file that
 //! is not Rust source names a public IPv4 host outside the documentation ranges and the public
-//! resolvers. When `docs/private/public-tree-deny.txt` exists, no such file uses the names it lists
-//! either.
+//! resolvers. When `docs/private/public-tree-deny.txt` exists, no tracked file outside `vendor/`, the
+//! corpus's modules included, uses the names it lists either.
 
 use std::net::Ipv4Addr;
 use std::path::Path;
@@ -83,14 +83,17 @@ pub(crate) fn check(root: &Path) -> Result<(), String> {
         if path.starts_with("vendor/")
             || path.ends_with("Cargo.lock")
             || EXEMPT.contains(&path.as_str())
-            || is_third_party_module(&path)
         {
             continue;
         }
         let Ok(text) = std::fs::read_to_string(root.join(&path)) else {
             continue;
         };
-        problems.extend(file_problems(&path, &text, &deny));
+        if is_third_party_module(&path) {
+            problems.extend(denied(&path, &text, &deny));
+        } else {
+            problems.extend(file_problems(&path, &text, &deny));
+        }
     }
     if problems.is_empty() {
         Ok(())
@@ -185,8 +188,23 @@ fn doc_problems(path: &str, text: &str, commits: &[String]) -> Vec<String> {
     problems
 }
 
-fn file_problems(path: &str, text: &str, deny: &[Deny]) -> Vec<String> {
+fn denied(path: &str, text: &str, deny: &[Deny]) -> Vec<String> {
     let mut problems = Vec::new();
+    for (index, line) in text.lines().enumerate() {
+        for name in deny.iter().filter(|name| name.matches(line)) {
+            problems.push(format!(
+                "{path}:{}: `{}` is {}",
+                index + 1,
+                name.pattern,
+                name.category
+            ));
+        }
+    }
+    problems
+}
+
+fn file_problems(path: &str, text: &str, deny: &[Deny]) -> Vec<String> {
+    let mut problems = denied(path, text, deny);
     let is_rust = path.ends_with(".rs");
     for (index, line) in text.lines().enumerate() {
         let at = format!("{path}:{}", index + 1);
@@ -194,9 +212,6 @@ fn file_problems(path: &str, text: &str, deny: &[Deny]) -> Vec<String> {
             problems.push(format!(
                 "{at}: `{name}` is {kind}; say what it is, not where the project keeps it"
             ));
-        }
-        for name in deny.iter().filter(|name| name.matches(line)) {
-            problems.push(format!("{at}: `{}` is {}", name.pattern, name.category));
         }
         for home in HOMES {
             if line.contains(home) {

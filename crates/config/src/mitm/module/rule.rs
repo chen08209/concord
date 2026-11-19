@@ -9,7 +9,7 @@ use sha2::{Digest, Sha256};
 
 use super::IgnoreReason;
 use super::resource::is_url;
-use super::source::unquote;
+use super::source::{split_commas, unquote};
 
 /// A built-in policy in its Surge name, or one the host maps to an outbound.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
@@ -262,6 +262,31 @@ impl<'a> RuleReader<'a> {
             no_resolve: has(options, "no-resolve"),
             extended_matching: false,
         })
+    }
+
+    /// Loon's `[Remote Rule]`: `url, policy=P, tag=T, enabled=B`, or the policy second
+    /// (Rule/sub_rule); a rule with no policy is `DIRECT`.
+    pub(super) fn remote(&mut self, line: &str) -> Result<Option<ModuleRule>, Refusal> {
+        let parts = split_commas(line);
+        let (url, options) = parts
+            .split_first()
+            .ok_or_else(|| refuse(IgnoreReason::Unreadable))?;
+        if !is_url(url) {
+            return Err(refuse(IgnoreReason::Unreadable));
+        }
+        let mut policy = "DIRECT";
+        for (at, option) in options.iter().enumerate() {
+            match option.split_once('=') {
+                Some((key, value)) => match key.trim().to_ascii_lowercase().as_str() {
+                    "policy" => policy = value.trim(),
+                    "enabled" if value.trim().eq_ignore_ascii_case("false") => return Ok(None),
+                    _ => {}
+                },
+                None if at == 0 && !option.is_empty() => policy = option,
+                None => {}
+            }
+        }
+        self.rule_set(url, policy, &[], false).map(Some)
     }
 
     fn add_set(&mut self, key: &str, domain: bool, source: RuleSetSource) -> String {

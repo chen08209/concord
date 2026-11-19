@@ -1,0 +1,187 @@
+{
+  "format": "loon",
+  "meta": {
+    "name": "哔哩哔哩去广告",
+    "desc": "过滤哔哩哔哩广告、移除青少年模式弹窗和交互式弹幕、移除无用功能和链接跟踪参数，增加空降助手以便跳过视频中插入的广告。此插件仅建议iOS 15以上设备使用，且必须启用MitM-over-HTTP/2功能。\n\n空降助手是第三方提供的功能，依赖于Android版空降助手的服务器数据运作，可能会存在不准确或者失效的问题，此功能与哔哩哔哩官方无关。",
+    "author": "kokoryh[https://github.com/kokoryh]",
+    "icon": "https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/Bilibili.png",
+    "homepage": "https://hub.kelee.one",
+    "category": "去广告",
+    "system": "iOS, iPadOS",
+    "requirement": null,
+    "argumentsDesc": null
+  },
+  "off": null,
+  "arguments": [
+    {
+      "name": "displayUpList",
+      "kind": {
+        "type": "select",
+        "options": [
+          "show",
+          "hide",
+          "auto"
+        ]
+      },
+      "number": false,
+      "default": "show",
+      "label": "[动态]中[最常访问]的显示方式",
+      "desc": "auto：仅当列表中存在直播状态时显示；show：始终显示；hide：始终隐藏。",
+      "line": 14
+    },
+    {
+      "name": "purifyComment",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "移除评论区置顶广告",
+      "desc": "移除评论区置顶广告",
+      "line": 15
+    },
+    {
+      "name": "optimizeRequest",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "优化评论区加载异常",
+      "desc": "尝试解决评论区加载异常的问题",
+      "line": 16
+    },
+    {
+      "name": "sponsorBlock",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "false",
+      "label": "空降助手",
+      "desc": "用于跳过视频中的广告",
+      "line": 17
+    },
+    {
+      "name": "logLevel",
+      "kind": {
+        "type": "select",
+        "options": [
+          "off",
+          "error",
+          "warn",
+          "info",
+          "debug"
+        ]
+      },
+      "number": false,
+      "default": "off",
+      "label": "日志等级",
+      "desc": "脚本的日志输出等级",
+      "line": 18
+    }
+  ],
+  "hostname": [
+    {
+      "line": 77,
+      "items": "grpc.biliapi.net, app.bilibili.com, api.bilibili.com, api.live.bilibili.com, line3-h5-mobile-api.biligame.com"
+    }
+  ],
+  "force-http-hostname": [],
+  "skip-server-cert-verify": null,
+  "client-source-address": [],
+  "h2": null,
+  "url-rewrite": {
+    "48": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/line3-h5-mobile-api\\\\.biligame\\\\.com\\\\/game\\\\/live\\\\/large_card_material\\\\?)\", head: None, replacement: \"\", action: RejectDict }",
+    "50": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/api\\\\.live\\\\.bilibili\\\\.com\\\\/xlive\\\\/e-commerce-interface\\\\/v1\\\\/ecommerce-user\\\\/get_shopping_info\\\\?)\", head: None, replacement: \"\", action: RejectDict }"
+  },
+  "header-rewrite": {
+    "65": "HeaderRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/grpc\\\\.biliapi\\\\.net\\\\/bilibili\\\\.app\\\\.(interface\\\\.v1\\\\.(Teenagers\\\\/ModeStatus|Search\\\\/DefaultWords)|view\\\\.v1\\\\.View\\\\/TFInfo|viewunite\\\\.v1\\\\.View\\\\/(PlayPause|ViewEndPage))$)\", conditions: HeadConditionsDef { request: None, response: None }, edit: Add(\"grpc-status\", \"0\") }"
+  },
+  "body-rewrite": {
+    "29": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/api\\\\.bilibili\\\\.com\\\\/x\\\\/pd-proxy\\\\/tracker\\\\?)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data[][]?=\\\"stun.chat.bilibili.com:3478\\\"\") }",
+    "31": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/app\\\\.bilibili\\\\.com\\\\/x\\\\/v2\\\\/splash\\\\/(show|event\\\\/list2)\\\\?)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data |= with_entries(if .key | IN(\\\"show\\\", \\\"event_list\\\") then .value = [] else . end)\") }",
+    "35": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/app\\\\.bilibili\\\\.com\\\\/x\\\\/resource\\\\/show\\\\/tab\\\\/v2\\\\?)\", conditions: HeadConditionsDef { request: None, response: None }, action: JqFile(\"https://raw.githubusercontent.com/fkingikelee/fkikelee/main/Resource/kelee/JQLang/Bilibili/tab_Bilibili_remove_ads.jq\") }",
+    "37": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/app\\\\.bilibili\\\\.com\\\\/x\\\\/v2\\\\/feed\\\\/index\\\\?)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"if .data.items then .data.items |= map(select((.banner_item == null) and (.ad_info == null) and (.card_goto == \\\"av\\\") and (.card_type | IN(\\\"small_cover_v2\\\", \\\"large_cover_single_v9\\\", \\\"large_cover_v1\\\")))) end\") }",
+    "40": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/api\\\\.bilibili\\\\.com\\\\/pgc\\\\/view\\\\/v2\\\\/app\\\\/season\\\\?)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"del(.data.payment)\") }",
+    "42": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/api\\\\.bilibili\\\\.com\\\\/pgc\\\\/page\\\\/channel\\\\?)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data.modules |= map(select(.type != \\\"TIP\\\") | if .type == \\\"BANNER\\\" then .module_data.items |= map(select(.url | startswith(\\\"https://www.bilibili.com/blackboard/era/\\\") | not)) else . end)\") }",
+    "44": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/app\\\\.bilibili\\\\.com\\\\/x\\\\/v2\\\\/feed\\\\/index\\\\/story\\\\?)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"if .data.items then .data.items |= map(select((.ad_info == null) and (.card_goto | IN(\\\"vertical_ad_av\\\", \\\"vertical_ad_live\\\", \\\"vertical_ad_picture\\\") | not)) | del(.story_cart_icon, .free_flow_toast, .image_infos, .course_info, .game_info)) end\") }",
+    "52": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/api\\\\.live\\\\.bilibili\\\\.com\\\\/xlive\\\\/open-interface\\\\/v2\\\\/tracker\\\\/conf\\\\?)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data.domains=[\\\"wss://tracker.chat.bilibili.com\\\"]\") }",
+    "54": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/app\\\\.bilibili\\\\.com\\\\/x\\\\/resource\\\\/show\\\\/skin\\\\?)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"del(.data.common_equip)\") }",
+    "56": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/app\\\\.bilibili\\\\.com\\\\/x\\\\/v2\\\\/account\\\\/mine(\\\\/ipad)?\\\\?)\", conditions: HeadConditionsDef { request: None, response: None }, action: JqFile(\"https://raw.githubusercontent.com/fkingikelee/fkikelee/main/Resource/kelee/JQLang/Bilibili/mine_Bilibili_remove_ads.jq\") }",
+    "58": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/app\\\\.bilibili\\\\.com\\\\/x\\\\/v2\\\\/account\\\\/myinfo\\\\?)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data.vip |= if . != null and .status == 0 then . + { status: 1, type: 2, due_date: 9005270400000, role: 15 } else . end\") }"
+  },
+  "map-local": {
+    "33": "MapLocalDef { pattern: \"(?i:^https:\\\\/\\\\/app\\\\.bilibili\\\\.com\\\\/x\\\\/v2\\\\/splash\\\\/list\\\\?)\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{\\\"code\\\":0,\\\"message\\\":\\\"OK\\\",\\\"ttl\\\":1,\\\"data\\\":{\\\"max_time\\\":0,\\\"min_interval\\\":31536000,\\\"pull_interval\\\":31536000,\\\"keep_ids\\\":[],\\\"show\\\":[],\\\"list\\\":[{}],\\\"splash_request_id\\\":\\\"\\\"}}\", status: 200, header: {\"content-type\": \"text/plain; charset=utf-8\"}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "39": "MapLocalDef { pattern: \"(?i:^https:\\\\/\\\\/api\\\\.bilibili\\\\.com\\\\/pgc\\\\/activity\\\\/deliver\\\\/material\\\\/receive\\\\?)\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{\\\"code\\\":0,\\\"data\\\":{\\\"closeType\\\":\\\"close_win\\\",\\\"container\\\":[],\\\"showTime\\\":\\\"\\\"},\\\"message\\\":\\\"success\\\"}\", status: 200, header: {\"content-type\": \"text/plain; charset=utf-8\"}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "46": "MapLocalDef { pattern: \"(?i:^https:\\\\/\\\\/ap[ip]\\\\.bilibili\\\\.com\\\\/x\\\\/(resource\\\\/(top\\\\/activity|patch\\\\/tab(\\\\/v2)?)|v2\\\\/search\\\\/square|vip\\\\/ads\\\\/materials)\\\\?)\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{\\\"code\\\":-404,\\\"message\\\":\\\"-404\\\",\\\"ttl\\\":1,\\\"data\\\":null}\", status: 200, header: {\"content-type\": \"text/plain; charset=utf-8\"}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "60": "MapLocalDef { pattern: \"(?i:^https:\\\\/\\\\/grpc\\\\.biliapi\\\\.net\\\\/bilibili\\\\.app\\\\.interface\\\\.v1\\\\.Teenagers\\\\/ModeStatus$)\", conditions: HeadConditionsDef { request: None, response: None }, body: Base64([0, 0, 0, 0, 19, 10, 17, 8, 2, 18, 9, 116, 101, 101, 110, 97, 103, 101, 114, 115, 32, 2, 42, 0]), data: \"\", status: 200, header: {\"content-type\": \"text/plain; charset=utf-8\"}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "62": "MapLocalDef { pattern: \"(?i:^https:\\\\/\\\\/grpc\\\\.biliapi\\\\.net\\\\/bilibili\\\\.app\\\\.interface\\\\.v1\\\\.Search\\\\/DefaultWords$)\", conditions: HeadConditionsDef { request: None, response: None }, body: Base64([0, 0, 0, 0, 33, 26, 29, 230, 144, 156, 231, 180, 162, 232, 167, 134, 233, 162, 145, 227, 128, 129, 231, 149, 170, 229, 137, 167, 230, 136, 150, 117, 112, 228, 184, 187, 40, 1]), data: \"\", status: 200, header: {\"content-type\": \"text/plain; charset=utf-8\"}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "64": "MapLocalDef { pattern: \"(?i:^https:\\\\/\\\\/grpc\\\\.biliapi\\\\.net\\\\/bilibili\\\\.app\\\\.(view\\\\.v1\\\\.View\\\\/TFInfo|viewunite\\\\.v1\\\\.View\\\\/(PlayPause|ViewEndPage))$)\", conditions: HeadConditionsDef { request: None, response: None }, body: Base64([0, 0, 0, 0, 0]), data: \"\", status: 200, header: {\"content-type\": \"text/plain; charset=utf-8\"}, content_type: \"text/plain; charset=utf-8\", request: false }"
+  },
+  "request-body-mock": {},
+  "script": {
+    "70": "ScriptDef { name: \"请求处理\", path: \"https://raw.githubusercontent.com/fkingikelee/fkikelee/main/Resource/kelee/JavaScript/Bilibili/Bilibili_proto_request_kokoryh.js\", kind: HttpRequest, pattern: Some(\"(?i:^https:\\\\/\\\\/(?:grpc\\\\.biliapi\\\\.net|app\\\\.bilibili\\\\.com)\\\\/bilibili\\\\.(?:app\\\\.viewunite\\\\.v1\\\\.View\\\\/View|main\\\\.community\\\\.reply\\\\.v1\\\\.Reply\\\\/MainList)$)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: true, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(10.0), argument: Some(Object {\"purifyComment\": Bool(true), \"logLevel\": String(\"off\")}) }",
+    "72": "ScriptDef { name: \"ProtoBuf处理\", path: \"https://raw.githubusercontent.com/fkingikelee/fkikelee/main/Resource/kelee/JavaScript/Bilibili/Bilibili_proto_response_kokoryh.js\", kind: HttpResponse, pattern: Some(\"(?i:^https:\\\\/\\\\/(grpc\\\\.biliapi\\\\.net|app\\\\.bilibili\\\\.com)\\\\/bilibili\\\\.(app\\\\.(show\\\\.v1\\\\.Popular\\\\/Index|dynamic\\\\.v2\\\\.Dynamic\\\\/DynAll|view(unite)?\\\\.v1\\\\.View\\\\/(View|ViewProgress|RelatesFeed|AIRelateAsync)|playurl\\\\.v1\\\\.PlayURL\\\\/PlayView|playerunite\\\\.v1\\\\.Player\\\\/PlayViewUnite)|polymer\\\\.app\\\\.search\\\\.v1\\\\.Search\\\\/SearchAll|community\\\\.service\\\\.dm\\\\.v1\\\\.DM\\\\/DmView|main\\\\.community\\\\.reply\\\\.v1\\\\.Reply\\\\/MainList|pgc\\\\.gateway\\\\.player\\\\.v2\\\\.PlayURL\\\\/PlayView)$)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: true, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(20.0), argument: Some(Object {\"displayUpList\": String(\"show\"), \"purifyComment\": Bool(true), \"sponsorBlock\": Bool(false), \"logLevel\": String(\"off\")}) }",
+    "74": "ScriptDef { name: \"移除直播间广告\", path: \"https://raw.githubusercontent.com/fkingikelee/fkikelee/main/Resource/kelee/JavaScript/Bilibili/Bilibili_json_kokoryh.js\", kind: HttpResponse, pattern: Some(\"(?i:^https:\\\\/\\\\/api\\\\.live\\\\.bilibili\\\\.com\\\\/xlive\\\\/(?:app-interface\\\\/v2\\\\/index\\\\/feed|app-room\\\\/v1\\\\/index\\\\/getInfoBy(?:Room|User))\\\\?)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(20.0), argument: None }"
+  },
+  "rules": {
+    "21": "DOMAIN,bsbsb.top => <PROXY>",
+    "22": "DOMAIN,api.biliapi.com => REJECT",
+    "23": "DOMAIN,app.biliapi.com => REJECT",
+    "24": "DOMAIN,api.biliapi.net => REJECT",
+    "25": "DOMAIN,app.biliapi.net => REJECT",
+    "26": "AND,((DOMAIN-SUFFIX,chat.bilibili.com),(OR,((DOMAIN-KEYWORD,stun),(DOMAIN-KEYWORD,tracker),(DOMAIN-KEYWORD,p2p)))) => REJECT"
+  },
+  "rule-sets": [],
+  "resources": [
+    {
+      "url": "https://raw.githubusercontent.com/fkingikelee/fkikelee/main/Resource/kelee/JQLang/Bilibili/tab_Bilibili_remove_ads.jq",
+      "kind": "jq",
+      "lines": [
+        35
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fkingikelee/fkikelee/main/Resource/kelee/JQLang/Bilibili/mine_Bilibili_remove_ads.jq",
+      "kind": "jq",
+      "lines": [
+        56
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fkingikelee/fkikelee/main/Resource/kelee/JavaScript/Bilibili/Bilibili_proto_request_kokoryh.js",
+      "kind": "script",
+      "lines": [
+        70
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fkingikelee/fkikelee/main/Resource/kelee/JavaScript/Bilibili/Bilibili_proto_response_kokoryh.js",
+      "kind": "script",
+      "lines": [
+        72
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fkingikelee/fkikelee/main/Resource/kelee/JavaScript/Bilibili/Bilibili_json_kokoryh.js",
+      "kind": "script",
+      "lines": [
+        74
+      ]
+    }
+  ],
+  "network": {},
+  "declared-scripts": [
+    68,
+    70,
+    72,
+    74
+  ],
+  "ignored": [
+    {
+      "line": 68,
+      "reason": "disabled"
+    }
+  ]
+}

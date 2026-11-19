@@ -1,0 +1,70 @@
+{
+  "format": "loon",
+  "meta": {
+    "name": "斗鱼去广告",
+    "desc": "移除开屏、首页视频流、首页轮播图广告，移除直播间悬浮窗。",
+    "author": "可莉🅥[https://github.com/luestr/ProxyResource/blob/main/README.md]",
+    "icon": "https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/Douyu.png",
+    "homepage": "https://hub.kelee.one",
+    "category": "去广告",
+    "system": null,
+    "requirement": null,
+    "argumentsDesc": null
+  },
+  "off": null,
+  "arguments": [],
+  "hostname": [
+    {
+      "line": 33,
+      "items": "rtbapi.douyucdn.cn, apiv2.douyucdn.cn, venus.douyucdn.cn"
+    }
+  ],
+  "force-http-hostname": [],
+  "skip-server-cert-verify": null,
+  "client-source-address": [],
+  "h2": null,
+  "url-rewrite": {
+    "23": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/rtbapi\\\\.douyucdn\\\\.cn\\\\/japi\\\\/sign\\\\/app\\\\/getinfo)\", head: None, replacement: \"\", action: RejectDict }"
+  },
+  "header-rewrite": {},
+  "body-rewrite": {
+    "25": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/apiv2\\\\.douyucdn\\\\.cn\\\\/japi\\\\/entrance\\\\/roomRes\\\\/nc\\\\/m\\\\/list)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"del(.data.pendant_a, .data.entrance_d)\") }",
+    "27": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/venus\\\\.douyucdn\\\\.cn\\\\/venus\\\\/config\\\\/static\\\\/update.+keyCodeSet=flow_config)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"if .greatGodGameSitterSwitch != null then .greatGodGameSitterSwitch = 0 else . end | if .followMoreAnchorEntrance != null then .followMoreAnchorEntrance = 0 else . end | if .sdklivebanner != null then .sdklivebanner = 0 else . end | if .homeActFloatSwitch != null then .homeActFloatSwitch = 0 else . end | if .bringGoodsSwitch != null then .bringGoodsSwitch = 0 else . end | if .qqGameSwitch != null then .qqGameSwitch = 0 else . end\") }"
+  },
+  "map-local": {},
+  "request-body-mock": {},
+  "script": {
+    "30": "ScriptDef { name: \"移除首页轮播图和视频流广告\", path: \"https://raw.githubusercontent.com/fkingikelee/fkikelee/main/Resource/kelee/JavaScript/Douyu/Douyu_remove_ads.js\", kind: HttpResponse, pattern: Some(\"(?i:^https:\\\\/\\\\/apiv2\\\\.douyucdn\\\\.cn\\\\/mgapi\\\\/livenc\\\\/home\\\\/getRecV3)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(20.0), argument: None }"
+  },
+  "rules": {
+    "14": "URL-REGEX,^http:\\/\\/linkmicschedule\\.douyucdn\\.cn\\/im_schedule\\/im_gate_list => REJECT",
+    "17": "DOMAIN,stun1.douyucdn.cn => REJECT",
+    "18": "DOMAIN,stun1.qvb.qcloud.com => REJECT"
+  },
+  "rule-sets": [],
+  "resources": [
+    {
+      "url": "https://raw.githubusercontent.com/fkingikelee/fkikelee/main/Resource/kelee/JavaScript/Douyu/Douyu_remove_ads.js",
+      "kind": "script",
+      "lines": [
+        30
+      ]
+    }
+  ],
+  "network": {},
+  "declared-scripts": [
+    30
+  ],
+  "ignored": [
+    {
+      "line": 16,
+      "reason": "ruleType",
+      "detail": "PROTOCOL,STUN"
+    },
+    {
+      "line": 20,
+      "reason": "ruleType",
+      "detail": "^(HTTP:\\/\\/)((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\/(HLSH5P1\\.DOUYUCDN2\\.CN)(.*) 307 $1$5$6"
+    }
+  ]
+}

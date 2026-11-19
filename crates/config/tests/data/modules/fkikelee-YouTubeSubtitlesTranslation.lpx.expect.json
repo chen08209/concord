@@ -1,0 +1,154 @@
+{
+  "format": "loon",
+  "meta": {
+    "name": "YouTube双语翻译",
+    "desc": "字幕增强及双语翻译，支持Youtube Music歌词翻译。此插件需要置于YouTube去广告插件之下，且和YouTube去广告插件的歌词翻译冲突，不支持tvOS设备。",
+    "author": "VirgilClyne[https://github.com/VirgilClyne]",
+    "icon": "https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/YouTube.png",
+    "homepage": "https://hub.kelee.one",
+    "category": "功能增强",
+    "system": null,
+    "requirement": null,
+    "argumentsDesc": null
+  },
+  "off": null,
+  "arguments": [
+    {
+      "name": "Type",
+      "kind": {
+        "type": "select",
+        "options": [
+          "Official",
+          "Translate"
+        ]
+      },
+      "number": false,
+      "default": "Official",
+      "label": "字幕类型",
+      "desc": "请选择要使用的字幕，双语字幕将使用您选择类型呈现。",
+      "line": 14
+    },
+    {
+      "name": "AutoCC",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "自动显示翻译字幕",
+      "desc": "开启后总是自动开启显示字幕",
+      "line": 15
+    },
+    {
+      "name": "ShowOnly",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "仅显示“自动翻译”字幕",
+      "desc": "开启后仅显示“自动翻译”后的字幕，不显原文字幕。",
+      "line": 16
+    },
+    {
+      "name": "Position",
+      "kind": {
+        "type": "select",
+        "options": [
+          "Forward",
+          "Reverse"
+        ]
+      },
+      "number": false,
+      "default": "Forward",
+      "label": "原文字幕位置",
+      "desc": "原文字幕的显示位置",
+      "line": 17
+    }
+  ],
+  "hostname": [
+    {
+      "line": 35,
+      "items": "www.youtube.com, m.youtube.com, tv.youtube.com, music.youtube.com, youtubei.googleapis.com"
+    }
+  ],
+  "force-http-hostname": [],
+  "skip-server-cert-verify": null,
+  "client-source-address": [],
+  "h2": null,
+  "url-rewrite": {},
+  "header-rewrite": {},
+  "body-rewrite": {},
+  "map-local": {},
+  "request-body-mock": {},
+  "script": {
+    "20": "ScriptDef { name: \"JSON·YouTube播放器请求\", path: \"https://raw.githubusercontent.com/fkingikelee/fkikelee/main/Resource/kelee/JavaScript/YouTube/YouTube_Subtitles_Translate/YouTube_Subtitles_request.js\", kind: HttpRequest, pattern: Some(\"(?i:^https?:\\\\/\\\\/(www|m|tv)\\\\.youtube\\\\.com\\\\/youtubei\\\\/v1\\\\/player\\\\?(.*))\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(20.0), argument: Some(Object {\"Type\": String(\"Official\"), \"AutoCC\": Bool(true), \"ShowOnly\": Bool(true), \"Position\": String(\"Forward\")}) }",
+    "21": "ScriptDef { name: \"JSON·YouTube播放器响应\", path: \"https://raw.githubusercontent.com/fkingikelee/fkikelee/main/Resource/kelee/JavaScript/YouTube/YouTube_Subtitles_Translate/YouTube_Subtitles_response.js\", kind: HttpResponse, pattern: Some(\"(?i:^https?:\\\\/\\\\/(www|m|tv)\\\\.youtube\\\\.com\\\\/youtubei\\\\/v1\\\\/player\\\\?(.*))\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(20.0), argument: Some(Object {\"Type\": String(\"Official\"), \"AutoCC\": Bool(true), \"ShowOnly\": Bool(true), \"Position\": String(\"Forward\")}) }",
+    "22": "ScriptDef { name: \"Proto·YouTube播放器请求\", path: \"https://raw.githubusercontent.com/fkingikelee/fkikelee/main/Resource/kelee/JavaScript/YouTube/YouTube_Subtitles_Translate/YouTube_Subtitles_request.js\", kind: HttpRequest, pattern: Some(\"(?i:^https?:\\\\/\\\\/youtubei\\\\.googleapis\\\\.com\\\\/youtubei\\\\/v1\\\\/player\\\\?(.*))\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: true, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(20.0), argument: Some(Object {\"Type\": String(\"Official\"), \"AutoCC\": Bool(true), \"ShowOnly\": Bool(true), \"Position\": String(\"Forward\")}) }",
+    "23": "ScriptDef { name: \"Proto·YouTube播放器响应.proto\", path: \"https://raw.githubusercontent.com/fkingikelee/fkikelee/main/Resource/kelee/JavaScript/YouTube/YouTube_Subtitles_Translate/YouTube_Subtitles_response.js\", kind: HttpResponse, pattern: Some(\"(?i:^https?:\\\\/\\\\/youtubei\\\\.googleapis\\\\.com\\\\/youtubei\\\\/v1\\\\/player\\\\?(.*))\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: true, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(20.0), argument: Some(Object {\"Type\": String(\"Official\"), \"AutoCC\": Bool(true), \"ShowOnly\": Bool(true), \"Position\": String(\"Forward\")}) }",
+    "24": "ScriptDef { name: \"Proto·GetWatch响应\", path: \"https://raw.githubusercontent.com/fkingikelee/fkikelee/main/Resource/kelee/JavaScript/YouTube/YouTube_Subtitles_Translate/YouTube_Subtitles_response.js\", kind: HttpResponse, pattern: Some(\"(?i:^https?:\\\\/\\\\/youtubei\\\\.googleapis\\\\.com\\\\/youtubei\\\\/v1\\\\/get_watch\\\\?(.*))\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: true, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(20.0), argument: Some(Object {\"Type\": String(\"Official\"), \"AutoCC\": Bool(true), \"ShowOnly\": Bool(true), \"Position\": String(\"Forward\")}) }",
+    "25": "ScriptDef { name: \"YouTube定时文本请求\", path: \"https://raw.githubusercontent.com/fkingikelee/fkikelee/main/Resource/kelee/JavaScript/YouTube/YouTube_Subtitles_Translate/YouTube_Subtitles_request.js\", kind: HttpRequest, pattern: Some(\"(?i:^https?:\\\\/\\\\/(www|m)\\\\.youtube\\\\.com\\\\/api\\\\/timedtext\\\\?(.*))\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: false, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(20.0), argument: Some(Object {\"Type\": String(\"Official\"), \"AutoCC\": Bool(true), \"ShowOnly\": Bool(true), \"Position\": String(\"Forward\")}) }",
+    "26": "ScriptDef { name: \"YouTube合成定时文本响应\", path: \"https://raw.githubusercontent.com/fkingikelee/fkikelee/main/Resource/kelee/JavaScript/YouTube/YouTube_Subtitles_Translate/YouTube_Composite_Subtitles_response.js\", kind: HttpResponse, pattern: Some(\"(?i:^https?:\\\\/\\\\/(www|m)\\\\.youtube\\\\.com\\\\/api\\\\/timedtext\\\\?(.*)subtype=(Official|External))\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(20.0), argument: None }",
+    "27": "ScriptDef { name: \"YouTube翻译定时文本响应\", path: \"https://raw.githubusercontent.com/fkingikelee/fkikelee/main/Resource/kelee/JavaScript/YouTube/YouTube_Subtitles_Translate/YouTube_Subtitles_Translate_response.js\", kind: HttpResponse, pattern: Some(\"(?i:^https?:\\\\/\\\\/(www|m)\\\\.youtube\\\\.com\\\\/api\\\\/timedtext\\\\?(.*)subtype=Translate)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(20.0), argument: None }",
+    "29": "ScriptDef { name: \"JSON·YouTube Music浏览请求\", path: \"https://raw.githubusercontent.com/fkingikelee/fkikelee/main/Resource/kelee/JavaScript/YouTube/YouTube_Subtitles_Translate/YouTube_Subtitles_request.js\", kind: HttpRequest, pattern: Some(\"(?i:^https?:\\\\/\\\\/music\\\\.youtube\\\\.com\\\\/youtubei\\\\/v1\\\\/browse\\\\?(.*))\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(20.0), argument: Some(Object {\"Type\": String(\"Official\"), \"AutoCC\": Bool(true), \"ShowOnly\": Bool(true), \"Position\": String(\"Forward\")}) }",
+    "30": "ScriptDef { name: \"Proto·YouTube Music浏览请求\", path: \"https://raw.githubusercontent.com/fkingikelee/fkikelee/main/Resource/kelee/JavaScript/YouTube/YouTube_Subtitles_Translate/YouTube_Subtitles_request.js\", kind: HttpRequest, pattern: Some(\"(?i:^https?:\\\\/\\\\/youtubei\\\\.googleapis\\\\.com\\\\/youtubei\\\\/v1\\\\/browse\\\\?(.*))\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: true, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(20.0), argument: Some(Object {\"Type\": String(\"Official\"), \"AutoCC\": Bool(true), \"ShowOnly\": Bool(true), \"Position\": String(\"Forward\")}) }",
+    "31": "ScriptDef { name: \"JSON·YouTube Music翻译歌词响应\", path: \"https://raw.githubusercontent.com/fkingikelee/fkikelee/main/Resource/kelee/JavaScript/YouTube/YouTube_Subtitles_Translate/YouTube_Subtitles_Translate_response.js\", kind: HttpResponse, pattern: Some(\"(?i:^https?:\\\\/\\\\/music\\\\.youtube\\\\.com\\\\/youtubei\\\\/v1\\\\/browse\\\\?(.*)subtype=Translate)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(20.0), argument: None }",
+    "32": "ScriptDef { name: \"Proto·YouTube Music翻译歌词响应\", path: \"https://raw.githubusercontent.com/fkingikelee/fkikelee/main/Resource/kelee/JavaScript/YouTube/YouTube_Subtitles_Translate/YouTube_Subtitles_Translate_response.js\", kind: HttpResponse, pattern: Some(\"(?i:^https?:\\\\/\\\\/youtubei\\\\.googleapis\\\\.com\\\\/youtubei\\\\/v1\\\\/browse\\\\?(.*)subtype=Translate)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: true, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(20.0), argument: None }"
+  },
+  "rules": {},
+  "rule-sets": [],
+  "resources": [
+    {
+      "url": "https://raw.githubusercontent.com/fkingikelee/fkikelee/main/Resource/kelee/JavaScript/YouTube/YouTube_Subtitles_Translate/YouTube_Subtitles_request.js",
+      "kind": "script",
+      "lines": [
+        20,
+        22,
+        25,
+        29,
+        30
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fkingikelee/fkikelee/main/Resource/kelee/JavaScript/YouTube/YouTube_Subtitles_Translate/YouTube_Subtitles_response.js",
+      "kind": "script",
+      "lines": [
+        21,
+        23,
+        24
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fkingikelee/fkikelee/main/Resource/kelee/JavaScript/YouTube/YouTube_Subtitles_Translate/YouTube_Composite_Subtitles_response.js",
+      "kind": "script",
+      "lines": [
+        26
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fkingikelee/fkikelee/main/Resource/kelee/JavaScript/YouTube/YouTube_Subtitles_Translate/YouTube_Subtitles_Translate_response.js",
+      "kind": "script",
+      "lines": [
+        27,
+        31,
+        32
+      ]
+    }
+  ],
+  "network": {},
+  "declared-scripts": [
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    29,
+    30,
+    31,
+    32
+  ],
+  "ignored": []
+}

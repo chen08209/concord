@@ -1,0 +1,194 @@
+{
+  "format": "loon",
+  "meta": {
+    "name": "哔哩哔哩",
+    "desc": "没有广告的哔哩哔哩更值得干杯。",
+    "author": "RuCu6[https://github.com/RuCu6], kokoryh[https://github.com/kokoryh], 可莉🅥[https://gitlab.com/lodepuly/vpn_tool]",
+    "icon": "icon not found",
+    "homepage": null,
+    "category": "rucu6",
+    "system": null,
+    "requirement": null,
+    "argumentsDesc": null
+  },
+  "off": null,
+  "arguments": [
+    {
+      "name": "displayUpList",
+      "kind": {
+        "type": "select",
+        "options": [
+          "show"
+        ]
+      },
+      "number": false,
+      "default": "show",
+      "label": "配置「最常访问」",
+      "desc": "show:始终显示 hide:始终隐藏 auto:仅当列表中存在直播状态时显示",
+      "line": 10
+    },
+    {
+      "name": "optimizeRequest",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "开启「评论区」加载优化",
+      "desc": "true:开启 false:关闭",
+      "line": 11
+    },
+    {
+      "name": "purifyComment",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "过滤「评论区」置顶广告",
+      "desc": "true:开启 false:关闭",
+      "line": 12
+    },
+    {
+      "name": "sponsorBlock",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "开启「空降助手」",
+      "desc": "过滤「视频内」插播广告 true:开启 false:关闭",
+      "line": 13
+    },
+    {
+      "name": "logLevel",
+      "kind": {
+        "type": "select",
+        "options": [
+          "error"
+        ]
+      },
+      "number": false,
+      "default": "error",
+      "label": "配置「日志等级」",
+      "desc": "日志等级",
+      "line": 14
+    }
+  ],
+  "hostname": [
+    {
+      "line": 76,
+      "items": "*live.bilibili.com, *api.biligame.com, ap?.bilibili.com, grpc.biliapi.net, m.bilibili.com, manga.bilibili.com, www.bilibili.com"
+    }
+  ],
+  "force-http-hostname": [],
+  "skip-server-cert-verify": null,
+  "client-source-address": [],
+  "h2": null,
+  "url-rewrite": {
+    "36": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/app\\\\.bilibili\\\\.com\\\\/x\\\\/resource\\\\/peak\\\\/download)\", head: None, replacement: \"\", action: RejectDict }",
+    "39": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/api\\\\.bilibili\\\\.com\\\\/x\\\\/v2\\\\/dm\\\\/qoe\\\\/show\\\\?)\", head: None, replacement: \"\", action: RejectDict }",
+    "40": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/api\\\\.bilibili\\\\.com\\\\/x\\\\/vip\\\\/ads\\\\/materials\\\\?)\", head: None, replacement: \"\", action: RejectDict }",
+    "41": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/api\\\\.live\\\\.bilibili\\\\.com\\\\/xlive\\\\/e-commerce-interface\\\\/v1\\\\/ecommerce-user\\\\/get_shopping_info\\\\?)\", head: None, replacement: \"\", action: RejectDict }",
+    "43": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/api\\\\.bilibili\\\\.com\\\\/x\\\\/web-interface\\\\/zone\\\\?jsonp)\", head: None, replacement: \"\", action: RejectDict }",
+    "44": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/app\\\\.bilibili\\\\.com\\\\/x\\\\/resource\\\\/ip)\", head: None, replacement: \"\", action: RejectDict }",
+    "45": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/app\\\\.bilibili\\\\.com\\\\/x\\\\/resource\\\\/patch\\\\/tab(\\\\/v2)?\\\\?)\", head: None, replacement: \"\", action: RejectDict }",
+    "52": "UrlRewriteDef { pattern: \"(?i:(^https:\\\\/\\\\/live\\\\.bilibili\\\\.com\\\\/\\\\d+)(?:\\\\/?\\\\?.*))\", head: None, replacement: \"${1}\", action: Redirect302 }",
+    "53": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/line3-h5-mobile-api\\\\.biligame\\\\.com\\\\/game\\\\/live\\\\/large_card_material\\\\?)\", head: None, replacement: \"\", action: RejectDict }",
+    "54": "UrlRewriteDef { pattern: \"(?i:(^https:\\\\/\\\\/(?:www|m)\\\\.bilibili\\\\.com\\\\/video\\\\/(?:BV\\\\w{10}|av\\\\d{9}))(?:\\\\/?\\\\?.*))\", head: None, replacement: \"${1}\", action: Redirect302 }"
+  },
+  "header-rewrite": {
+    "49": "HeaderRewriteDef { response: true, pattern: \"^https:\\\\/\\\\/grpc\\\\.biliapi\\\\.net\\\\/bilibili\\\\.app\\\\.interface\\\\.v1\\\\.Search\\\\/DefaultWords$\", conditions: HeadConditionsDef { request: None, response: None }, edit: Del(\"grpc-status\") }",
+    "49+1": "HeaderRewriteDef { response: true, pattern: \"^https:\\\\/\\\\/grpc\\\\.biliapi\\\\.net\\\\/bilibili\\\\.app\\\\.interface\\\\.v1\\\\.Search\\\\/DefaultWords$\", conditions: HeadConditionsDef { request: None, response: None }, edit: Add(\"grpc-status\", \"0\") }",
+    "50": "HeaderRewriteDef { response: true, pattern: \"^https:\\\\/\\\\/grpc\\\\.biliapi\\\\.net\\\\/bilibili\\\\.app\\\\.interface\\\\.v1\\\\.Teenagers\\\\/ModeStatus$\", conditions: HeadConditionsDef { request: None, response: None }, edit: Del(\"grpc-status\") }",
+    "50+1": "HeaderRewriteDef { response: true, pattern: \"^https:\\\\/\\\\/grpc\\\\.biliapi\\\\.net\\\\/bilibili\\\\.app\\\\.interface\\\\.v1\\\\.Teenagers\\\\/ModeStatus$\", conditions: HeadConditionsDef { request: None, response: None }, edit: Add(\"grpc-status\", \"0\") }",
+    "51": "HeaderRewriteDef { response: true, pattern: \"^https:\\\\/\\\\/grpc\\\\.biliapi\\\\.net\\\\/bilibili\\\\.app\\\\.(?:view\\\\.v1\\\\.View\\\\/TFInfo|viewunite\\\\.v1\\\\.View\\\\/(?:PlayPause|ViewEndPage))$\", conditions: HeadConditionsDef { request: None, response: None }, edit: Del(\"grpc-status\") }",
+    "51+1": "HeaderRewriteDef { response: true, pattern: \"^https:\\\\/\\\\/grpc\\\\.biliapi\\\\.net\\\\/bilibili\\\\.app\\\\.(?:view\\\\.v1\\\\.View\\\\/TFInfo|viewunite\\\\.v1\\\\.View\\\\/(?:PlayPause|ViewEndPage))$\", conditions: HeadConditionsDef { request: None, response: None }, edit: Add(\"grpc-status\", \"0\") }"
+  },
+  "body-rewrite": {
+    "31": "BodyRewriteDef { response: true, pattern: \"(?i:^http:\\\\/\\\\/[^?]+\\\\/resolve\\\\?host=(ap[ip]\\\\.bilibili\\\\.com|grpc\\\\.biliapi\\\\.net|api\\\\.live\\\\.bilibili\\\\.com))\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".dns[]? |= (.ips = [] | .ttl = 86400)\") }",
+    "33": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/api\\\\.bilibili\\\\.com\\\\/pgc\\\\/page\\\\/channel\\\\?)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data.modules |= map(select(.type != \\\"TIP\\\") | if .type == \\\"BANNER\\\" then .module_data.items |= map(select(.url | startswith(\\\"https://www.bilibili.com/blackboard/era/\\\") | not)) else . end)\") }",
+    "34": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/api\\\\.bilibili\\\\.com\\\\/pgc\\\\/view\\\\/v2\\\\/app\\\\/season\\\\?)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"del(.data.payment)\") }",
+    "35": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/api\\\\.live\\\\.bilibili\\\\.com\\\\/xlive\\\\/(?:app-interface\\\\/v2\\\\/index\\\\/feed|app-room\\\\/v1\\\\/index\\\\/getInfoBy(?:Room|User))\\\\?)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data |= (del(.play_together_info, .play_together_info_v2, .activity_banner_info) | if .function_card then .function_card[] = null end | if .new_tab_info.outer_list then .new_tab_info.outer_list |= map(select(.biz_id != 33)) end | if .card_list then .card_list |= map(select(.card_type | IN(\\\"banner_v2\\\", \\\"activity_card_v1\\\") | not)) end | reduce ([[\\\"show_reserve_status\\\"], false], [[\\\"reserve_info\\\", \\\"show_reserve_status\\\"], false], [[\\\"shopping_info\\\", \\\"is_show\\\"], 0]) as [$path, $value] (.; if getpath($path) then setpath($path; $value) end))\") }",
+    "37": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/api\\\\.live\\\\.bilibili\\\\.com\\\\/xlive\\\\/(?:app-interface\\\\/v2\\\\/index\\\\/feed|app-room\\\\/v1\\\\/index\\\\/getInfoBy(?:Room|User))\\\\?)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data |= (del(.play_together_info, .play_together_info_v2, .activity_banner_info) | if .function_card then .function_card[] = null end | if .new_tab_info.outer_list then .new_tab_info.outer_list |= map(select(.biz_id != 33)) end | if .card_list then .card_list |= map(select(.card_type | IN(\\\"banner_v2\\\", \\\"activity_card_v1\\\") | not)) end | reduce ([[\\\"show_reserve_status\\\"], false], [[\\\"reserve_info\\\", \\\"show_reserve_status\\\"], false], [[\\\"shopping_info\\\", \\\"is_show\\\"], 0]) as [$path, $value] (.; if getpath($path) then setpath($path; $value) end))\") }",
+    "38": "BodyRewriteDef { response: true, pattern: \"^https:\\\\/\\\\/api\\\\.bilibili\\\\.com\\\\/x\\\\/pd-proxy\\\\/tracker\\\\?\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data[][]? = \\\"stun.chat.bilibili.com:3478\\\"\") }",
+    "42": "BodyRewriteDef { response: true, pattern: \"^https:\\\\/\\\\/api\\\\.live\\\\.bilibili\\\\.com\\\\/xlive\\\\/open-interface\\\\/v2\\\\/tracker\\\\/conf\\\\?\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data.domains = [\\\"wss://tracker.chat.bilibili.com\\\"]\") }",
+    "46": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/app\\\\.bilibili\\\\.com\\\\/x\\\\/resource\\\\/show\\\\/skin\\\\?)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"del(.data.common_equip)\") }",
+    "56": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/manga\\\\.bilibili\\\\.com\\\\/twirp\\\\/comic\\\\.v1\\\\.(?:Comic\\\\/AppInit|Home\\\\/HomeFeed)\\\\?)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data as $data | .data[(\\\"activity_tab\\\", \\\"flash\\\", \\\"operate\\\") | select($data[.])]=null | if .data.feeds then .data.feeds |= map(select(.type | IN(15, 30) | not)) end\") }"
+  },
+  "map-local": {
+    "32": "MapLocalDef { pattern: \"(?i:^https:\\\\/\\\\/api\\\\.bilibili\\\\.com\\\\/pgc\\\\/activity\\\\/deliver\\\\/material\\\\/receive\\\\?)\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{\\\"code\\\":0,\\\"data\\\":{\\\"closeType\\\":\\\"close_win\\\",\\\"container\\\":[],\\\"showTime\\\":\\\"\\\"},\\\"message\\\":\\\"success\\\"}\", status: 200, header: {\"content-type\": \"text/plain; charset=utf-8\"}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "47": "MapLocalDef { pattern: \"(?i:^https:\\\\/\\\\/app\\\\.bilibili\\\\.com\\\\/x\\\\/resource\\\\/top\\\\/activity\\\\?)\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{\\\"code\\\":-404,\\\"message\\\":\\\"啥都木有\\\",\\\"ttl\\\":1,\\\"data\\\":null}\", status: 200, header: {\"content-type\": \"text/plain; charset=utf-8\"}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "48": "MapLocalDef { pattern: \"(?i:^https:\\\\/\\\\/app\\\\.bilibili\\\\.com\\\\/x\\\\/v2\\\\/search\\\\/square\\\\?)\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{\\\"code\\\":0,\\\"message\\\":\\\"0\\\",\\\"ttl\\\":1,\\\"data\\\":{\\\"type\\\":\\\"history\\\",\\\"title\\\":\\\"搜索历史\\\",\\\"search_hotword_revision\\\":2}}\", status: 200, header: {\"content-type\": \"text/plain; charset=utf-8\"}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "49": "MapLocalDef { pattern: \"^https:\\\\/\\\\/grpc\\\\.biliapi\\\\.net\\\\/bilibili\\\\.app\\\\.interface\\\\.v1\\\\.Search\\\\/DefaultWords$\", conditions: HeadConditionsDef { request: None, response: None }, body: Base64([0, 0, 0, 0, 33, 26, 29, 230, 144, 156, 231, 180, 162, 232, 167, 134, 233, 162, 145, 227, 128, 129, 231, 149, 170, 229, 137, 167, 230, 136, 150, 117, 112, 228, 184, 187, 40, 1]), data: \"\", status: 200, header: {\"content-type\": \"text/plain; charset=utf-8\"}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "50": "MapLocalDef { pattern: \"^https:\\\\/\\\\/grpc\\\\.biliapi\\\\.net\\\\/bilibili\\\\.app\\\\.interface\\\\.v1\\\\.Teenagers\\\\/ModeStatus$\", conditions: HeadConditionsDef { request: None, response: None }, body: Base64([0, 0, 0, 0, 19, 10, 17, 8, 2, 18, 9, 116, 101, 101, 110, 97, 103, 101, 114, 115, 32, 2, 42, 0]), data: \"\", status: 200, header: {\"content-type\": \"text/plain; charset=utf-8\"}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "51": "MapLocalDef { pattern: \"^https:\\\\/\\\\/grpc\\\\.biliapi\\\\.net\\\\/bilibili\\\\.app\\\\.(?:view\\\\.v1\\\\.View\\\\/TFInfo|viewunite\\\\.v1\\\\.View\\\\/(?:PlayPause|ViewEndPage))$\", conditions: HeadConditionsDef { request: None, response: None }, body: Base64([0, 0, 0, 0, 0]), data: \"\", status: 200, header: {\"content-type\": \"text/plain; charset=utf-8\"}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "55": "MapLocalDef { pattern: \"(?i:^https:\\\\/\\\\/manga\\\\.bilibili\\\\.com\\\\/twirp\\\\/comic\\\\.v1\\\\.Comic\\\\/(?:Flash|ListFlash|GetActivityTab|GetBubbles))\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{\\\"code\\\":0,\\\"msg\\\":\\\"\\\",\\\"data\\\":null}\", status: 200, header: {\"content-type\": \"text/plain; charset=utf-8\"}, content_type: \"text/plain; charset=utf-8\", request: false }"
+  },
+  "request-body-mock": {},
+  "script": {
+    "59": "ScriptDef { name: \"bilibili_airborne\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/rucu6/bilibili/rucu6_request.js\", kind: HttpRequest, pattern: Some(\"^https:\\\\/\\\\/(?:app\\\\.bilibili\\\\.com|grpc\\\\.biliapi\\\\.net)\\\\/bilibili\\\\.(?:app\\\\.view(unite)?\\\\.v1\\\\.View\\\\/ViewProgress|community\\\\.service\\\\.dm\\\\.v1\\\\.DM\\\\/DmSegMobile)$\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: true, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(20.0), argument: Some(Object {\"logLevel\": String(\"error\")}) }",
+    "61": "ScriptDef { name: \"bilibili_request\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/rucu6/bilibili/rucu6_request.js\", kind: HttpRequest, pattern: Some(\"^https:\\\\/\\\\/(?:app\\\\.bilibili\\\\.com|grpc\\\\.biliapi\\\\.net)\\\\/bilibili\\\\.(?:app\\\\.viewunite\\\\.v1\\\\.View\\\\/View|main\\\\.community\\\\.reply\\\\.v1\\\\.Reply\\\\/MainList)$\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: true, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(20.0), argument: Some(Object {\"purifyComment\": Bool(true), \"logLevel\": String(\"error\")}) }",
+    "63": "ScriptDef { name: \"bilibili_response\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/rucu6/bilibili/rucu6_response.js\", kind: HttpResponse, pattern: Some(\"^https:\\\\/\\\\/(?:app\\\\.bilibili\\\\.com|grpc\\\\.biliapi\\\\.net)\\\\/bilibili\\\\.(?:app\\\\.(?:dynamic\\\\.v2\\\\.Dynamic\\\\/DynAll|playerunite\\\\.v1\\\\.Player\\\\/PlayViewUnite|playurl\\\\.v1\\\\.PlayURL\\\\/PlayView|show\\\\.v1\\\\.Popular\\\\/Index|view(unite)?\\\\.v1\\\\.View\\\\/(?:AIRelateAsync|RelatesFeed|View|ViewProgress))|community\\\\.service\\\\.dm\\\\.v1\\\\.DM\\\\/DmView|main\\\\.community\\\\.reply\\\\.v1\\\\.Reply\\\\/MainList|pgc\\\\.gateway\\\\.player\\\\.v2\\\\.PlayURL\\\\/PlayView|polymer\\\\.app\\\\.search\\\\.v1\\\\.Search\\\\/SearchAll)$\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: true, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(20.0), argument: Some(Object {\"displayUpList\": String(\"show\"), \"purifyComment\": Bool(true), \"sponsorBlock\": Bool(true), \"logLevel\": String(\"error\")}) }",
+    "65": "ScriptDef { name: \"移除观影页广告\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/rucu6/bilibili/rucu6_json.js\", kind: HttpResponse, pattern: Some(\"(?i:^https:\\\\/\\\\/api\\\\.bilibili\\\\.com\\\\/pgc\\\\/page\\\\/(?:bangumi|cinema\\\\/tab))\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(20.0), argument: None }",
+    "67": "ScriptDef { name: \"移除开屏广告\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/rucu6/bilibili/rucu6_json.js\", kind: HttpResponse, pattern: Some(\"(?i:^https:\\\\/\\\\/app\\\\.bilibili\\\\.com\\\\/x\\\\/v2\\\\/splash)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(20.0), argument: None }",
+    "69": "ScriptDef { name: \"精简首页顶部标签\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/rucu6/bilibili/rucu6_json.js\", kind: HttpResponse, pattern: Some(\"(?i:^https:\\\\/\\\\/app\\\\.bilibili\\\\.com\\\\/x\\\\/resource\\\\/show\\\\/tab\\\\/v2\\\\?)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(20.0), argument: None }",
+    "71": "ScriptDef { name: \"精简我的页面\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/rucu6/bilibili/rucu6_json.js\", kind: HttpResponse, pattern: Some(\"(?i:^https:\\\\/\\\\/app\\\\.bilibili\\\\.com\\\\/x\\\\/v2\\\\/account\\\\/mine)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(20.0), argument: None }",
+    "73": "ScriptDef { name: \"移除首页推荐广告\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/rucu6/bilibili/rucu6_json.js\", kind: HttpResponse, pattern: Some(\"(?i:^https:\\\\/\\\\/app\\\\.bilibili\\\\.com\\\\/x\\\\/v2\\\\/feed\\\\/index)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(20.0), argument: None }"
+  },
+  "rules": {
+    "17": "DOMAIN,bsbsb.top => <PROXY>",
+    "18": "DST-PORT,4480 => REJECT-NO-DROP",
+    "19": "DST-PORT,4483 => REJECT-NO-DROP",
+    "20": "DST-PORT,9102 => REJECT-NO-DROP",
+    "21": "AND,((DOMAIN-SUFFIX,chat.bilibili.com),(OR,((DOMAIN-KEYWORD,stun),(DOMAIN-KEYWORD,tracker),(DOMAIN-KEYWORD,p2p)))) => REJECT",
+    "22": "DOMAIN,api.biliapi.com => REJECT",
+    "23": "DOMAIN,api.biliapi.net => REJECT",
+    "24": "DOMAIN,app.biliapi.com => REJECT",
+    "25": "DOMAIN,app.biliapi.net => REJECT",
+    "26": "DOMAIN,dns.google => REJECT",
+    "27": "URL-REGEX,^http:\\/\\/upos-sz-static\\.bilivideo\\.com\\/ssaxcode\\/\\w{2}\\/\\w{2}\\/\\w{32}-1-SPLASH => <REJECT-VIDEO-NO-DROP>",
+    "28": "URL-REGEX,^http:\\/\\/[\\d\\.]+:8000\\/v1\\/resource\\/\\w{32}-1-SPLASH => <REJECT-VIDEO-NO-DROP>"
+  },
+  "rule-sets": [],
+  "resources": [
+    {
+      "url": "https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/rucu6/bilibili/rucu6_request.js",
+      "kind": "script",
+      "lines": [
+        59,
+        61
+      ]
+    },
+    {
+      "url": "https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/rucu6/bilibili/rucu6_response.js",
+      "kind": "script",
+      "lines": [
+        63
+      ]
+    },
+    {
+      "url": "https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/rucu6/bilibili/rucu6_json.js",
+      "kind": "script",
+      "lines": [
+        65,
+        67,
+        69,
+        71,
+        73
+      ]
+    }
+  ],
+  "network": {},
+  "declared-scripts": [
+    59,
+    61,
+    63,
+    65,
+    67,
+    69,
+    71,
+    73
+  ],
+  "ignored": []
+}

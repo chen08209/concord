@@ -96,6 +96,8 @@ pub enum BodyActionDef {
     Replace(Vec<(String, String)>),
     /// A jq expression, compiled where the rule runs.
     Jq(String),
+    /// A jq file in the resources directory, read where the rule is compiled.
+    JqFile(String),
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -107,13 +109,14 @@ pub struct BodyRewriteDef {
 }
 
 /// Where a `map-local` answer's body comes from: the line's `data` as text, a decoded
-/// base64 one, a file of that name in the resources directory, or the 1x1 GIF.
+/// base64 one, a file of that name in the resources directory (with `base64`, holding base64
+/// text to decode), or the 1x1 GIF.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum MapLocalBody {
     Text,
     TinyGif,
     Base64(Vec<u8>),
-    File,
+    File { base64: bool },
 }
 
 impl MapLocalBody {
@@ -122,7 +125,7 @@ impl MapLocalBody {
             MapLocalBody::Text => "text",
             MapLocalBody::TinyGif => "tiny-gif",
             MapLocalBody::Base64(_) => "base64",
-            MapLocalBody::File => "file",
+            MapLocalBody::File { .. } => "file",
         }
     }
 }
@@ -457,8 +460,9 @@ pub fn parse_map_local(line: &str, request: bool) -> Result<MapLocalDef, LineErr
             MapLocalBody::Base64(decode_base64(data).map_err(|err| err.within("data"))?),
             "application/octet-stream",
         ),
+        "json" => (MapLocalBody::Text, "application/json"),
         "" | "file" => (
-            MapLocalBody::File,
+            MapLocalBody::File { base64: false },
             mime_by_extension(data).unwrap_or("application/octet-stream"),
         ),
         other => {

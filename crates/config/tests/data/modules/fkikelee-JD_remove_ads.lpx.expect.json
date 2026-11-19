@@ -1,0 +1,56 @@
+{
+  "format": "loon",
+  "meta": {
+    "name": "京东去广告",
+    "desc": "移除京东开屏广告，精简我的页面产品推广。",
+    "author": "RuCu6[https://github.com/RuCu6], Maasea[https://github.com/Maasea]",
+    "icon": "https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/JD.png",
+    "homepage": "https://hub.kelee.one",
+    "category": "去广告",
+    "system": null,
+    "requirement": null,
+    "argumentsDesc": null
+  },
+  "off": null,
+  "arguments": [],
+  "hostname": [
+    {
+      "line": 25,
+      "items": "api.m.jd.com"
+    }
+  ],
+  "force-http-hostname": [],
+  "skip-server-cert-verify": null,
+  "client-source-address": [],
+  "h2": null,
+  "url-rewrite": {
+    "17": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/api\\\\.m\\\\.jd\\\\.com\\\\/client\\\\.action\\\\?functionId=(searchBoxWord|stationPullService|uniformRecommend[06]))\", head: None, replacement: \"\", action: RejectDict }"
+  },
+  "header-rewrite": {},
+  "body-rewrite": {
+    "19": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/api\\\\.m\\\\.jd\\\\.com\\\\/client\\\\.action\\\\?functionId=basicConfig)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"if .data.JDMessage.socketmonitor.isSocketEstablishedAhead != null then .data.JDMessage.socketmonitor.isSocketEstablishedAhead = 0 else . end | if .data.JDMessage.socketmonitor.isSocketReport != null then .data.JDMessage.socketmonitor.isSocketReport = 0 else . end | if .data.JDHttpToolKit.httpdns.httpdns != null then .data.JDHttpToolKit.httpdns.httpdns = 0 else . end\") }"
+  },
+  "map-local": {},
+  "request-body-mock": {},
+  "script": {
+    "22": "ScriptDef { name: \"移除京东广告\", path: \"https://raw.githubusercontent.com/fkingikelee/fkikelee/main/Resource/kelee/JavaScript/JD/JD_remove_ads.js\", kind: HttpResponse, pattern: Some(\"(?i:^https:\\\\/\\\\/api\\\\.m\\\\.jd\\\\.com\\\\/client\\\\.action\\\\?functionId=(deliverLayer|getTabHomeInfo|myOrderInfo|orderTrackBusiness|personinfoBusiness|start|welcomeHome))\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(20.0), argument: None }"
+  },
+  "rules": {
+    "14": "URL-REGEX,^http:\\/\\/\\w{32}\\.jddebug\\.com\\/diagnose\\? => REJECT"
+  },
+  "rule-sets": [],
+  "resources": [
+    {
+      "url": "https://raw.githubusercontent.com/fkingikelee/fkikelee/main/Resource/kelee/JavaScript/JD/JD_remove_ads.js",
+      "kind": "script",
+      "lines": [
+        22
+      ]
+    }
+  ],
+  "network": {},
+  "declared-scripts": [
+    22
+  ],
+  "ignored": []
+}

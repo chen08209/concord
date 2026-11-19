@@ -32,6 +32,13 @@ repository's own licence text.
 | `chavy-boxjs.rewrite.surge.sgmodule` | https://raw.githubusercontent.com/chavyleung/scripts/bfab3c906f3d5d126e9094f15730e025f7f32128/box/rewrite/boxjs.rewrite.surge.sgmodule | GPL-3.0 |
 | `chavy-surge.cookies.sgmodule` | https://raw.githubusercontent.com/chavyleung/scripts/bfab3c906f3d5d126e9094f15730e025f7f32128/surge.cookies.sgmodule | GPL-3.0 |
 | `chavy-jd.618.sgmodule` | https://raw.githubusercontent.com/chavyleung/scripts/bfab3c906f3d5d126e9094f15730e025f7f32128/jd/jd.618.sgmodule | GPL-3.0 |
+| `fmz200-blockAds.plugin` | https://raw.githubusercontent.com/fmz200/wool_scripts/eca3853dfed0f2db829408a81b98ff279bcfe8f9/Loon/plugin/blockAds.plugin | GPL-3.0 |
+| `fmz200-WeChatMiniAds.plugin` | https://raw.githubusercontent.com/fmz200/wool_scripts/eca3853dfed0f2db829408a81b98ff279bcfe8f9/Loon/plugin/WeChatMiniAds.plugin | GPL-3.0 |
+| `fmz200-weibo.plugin` | https://raw.githubusercontent.com/fmz200/wool_scripts/eca3853dfed0f2db829408a81b98ff279bcfe8f9/Loon/plugin/weibo.plugin | GPL-3.0 |
+| `app2smile-spotify.plugin` | https://raw.githubusercontent.com/app2smile/rules/df6366a7024e0b3f0aa3510c5b791eea6f3cba89/plugin/spotify.plugin | MIT |
+| `app2smile-tieba.plugin` | https://raw.githubusercontent.com/app2smile/rules/df6366a7024e0b3f0aa3510c5b791eea6f3cba89/plugin/tieba.plugin | MIT |
+| `sparkle-bilibili.lpx` | https://raw.githubusercontent.com/kokoryh/Sparkle/0eb4fd1c0c30e7aeaab6c70f5ec546a34f3c9d81/release/loon/plugin/bilibili.lpx | GPL-3.0 |
+| `chavy-boxjs.rewrite.loon.plugin` | https://raw.githubusercontent.com/chavyleung/scripts/bfab3c906f3d5d126e9094f15730e025f7f32128/box/rewrite/boxjs.rewrite.loon.plugin | GPL-3.0 |
 
 `remote.json` lists modules from repositories that declare no licence compatible with
 GPL-3.0-or-later, by URL and SHA-256 only. `cargo xtask module-corpus` downloads them into

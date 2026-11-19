@@ -1,6 +1,9 @@
 //! The sectioned text Surge and Loon write, a section's lines read the way that section is.
 
-use super::arguments::{read_surge, substitute_surge};
+use std::borrow::Cow;
+
+use super::arguments::{read_loon, read_surge, substitute_loon, substitute_surge};
+use super::loon::{self, Out};
 use super::network::{NetworkEdits, Refused};
 use super::requirement::evaluate;
 use super::resource::{ResourceKind, is_url, locate};
@@ -11,15 +14,15 @@ use super::source::{
 };
 use super::{
     HostLine, IgnoreReason, IgnoredLine, ModuleDef, ModuleFormat, ModuleInput, ModuleLine,
-    ModuleMeta, ModuleOff,
+    ModuleMeta, ModuleOff, Unreadable,
 };
 use crate::mitm::rules::mime_by_extension;
 use crate::mitm::script::{
     EVENT_ENGINE_STARTED, EVENT_NETWORK_CHANGED, EVENT_PROFILE_RELOADED, split_script_line,
 };
 use crate::mitm::{
-    MapLocalBody, host_items, parse_body_rewrite, parse_header_rewrite, parse_map_local,
-    parse_script, parse_url_rewrite, source_items,
+    BodyActionDef, MapLocalBody, MapLocalDef, Read, host_items, parse_body_rewrite,
+    parse_header_rewrite, parse_map_local, parse_script, parse_url_rewrite, source_items,
 };
 
 const LOON_SECTIONS: [&str; 4] = ["rewrite", "argument", "remote rule", "plugin"];
@@ -50,10 +53,24 @@ fn declarations(text: &str, def: &mut ModuleDef) -> Declarations {
     let mut meta = ModuleMeta::default();
     let mut inline_sets = Vec::new();
     let mut format = ModuleFormat::Surge;
+    let mut tag = None;
+    let mut in_arguments = false;
     for (number, raw) in numbered(text) {
         let line = raw.trim();
+        if in_arguments && !line.is_empty() && !is_comment(line) && section_name(line).is_none() {
+            match read_loon(line, number) {
+                Ok(argument) => def.arguments.push(argument),
+                Err(Unreadable(detail)) => def.ignored.push(IgnoredLine {
+                    line: number,
+                    reason: IgnoreReason::Unreadable,
+                    detail: Some(detail),
+                }),
+            }
+            continue;
+        }
         if let Some(name) = section_name(line) {
             let lower = name.to_ascii_lowercase();
+            in_arguments = lower == "argument";
             if let Some(set) = lower.strip_prefix("ruleset ").and(name.get(8..)) {
                 inline_sets.push(set.trim().to_string());
             }
@@ -81,11 +98,20 @@ fn declarations(text: &str, def: &mut ModuleDef) -> Declarations {
                 read_surge(value, number, &mut def.arguments);
                 continue;
             }
+            "tag" => {
+                if tag.is_none() && !value.is_empty() {
+                    tag = Some(value.to_string());
+                }
+                continue;
+            }
             _ => continue,
         };
         if slot.is_none() && !value.is_empty() {
             *slot = Some(value.to_string());
         }
+    }
+    if format == ModuleFormat::Loon && meta.category.is_none() {
+        meta.category = tag;
     }
     Declarations {
         meta,
@@ -131,15 +157,29 @@ pub(super) fn read(text: &str, input: &ModuleInput<'_>) -> ModuleDef {
             continue;
         };
         let lower = section.to_ascii_lowercase();
-        if lower == "script" {
+        if lower == "argument" {
+            continue;
+        }
+        if lower == "script" || loon::is_new_script(line) {
             reader.declare_script(line, number);
         }
+        if matches!(lower.as_str(), "rewrite" | "script") && loon::is_new(line) {
+            reader.read_new(line, number);
+            continue;
+        }
+        let raw = line;
         let line = substitute_surge(line, &reader.def.arguments, input.arguments);
+        let line = match reader.def.format {
+            ModuleFormat::Loon => Cow::Owned(
+                substitute_loon(&line, &reader.def.arguments, input.arguments).into_owned(),
+            ),
+            _ => line,
+        };
         let line = line.trim();
         if line.is_empty() || is_comment(line) {
             continue;
         }
-        reader.read_line(&lower, section, line, number);
+        reader.read_line(&lower, section, line, raw, number);
     }
     reader.def.meta = meta;
     reader.finish()
@@ -174,7 +214,7 @@ impl Reader<'_> {
         });
     }
 
-    fn read_line(&mut self, lower: &str, section: &str, line: &str, number: u32) {
+    fn read_line(&mut self, lower: &str, section: &str, line: &str, raw: &str, number: u32) {
         let lists = &mut self.def.lists;
         match lower {
             "general" => self.read_general(line, number),
@@ -197,9 +237,23 @@ impl Reader<'_> {
             "body rewrite" => lists
                 .body_rewrite
                 .push(at(number, parse_body_rewrite(line))),
-            "map local" => self.read_map_local(line, number),
+            "map local" => {
+                let mut read = parse_map_local(line, false);
+                if self.place_file(&mut read, number) {
+                    self.def.lists.map_local.push(at(number, read));
+                }
+            }
             "mitm" => self.read_mitm(line, number),
-            "script" => self.read_script(line, number),
+            "script" => self.read_script(line, raw, number),
+            "rewrite" => match loon::read_legacy(line) {
+                Ok(outs) => outs.into_iter().for_each(|out| self.place(number, out)),
+                Err((reason, detail)) => self.ignore(number, reason, detail),
+            },
+            "remote rule" => match self.rules.remote(line) {
+                Ok(Some(def)) => self.def.rules.push(ModuleLine { line: number, def }),
+                Ok(None) => self.ignore(number, IgnoreReason::Disabled, None),
+                Err((reason, detail)) => self.ignore(number, reason, detail),
+            },
             _ if lower.starts_with("ruleset ") => {
                 let set = section.get(8..).unwrap_or_default().trim();
                 if let Err((reason, detail)) = self.rules.read_inline(set, line, number) {
@@ -286,38 +340,95 @@ impl Reader<'_> {
         }
     }
 
-    fn read_map_local(&mut self, line: &str, number: u32) {
-        let mut read = parse_map_local(line, false);
-        if let Ok(local) = &mut read
-            && local.body == MapLocalBody::File
-        {
-            match locate(
-                &local.data,
-                ResourceKind::MapLocal,
-                number,
-                self.input.attachments,
-                &mut self.def.resources,
-            ) {
-                Ok(path) => {
-                    if is_url(&path) {
-                        let without_query = path.split(['?', '#']).next().unwrap_or_default();
-                        local.content_type =
-                            mime_by_extension(without_query).unwrap_or("application/octet-stream");
+    /// A new-syntax Loon line, read with the arguments as typed values.
+    fn read_new(&mut self, line: &str, number: u32) {
+        match loon::read_new(line, &self.def.arguments, self.input.arguments) {
+            Ok(Some(outs)) => outs.into_iter().for_each(|out| self.place(number, out)),
+            Ok(None) => self.ignore(number, IgnoreReason::Disabled, None),
+            Err((reason, detail)) => self.ignore(number, reason, detail),
+        }
+    }
+
+    fn place(&mut self, number: u32, out: Out) {
+        match out {
+            Out::Url(read) => self.def.lists.url_rewrite.push(at(number, read)),
+            Out::Header(read) => self.def.lists.header_rewrite.push(at(number, read)),
+            Out::Body(mut read) => {
+                if let Ok(def) = &mut read
+                    && let BodyActionDef::JqFile(path) = &mut def.action
+                {
+                    match self.locate(path, ResourceKind::Jq, number) {
+                        Some(file) => *path = file,
+                        None => return,
                     }
-                    local.data = path;
                 }
-                Err(reason) => {
-                    self.ignore(number, reason, Some(local.data.clone()));
-                    return;
+                self.def.lists.body_rewrite.push(at(number, read));
+            }
+            Out::MapLocal(mut read) => {
+                if self.place_file(&mut read, number) {
+                    self.def.lists.map_local.push(at(number, read));
+                }
+            }
+            Out::RequestBodyMock(mut read) => {
+                if self.place_file(&mut read, number) {
+                    self.def.lists.request_body_mock.push(at(number, read));
+                }
+            }
+            Out::Script(mut def) => {
+                if let Some(file) = self.locate(&def.path, ResourceKind::Script, number) {
+                    def.path = file;
+                    self.def.lists.script.push(at(number, Ok(def)));
                 }
             }
         }
-        self.def.lists.map_local.push(at(number, read));
+    }
+
+    /// The file a line names: a URL stays as the resource it is, a relative path becomes its
+    /// attachment; `None` once the line is ignored for want of one.
+    fn locate(&mut self, path: &str, kind: ResourceKind, number: u32) -> Option<String> {
+        let path = unquote(path);
+        match locate(
+            path,
+            kind,
+            number,
+            self.input.attachments,
+            &mut self.def.resources,
+        ) {
+            Ok(file) => Some(file),
+            Err(reason) => {
+                self.ignore(number, reason, Some(path.to_string()));
+                None
+            }
+        }
+    }
+
+    /// Places a map local's file; `false` once the line is ignored for want of one.
+    fn place_file(&mut self, read: &mut Read<MapLocalDef>, number: u32) -> bool {
+        let Ok(local) = read else {
+            return true;
+        };
+        if !matches!(local.body, MapLocalBody::File { .. }) {
+            return true;
+        }
+        let Some(path) = self.locate(&local.data.clone(), ResourceKind::MapLocal, number) else {
+            return false;
+        };
+        if is_url(&path) {
+            let without_query = path.split(['?', '#']).next().unwrap_or_default();
+            local.content_type =
+                mime_by_extension(without_query).unwrap_or("application/octet-stream");
+        }
+        local.data = path;
+        true
     }
 
     /// Counted before the arguments are filled in, so a script an argument turns off still
     /// asks for consent.
     fn declare_script(&mut self, line: &str, number: u32) {
+        if loon::is_new_script(line) {
+            self.def.declared_scripts.push(number);
+            return;
+        }
         let kind = split_script_line(line)
             .map(|(_, kind, _)| kind)
             .unwrap_or_default();
@@ -326,9 +437,12 @@ impl Reader<'_> {
         }
     }
 
-    fn read_script(&mut self, line: &str, number: u32) {
+    fn read_script(&mut self, line: &str, raw: &str, number: u32) {
+        let mut legacy = false;
         if let Ok((_, kind, params)) = split_script_line(line) {
+            legacy = !params.contains_key("type");
             let param = |key: &str| params.get(key).map(String::as_str);
+            let off = |key: &str| param(key).is_some_and(|on| on.eq_ignore_ascii_case("false"));
             let refused = match kind.as_str() {
                 "dns" | "rule" => Some(IgnoreReason::ScriptType),
                 "event"
@@ -339,9 +453,7 @@ impl Reader<'_> {
                 {
                     Some(IgnoreReason::Event)
                 }
-                _ if param("enable").is_some_and(|on| on.eq_ignore_ascii_case("false")) => {
-                    Some(IgnoreReason::Disabled)
-                }
+                _ if off("enable") || off("enabled") => Some(IgnoreReason::Disabled),
                 _ => None,
             };
             if let Some(reason) = refused {
@@ -351,21 +463,27 @@ impl Reader<'_> {
         }
         let mut read = parse_script(line);
         if let Ok(script) = &mut read {
-            match locate(
-                unquote(&script.path),
-                ResourceKind::Script,
-                number,
-                self.input.attachments,
-                &mut self.def.resources,
-            ) {
-                Ok(path) => script.path = path,
-                Err(reason) => {
-                    self.ignore(number, reason, Some(script.path.clone()));
-                    return;
-                }
+            if legacy {
+                self.read_legacy_script(script, raw);
+            }
+            match self.locate(&script.path.clone(), ResourceKind::Script, number) {
+                Some(file) => script.path = file,
+                None => return,
             }
         }
         self.def.lists.script.push(at(number, read));
+    }
+
+    /// Loon's legacy script: its URL regex ignores case (Script/script_v2), and its plugin
+    /// arguments may be handed on as an object.
+    fn read_legacy_script(&self, script: &mut crate::mitm::ScriptDef, raw: &str) {
+        if let Some(pattern) = &mut script.pattern {
+            pattern.insert_str(0, "(?i)");
+        }
+        if let Some(argument) = loon::legacy_script(raw, &self.def.arguments, self.input.arguments)
+        {
+            script.argument = Some(argument);
+        }
     }
 
     fn finish(mut self) -> ModuleDef {
@@ -410,8 +528,6 @@ fn at<T>(line: u32, def: T) -> ModuleLine<T> {
     ModuleLine { line, def }
 }
 
-/// `#!system` gates a module only on a system Surge runs on, as it names those alone; a
-/// module written for one runs everywhere else.
 /// `#!system` names the systems Surge runs the module on, not where Concord does, so only
 /// `#!requirement` turns a module off.
 fn module_off(meta: &ModuleMeta, input: &ModuleInput<'_>) -> Option<ModuleOff> {

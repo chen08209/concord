@@ -28,7 +28,7 @@
   "body-rewrite": {},
   "map-local": {
     "12": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/([\\\\w-]+)\\\\.googlevideo\\\\.com\\\\/initplayback(\\\\?.*oad=.+)$\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{}\", status: 200, header: {\"content-type\": \"application/json\"}, content_type: \"text/plain; charset=utf-8\", request: false }",
-    "14": "MapLocalDef { pattern: \"^https:\\\\/\\\\/dualsubs\\\\.github\\\\.io\\\\/api\\\\/YouTube(?:\\\\?.*)?$\", conditions: HeadConditionsDef { request: None, response: None }, body: File, data: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/DualSubs.YouTube/DualSubs_DualSubs.YouTube.PreferencePanes.json\", status: 200, header: {}, content_type: \"application/json\", request: false }"
+    "14": "MapLocalDef { pattern: \"^https:\\\\/\\\\/dualsubs\\\\.github\\\\.io\\\\/api\\\\/YouTube(?:\\\\?.*)?$\", conditions: HeadConditionsDef { request: None, response: None }, body: File { base64: false }, data: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/DualSubs.YouTube/DualSubs_DualSubs.YouTube.PreferencePanes.json\", status: 200, header: {}, content_type: \"application/json\", request: false }"
   },
   "request-body-mock": {},
   "script": {

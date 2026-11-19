@@ -158,7 +158,8 @@ impl Config {
             })
         });
         each("body-rewrite", &def.body_rewrite, visit, |read| {
-            compiled(read, compile_body_rewrite, |rule| {
+            let body = |def: &_| compile_body_rewrite(def, &env.resources);
+            compiled(read, body, |rule| {
                 let view = rule.view();
                 rules.body_rewrites.push(Arc::new(rule));
                 view

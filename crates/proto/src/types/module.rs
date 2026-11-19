@@ -258,4 +258,9 @@ pub enum MitmIgnoreReason {
     NoAttachment,
     /// A line of a section Concord reads that does not parse.
     Unreadable,
+    /// A condition Concord cannot test, as `||` across the URL and a header.
+    Condition,
+    /// A value only the request at hand fills in, as the condition's capture inside a header
+    /// value; a URL rewrite's replacement may name the URL's.
+    RuntimeValue,
 }

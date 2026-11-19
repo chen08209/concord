@@ -1,0 +1,48 @@
+{
+  "format": "loon",
+  "meta": {
+    "name": "Reddit去广告",
+    "desc": "过滤应用内推广，阻止NSFW提示。",
+    "author": "xream[https://github.com/xream]",
+    "icon": "https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/Reddit.png",
+    "homepage": "https://hub.kelee.one",
+    "category": "去广告",
+    "system": null,
+    "requirement": null,
+    "argumentsDesc": null
+  },
+  "off": null,
+  "arguments": [],
+  "hostname": [
+    {
+      "line": 17,
+      "items": "gql.reddit.com, gql-fed.reddit.com"
+    }
+  ],
+  "force-http-hostname": [],
+  "skip-server-cert-verify": null,
+  "client-source-address": [],
+  "h2": null,
+  "url-rewrite": {},
+  "header-rewrite": {},
+  "body-rewrite": {
+    "14": "BodyRewriteDef { response: true, pattern: \"(?i:^https?:\\\\/\\\\/gql(-fed)?\\\\.reddit\\\\.com)\", conditions: HeadConditionsDef { request: None, response: None }, action: JqFile(\"https://raw.githubusercontent.com/fkingikelee/fkikelee/main/Resource/kelee/JQLang/Reddit/Reddit_remove_ads.jq\") }"
+  },
+  "map-local": {},
+  "request-body-mock": {},
+  "script": {},
+  "rules": {},
+  "rule-sets": [],
+  "resources": [
+    {
+      "url": "https://raw.githubusercontent.com/fkingikelee/fkikelee/main/Resource/kelee/JQLang/Reddit/Reddit_remove_ads.jq",
+      "kind": "jq",
+      "lines": [
+        14
+      ]
+    }
+  ],
+  "network": {},
+  "declared-scripts": [],
+  "ignored": []
+}

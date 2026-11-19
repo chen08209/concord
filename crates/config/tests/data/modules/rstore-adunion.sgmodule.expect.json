@@ -55,18 +55,18 @@
     "569": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/bla\\\\.gtimg\\\\.com\\\\/qqlive\\\\/\\\\d{6}.+?\\\\.png\", conditions: HeadConditionsDef { request: None, response: None }, body: TinyGif, data: \"\", status: 200, header: {}, content_type: \"image/gif\", request: false }",
     "570": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/mmgr\\\\.gtimg\\\\.com\\\\/gjsmall\\\\/qiantu\\\\/upload\\\\/\", conditions: HeadConditionsDef { request: None, response: None }, body: TinyGif, data: \"\", status: 200, header: {}, content_type: \"image/gif\", request: false }",
     "571": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/mmgr\\\\.gtimg\\\\.com\\\\/gjsmall\\\\/qqpim\\\\/public\\\\/ios\\\\/splash\\\\/.+?\\\\/\\\\d{4}_\\\\d{4}\", conditions: HeadConditionsDef { request: None, response: None }, body: TinyGif, data: \"\", status: 200, header: {}, content_type: \"image/gif\", request: false }",
-    "572": "error Unknown: unknown data-type \"json\"",
-    "573": "error Unknown: unknown data-type \"json\"",
+    "572": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/bk\\\\.bingo\\\\.qq\\\\.com\\\\/bk\\\\/crx\\\\/data\\\\/videoAd\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{}\", status: 200, header: {}, content_type: \"application/json\", request: false }",
+    "573": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/api\\\\.map\\\\.baidu\\\\.com\\\\/\\\\?qt=verify\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{}\", status: 200, header: {}, content_type: \"application/json\", request: false }",
     "574": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/afd\\\\.baidu\\\\.com\\\\/afd\\\\/entry\", conditions: HeadConditionsDef { request: None, response: None }, body: TinyGif, data: \"\", status: 200, header: {}, content_type: \"image/gif\", request: false }",
     "575": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/issuecdn\\\\.baidupcs\\\\.com\\\\/issue\\\\/netdisk\\\\/guanggao\\\\/\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"\", status: 200, header: {}, content_type: \"text/plain; charset=utf-8\", request: false }",
     "576": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/[\\\\s\\\\S]*\\\\.baidu\\\\.com/.*?ad[xs]\\\\.php\", conditions: HeadConditionsDef { request: None, response: None }, body: TinyGif, data: \"\", status: 200, header: {}, content_type: \"image/gif\", request: false }",
     "577": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/t\\\\d{2}\\\\.baidu\\\\.com\", conditions: HeadConditionsDef { request: None, response: None }, body: TinyGif, data: \"\", status: 200, header: {}, content_type: \"image/gif\", request: false }",
     "578": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/g\\\\.alicdn\\\\.com\\\\/(?>alilog|trace)\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"\", status: 200, header: {}, content_type: \"text/plain; charset=utf-8\", request: false }",
-    "579": "error Unknown: unknown data-type \"json\"",
-    "580": "error Unknown: unknown data-type \"json\"",
+    "579": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/yixiu-abtest\\\\.alicdn\\\\.com\\\\/ut-abtest\\\\/config\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{}\", status: 200, header: {}, content_type: \"application/json\", request: false }",
+    "580": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/www\\\\.google\\\\.com\\\\/ads\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{}\", status: 200, header: {}, content_type: \"application/json\", request: false }",
     "581": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/api\\\\d?\\\\.musical\\\\.ly\\\\/api\\\\/ad\\\\/\", conditions: HeadConditionsDef { request: None, response: None }, body: TinyGif, data: \"\", status: 200, header: {}, content_type: \"image/gif\", request: false }",
     "582": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/cdn\\\\.api\\\\.fotoable\\\\.com\\\\/Advertise\\\\/\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"\", status: 200, header: {}, content_type: \"text/plain; charset=utf-8\", request: false }",
-    "583": "error Unknown: unknown data-type \"json\""
+    "583": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/cloud\\\\.bluecardsoft\\\\.com\\\\/yuntingad\\\\/\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{}\", status: 200, header: {}, content_type: \"application/json\", request: false }"
   },
   "request-body-mock": {},
   "script": {

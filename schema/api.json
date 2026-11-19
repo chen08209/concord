@@ -759,7 +759,7 @@
       }
     },
     {
-      "name": "mitm.module.read",
+      "name": "mitm.readModule",
       "kind": "unary",
       "exec": "concurrent",
       "capability": "mitm",
@@ -5928,6 +5928,16 @@
           "type": "string",
           "const": "unreadable",
           "description": "A line of a section Concord reads that does not parse."
+        },
+        {
+          "type": "string",
+          "const": "condition",
+          "description": "A condition Concord cannot test, as `||` across the URL and a header."
+        },
+        {
+          "type": "string",
+          "const": "runtimeValue",
+          "description": "A value only the request at hand fills in, as the condition's capture inside a header\nvalue; a URL rewrite's replacement may name the URL's."
         }
       ],
       "description": "Why a line takes no effect; a host shows each in its own words."

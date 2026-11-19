@@ -7,7 +7,24 @@
 //! does not take effect is either kept in its list with its error, as the profile's own lines
 //! are, or listed in [ModuleDef::ignored] with the reason.
 
+/// A line that does not parse, and what in it does not.
+#[derive(Debug)]
+pub(super) struct Unreadable(pub(super) String);
+
+impl From<String> for Unreadable {
+    fn from(detail: String) -> Self {
+        Self(detail)
+    }
+}
+
+impl From<&str> for Unreadable {
+    fn from(detail: &str) -> Self {
+        Self(detail.to_string())
+    }
+}
+
 mod arguments;
+mod loon;
 mod network;
 mod requirement;
 mod resource;
@@ -154,6 +171,11 @@ pub enum IgnoreReason {
     NoAttachment,
     /// A line of a section Concord reads that does not parse.
     Unreadable,
+    /// A condition Concord cannot test, as `||` across the URL and a header.
+    Condition,
+    /// A value only the request at hand fills in, as the condition's capture inside a header
+    /// value; a URL rewrite's replacement may name the URL's.
+    RuntimeValue,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]

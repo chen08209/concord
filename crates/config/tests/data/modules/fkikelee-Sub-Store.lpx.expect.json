@@ -1,0 +1,82 @@
+{
+  "format": "loon",
+  "meta": {
+    "name": "Sub-Store",
+    "desc": "高级订阅管理工具，定时任务默认为每天23点55分，可在插件设置中自定义。使用前请在本插件的详情页面为[PROXY]项分配代理策略。",
+    "author": "Peng-YM[https://github.com/Peng-YM]",
+    "icon": "https://raw.githubusercontent.com/luestr/IconResource/main/Other_icon/120px/Sub-Store.png",
+    "homepage": "https://hub.kelee.one",
+    "category": "订阅管理",
+    "system": null,
+    "requirement": null,
+    "argumentsDesc": null
+  },
+  "off": null,
+  "arguments": [
+    {
+      "name": "cron",
+      "kind": {
+        "type": "text"
+      },
+      "number": false,
+      "default": "55 23 * * *",
+      "label": "定时参数",
+      "desc": "这里需要输入符合CRON表达式的参数",
+      "line": 17
+    }
+  ],
+  "hostname": [
+    {
+      "line": 25,
+      "items": "sub.store"
+    }
+  ],
+  "force-http-hostname": [],
+  "skip-server-cert-verify": null,
+  "client-source-address": [],
+  "h2": null,
+  "url-rewrite": {},
+  "header-rewrite": {},
+  "body-rewrite": {},
+  "map-local": {},
+  "request-body-mock": {},
+  "script": {
+    "20": "ScriptDef { name: \"Sub-Store Core\", path: \"https://raw.githubusercontent.com/fkingikelee/fkikelee/main/Resource/github.com/sub-store-org/Sub-Store/releases/latest/download/sub-store-1.min.js\", kind: HttpRequest, pattern: Some(\"(?i:^https?:\\\\/\\\\/sub\\\\.store\\\\/((download)|api\\\\/(preview|sync|(utils\\\\/node-info))))\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(120.0), argument: None }",
+    "21": "ScriptDef { name: \"Sub-Store Simple\", path: \"https://raw.githubusercontent.com/fkingikelee/fkikelee/main/Resource/github.com/sub-store-org/Sub-Store/releases/latest/download/sub-store-0.min.js\", kind: HttpRequest, pattern: Some(\"(?i:^https?:\\\\/\\\\/sub\\\\.store)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(120.0), argument: None }",
+    "22": "ScriptDef { name: \"Sub-Store Sync\", path: \"https://raw.githubusercontent.com/fkingikelee/fkikelee/main/Resource/github.com/sub-store-org/Sub-Store/releases/latest/download/cron-sync-artifacts.min.js\", kind: Cron, pattern: None, conditions: HeadConditionsDef { request: None, response: None }, requires_body: false, binary_body: false, max_size: 0, cronexp: \"55 23 * * *\", event: \"\", timeout: Some(120.0), argument: None }"
+  },
+  "rules": {
+    "14": "DOMAIN,sub-store.vercel.app => <PROXY>"
+  },
+  "rule-sets": [],
+  "resources": [
+    {
+      "url": "https://raw.githubusercontent.com/fkingikelee/fkikelee/main/Resource/github.com/sub-store-org/Sub-Store/releases/latest/download/sub-store-1.min.js",
+      "kind": "script",
+      "lines": [
+        20
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fkingikelee/fkikelee/main/Resource/github.com/sub-store-org/Sub-Store/releases/latest/download/sub-store-0.min.js",
+      "kind": "script",
+      "lines": [
+        21
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fkingikelee/fkikelee/main/Resource/github.com/sub-store-org/Sub-Store/releases/latest/download/cron-sync-artifacts.min.js",
+      "kind": "script",
+      "lines": [
+        22
+      ]
+    }
+  ],
+  "network": {},
+  "declared-scripts": [
+    20,
+    21,
+    22
+  ],
+  "ignored": []
+}

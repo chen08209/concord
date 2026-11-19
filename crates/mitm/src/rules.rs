@@ -172,7 +172,10 @@ impl HeaderRewrite {
     }
 }
 
-pub(crate) fn compile_body_rewrite(def: &BodyRewriteDef) -> Result<BodyRewrite, LineError> {
+pub(crate) fn compile_body_rewrite(
+    def: &BodyRewriteDef,
+    resources: &Path,
+) -> Result<BodyRewrite, LineError> {
     let action = match &def.action {
         BodyActionDef::Replace(pairs) => BodyAction::Replace(
             pairs
@@ -186,6 +189,13 @@ pub(crate) fn compile_body_rewrite(def: &BodyRewriteDef) -> Result<BodyRewrite, 
                 .collect::<Result<_, LineError>>()?,
         ),
         BodyActionDef::Jq(expression) => BodyAction::Jq(Jq::compile(expression)?),
+        BodyActionDef::JqFile(name) => {
+            let code = read_resource(resources, "jq file", name)?;
+            let code = String::from_utf8(code).map_err(|_| {
+                LineError::resource(format!("jq file {} is not UTF-8", quote(name)))
+            })?;
+            BodyAction::Jq(Jq::compile(&code)?)
+        }
     };
     Ok(BodyRewrite {
         response: def.response,
@@ -279,7 +289,12 @@ pub(crate) fn compile_map_local(
         MapLocalBody::Text => def.data.as_bytes().to_vec(),
         MapLocalBody::TinyGif => tiny_gif(),
         MapLocalBody::Base64(bytes) => bytes.clone(),
-        MapLocalBody::File => read_resource(resources, "data", &def.data)?,
+        MapLocalBody::File { base64: false } => read_resource(resources, "data", &def.data)?,
+        MapLocalBody::File { base64: true } => {
+            let text = read_resource(resources, "data", &def.data)?;
+            let text = String::from_utf8_lossy(&text);
+            decode_base64(text.trim()).map_err(|err| err.within("data"))?
+        }
     };
     let mut header = def.header.clone();
     if !header.contains_key(CONTENT_TYPE) {
@@ -312,7 +327,10 @@ pub(crate) fn parse_header_rewrite(line: &str) -> Result<HeaderRewrite, LineErro
 
 #[cfg(test)]
 pub(crate) fn parse_body_rewrite(line: &str) -> Result<BodyRewrite, LineError> {
-    compile_body_rewrite(&concord_config::mitm::parse_body_rewrite(line)?)
+    compile_body_rewrite(
+        &concord_config::mitm::parse_body_rewrite(line)?,
+        Path::new(""),
+    )
 }
 
 #[cfg(test)]

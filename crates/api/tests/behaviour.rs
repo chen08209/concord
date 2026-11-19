@@ -1641,7 +1641,7 @@ async fn mitm_validate_answers_each_line_with_its_view_or_its_issue() {
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
-async fn mitm_module_read_shows_each_module_line_by_its_line() {
+async fn a_module_read_shows_each_module_line_by_its_line() {
     let rig = Rig::new().await;
     let text = r#"#!name=Sample
 #!arguments=host:a.test
@@ -1662,7 +1662,7 @@ p = title=x
 "#;
     let view = rig
         .control
-        .mitm_module_read(MitmModuleReadParams {
+        .mitm_read_module(MitmModuleReadParams {
             text: text.to_string(),
             arguments: BTreeMap::from([("host".to_string(), "b.test".to_string())]),
             attachments: BTreeMap::new(),

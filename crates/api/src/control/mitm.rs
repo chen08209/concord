@@ -60,7 +60,7 @@ impl Control {
         serde_json::from_value(validation).map_err(|err| ApiError::internal(err.to_string()))
     }
 
-    pub(super) async fn mitm_module_read(
+    pub(super) async fn mitm_read_module(
         &self,
         params: MitmModuleReadParams,
     ) -> Result<MitmModuleView, ApiError> {

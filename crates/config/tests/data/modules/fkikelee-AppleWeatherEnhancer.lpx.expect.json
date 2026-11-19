@@ -1,0 +1,189 @@
+{
+  "format": "loon",
+  "meta": {
+    "name": "Apple天气增强",
+    "desc": "解锁Apple天气的全部功能、替换空气质量数据源、添加下一小时降水数据、添加天气数据。",
+    "author": "VirgilClyne[https://github.com/VirgilClyne], WordlessEcho[https://github.com/WordlessEcho], 001[https://github.com/001ProMax]",
+    "icon": "https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/AppleWeather.png",
+    "homepage": "https://hub.kelee.one",
+    "category": "功能增强",
+    "system": "iOS, iPadOS, macOS, watchOS",
+    "requirement": null,
+    "argumentsDesc": null
+  },
+  "off": null,
+  "arguments": [
+    {
+      "name": "Weather.Provider",
+      "kind": {
+        "type": "select",
+        "options": [
+          "ColorfulClouds",
+          "WeatherKit",
+          "QWeather"
+        ]
+      },
+      "number": false,
+      "default": "ColorfulClouds",
+      "label": "[天气]数据源",
+      "desc": "使用选定的数据源替换天气数据。",
+      "line": 14
+    },
+    {
+      "name": "NextHour.Provider",
+      "kind": {
+        "type": "select",
+        "options": [
+          "ColorfulClouds",
+          "WeatherKit",
+          "QWeather"
+        ]
+      },
+      "number": false,
+      "default": "ColorfulClouds",
+      "label": "[未来一小时降水强度]数据源",
+      "desc": "使用选定的数据源填充未来一小时降水强度的数据。",
+      "line": 15
+    },
+    {
+      "name": "AirQuality.Calculate.Algorithm",
+      "kind": {
+        "type": "select",
+        "options": [
+          "EU_EAQI",
+          "None",
+          "UBA",
+          "WAQI_InstantCast_US",
+          "WAQI_InstantCast_CN",
+          "WAQI_InstantCast_CN_25_DRAFT"
+        ]
+      },
+      "number": false,
+      "default": "EU_EAQI",
+      "label": "AQI算法",
+      "desc": "使用内置算法，通过污染物数据本地计算空气指数。InstantCast源自于WAQI，美标版本使用了WAQI的臭氧标准。",
+      "line": 16
+    },
+    {
+      "name": "API.ColorfulClouds.Token",
+      "kind": {
+        "type": "text"
+      },
+      "number": false,
+      "default": "",
+      "label": "[API]彩云天气令牌",
+      "desc": "彩云天气API令牌",
+      "line": 17
+    },
+    {
+      "name": "API.QWeather.Host",
+      "kind": {
+        "type": "text"
+      },
+      "number": false,
+      "default": "devapi.qweather.com",
+      "label": "[API]和风天气主机",
+      "desc": "和风天气API使用的主机名",
+      "line": 18
+    },
+    {
+      "name": "API.QWeather.Token",
+      "kind": {
+        "type": "text"
+      },
+      "number": false,
+      "default": "",
+      "label": "[API]和风天气令牌",
+      "desc": "和风天气API令牌",
+      "line": 19
+    },
+    {
+      "name": "API.WAQI.Token",
+      "kind": {
+        "type": "text"
+      },
+      "number": false,
+      "default": "",
+      "label": "[API]WAQI令牌",
+      "desc": "WAQI API令牌，填写此字段将自动使用WAQI高级API",
+      "line": 20
+    },
+    {
+      "name": "Storage",
+      "kind": {
+        "type": "select",
+        "options": [
+          "Argument",
+          "PersistentStore",
+          "database"
+        ]
+      },
+      "number": false,
+      "default": "Argument",
+      "label": "[储存]配置类型",
+      "desc": "选择要使用的配置类型。未设置此选项或不通过此选项的旧版本的配置顺序依旧是$persistentStore (BoxJs) > $argument > database。",
+      "line": 21
+    },
+    {
+      "name": "LogLevel",
+      "kind": {
+        "type": "select",
+        "options": [
+          "WARN",
+          "OFF",
+          "ERROR",
+          "INFO",
+          "DEBUG",
+          "ALL"
+        ]
+      },
+      "number": false,
+      "default": "WARN",
+      "label": "[调试]日志等级",
+      "desc": "选择脚本日志的输出等级，低于所选等级的日志将全部输出。",
+      "line": 22
+    }
+  ],
+  "hostname": [
+    {
+      "line": 36,
+      "items": "weatherkit.apple.com"
+    }
+  ],
+  "force-http-hostname": [],
+  "skip-server-cert-verify": null,
+  "client-source-address": [],
+  "h2": null,
+  "url-rewrite": {},
+  "header-rewrite": {},
+  "body-rewrite": {},
+  "map-local": {},
+  "request-body-mock": {},
+  "script": {
+    "31": "ScriptDef { name: \"天气可用性响应\", path: \"https://raw.githubusercontent.com/fkingikelee/fkikelee/main/Resource/github.com/NSRingo/WeatherKit/releases/download/v3.1.0/response.bundle.js\", kind: HttpResponse, pattern: Some(\"(?i:^https?:\\\\/\\\\/weatherkit\\\\.apple\\\\.com\\\\/api\\\\/v1\\\\/availability\\\\/)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(20.0), argument: Some(Object {\"Weather.Provider\": String(\"ColorfulClouds\"), \"NextHour.Provider\": String(\"ColorfulClouds\"), \"AirQuality.Calculate.Algorithm\": String(\"EU_EAQI\"), \"API.ColorfulClouds.Token\": Null, \"API.QWeather.Host\": String(\"devapi.qweather.com\"), \"API.QWeather.Token\": Null, \"API.WAQI.Token\": Null, \"Storage\": String(\"Argument\"), \"LogLevel\": String(\"WARN\")}) }",
+    "33": "ScriptDef { name: \"天气响应\", path: \"https://raw.githubusercontent.com/fkingikelee/fkikelee/main/Resource/github.com/NSRingo/WeatherKit/releases/download/v3.1.0/response.bundle.js\", kind: HttpResponse, pattern: Some(\"(?i:^https?:\\\\/\\\\/weatherkit\\\\.apple\\\\.com\\\\/api\\\\/v2\\\\/weather\\\\/)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: true, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(20.0), argument: Some(Object {\"Weather.Provider\": String(\"ColorfulClouds\"), \"NextHour.Provider\": String(\"ColorfulClouds\"), \"AirQuality.Calculate.Algorithm\": String(\"EU_EAQI\"), \"API.ColorfulClouds.Token\": Null, \"API.QWeather.Host\": String(\"devapi.qweather.com\"), \"API.QWeather.Token\": Null, \"API.WAQI.Token\": Null, \"Storage\": String(\"Argument\"), \"LogLevel\": String(\"WARN\")}) }"
+  },
+  "rules": {
+    "25": "DOMAIN,weather-analytics-events.apple.com => REJECT-DROP",
+    "26": "DOMAIN,tether.edge.apple => REJECT-DROP",
+    "27": "DOMAIN-SUFFIX,tthr.apple.com => REJECT-DROP",
+    "28": "AND,((OR,((IP-ASN,714),(IP-ASN,6185))),(NETWORK,UDP)) => REJECT-DROP"
+  },
+  "rule-sets": [],
+  "resources": [
+    {
+      "url": "https://raw.githubusercontent.com/fkingikelee/fkikelee/main/Resource/github.com/NSRingo/WeatherKit/releases/download/v3.1.0/response.bundle.js",
+      "kind": "script",
+      "lines": [
+        31,
+        33
+      ]
+    }
+  ],
+  "network": {},
+  "declared-scripts": [
+    31,
+    33
+  ],
+  "ignored": []
+}

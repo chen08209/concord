@@ -1,0 +1,74 @@
+{
+  "format": "loon",
+  "meta": {
+    "name": "Bilibili",
+    "desc": "去除动态综合页话题,最常访问,弹幕,青少年弹窗,播放页广告",
+    "author": "MartinsKing、VirgilClyne、app2smile、RuCu6、Maasea、kokoryh、key",
+    "icon": "https://github.com/Keywos/rule/raw/main/tv/app/144px/Bilibili.png",
+    "homepage": "https://github.com/Keywos",
+    "category": null,
+    "system": null,
+    "requirement": null,
+    "argumentsDesc": null
+  },
+  "off": null,
+  "arguments": [],
+  "hostname": [
+    {
+      "line": 38,
+      "items": "manga.bilibili.com, api.live.bilibili.com, api.vc.bilibili.com, app.bilibili.com, app.biliapi.net, api.bilibili.com, api.biliapi.net, grpc.biliapi.net"
+    }
+  ],
+  "force-http-hostname": [],
+  "skip-server-cert-verify": null,
+  "client-source-address": [],
+  "h2": null,
+  "url-rewrite": {
+    "14": "UrlRewriteDef { pattern: \"^https?:\\\\/\\\\/app\\\\.bilibili\\\\.com\\\\/x\\\\/resource\\\\/ip\", head: None, replacement: \"\", action: Reject }",
+    "15": "UrlRewriteDef { pattern: \"^https?:\\\\/\\\\/(grpc\\\\.biliapi\\\\.net|app\\\\.bilibili\\\\.com)\\\\/bilibili\\\\.app\\\\.interface\\\\.v1\\\\.Search\\\\/DefaultWords\", head: None, replacement: \"\", action: Reject }",
+    "17": "UrlRewriteDef { pattern: \"^https?:\\\\/\\\\/api\\\\.bili(bili\\\\.com|api\\\\.net)\\\\/pgc\\\\/season\\\\/app\\\\/related\\\\/recommend\\\\?\", head: None, replacement: \"\", action: RejectDict }",
+    "19": "UrlRewriteDef { pattern: \"^https?:\\\\/\\\\/api\\\\.live\\\\.bilibili\\\\.com\\\\/xlive\\\\/e-commerce-interface\\\\/v1\\\\/ecommerce-user\\\\/get_shopping_info\\\\?\", head: None, replacement: \"\", action: RejectDict }",
+    "21": "UrlRewriteDef { pattern: \"^https?:\\\\/\\\\/manga\\\\.bilibili\\\\.com\\\\/twirp\\\\/comic\\\\.v\\\\d\\\\.Comic\\\\/(Flash|ListFlash|GetActivityTab)\", head: None, replacement: \"\", action: RejectDict }"
+  },
+  "header-rewrite": {},
+  "body-rewrite": {},
+  "map-local": {},
+  "request-body-mock": {},
+  "script": {
+    "26": "ScriptDef { name: \"bilibili-json\", path: \"https://github.com/Keywos/rule/raw/main/JS/bjson.js\", kind: HttpResponse, pattern: Some(\"(?i)^https?:\\\\/\\\\/app\\\\.bilibili\\\\.com\\\\/x\\\\/(v2\\\\/(splash\\\\/(list|show)|feed\\\\/index|account\\\\/(mine(\\\\/ipad)?|myinfo\\\\?)|search\\\\/square)|resource\\\\/show\\\\/(tab\\\\/v2|skin\\\\?))\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(10.0), argument: None }",
+    "28": "ScriptDef { name: \"bilibili-jsons\", path: \"https://github.com/Keywos/rule/raw/main/JS/bjson.js\", kind: HttpResponse, pattern: Some(\"(?i)^https?:\\\\/\\\\/api\\\\.live\\\\.bilibili\\\\.com\\\\/xlive\\\\/app-room\\\\/v1\\\\/index\\\\/getInfoByRoom\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(10.0), argument: None }",
+    "30": "ScriptDef { name: \"bilibili-jsona\", path: \"https://github.com/Keywos/rule/raw/main/JS/bjson.js\", kind: HttpResponse, pattern: Some(\"(?i)^https?:\\\\/\\\\/api\\\\.bilibili\\\\.com\\\\/pgc\\\\/page\\\\/(bangumi|cinema\\\\/tab\\\\?)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(10.0), argument: None }",
+    "33": "ScriptDef { name: \"biliproto\", path: \"https://github.com/Keywos/rule/raw/main/JS/bproto.js\", kind: HttpResponse, pattern: Some(\"(?i)^https?:\\\\/\\\\/grpc\\\\.biliapi\\\\.net\\\\/bilibili\\\\.app\\\\.((view|viewunite)\\\\.v1\\\\.View\\\\/(View|TFInfo)$|dynamic\\\\.v2\\\\.Dynamic\\\\/Dyn(All|Video)$|playurl\\\\.v1\\\\.PlayURL\\\\/PlayView$|interface\\\\.v1\\\\.Teenagers\\\\/ModeStatus)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: true, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(10.0), argument: None }",
+    "35": "ScriptDef { name: \"biliproto\", path: \"https://github.com/Keywos/rule/raw/main/JS/bproto.js\", kind: HttpResponse, pattern: Some(\"(?i)^https?:\\\\/\\\\/grpc\\\\.biliapi\\\\.net\\\\/bilibili\\\\.(community\\\\.service\\\\.dm\\\\.v1\\\\.DM\\\\/(DmView|DmSegMobile)|main\\\\.community\\\\.reply\\\\.v1\\\\.Reply\\\\/MainList)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: true, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(10.0), argument: None }"
+  },
+  "rules": {},
+  "rule-sets": [],
+  "resources": [
+    {
+      "url": "https://github.com/Keywos/rule/raw/main/JS/bjson.js",
+      "kind": "script",
+      "lines": [
+        26,
+        28,
+        30
+      ]
+    },
+    {
+      "url": "https://github.com/Keywos/rule/raw/main/JS/bproto.js",
+      "kind": "script",
+      "lines": [
+        33,
+        35
+      ]
+    }
+  ],
+  "network": {},
+  "declared-scripts": [
+    26,
+    28,
+    30,
+    33,
+    35
+  ],
+  "ignored": []
+}

@@ -93,5 +93,115 @@
     "name": "bm7-TikTokJP.sgmodule",
     "url": "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/0b6897dc17e0c513d25449c935a9694818e32f0c/external/Shadowrocket/TikTokUnlock/TikTokJP/TikTokJP.sgmodule",
     "sha256": "17189ac97945ce304ee767e19a7f78ebf3f2cc4df65015c55d2e43fcb8b29f85"
+  },
+  {
+    "name": "fkikelee-Bilibili_remove_ads.lpx",
+    "url": "https://raw.githubusercontent.com/fkingikelee/fkikelee/f4fe63f75e8dba21382929e8b1d0d2f2e0ca5091/lpx/Bilibili_remove_ads.lpx",
+    "sha256": "7805d592c2b6418da00080f3ab40ea156ba0206556b4e4086dab857398a60e2e"
+  },
+  {
+    "name": "fkikelee-Amap_remove_ads.lpx",
+    "url": "https://raw.githubusercontent.com/fkingikelee/fkikelee/f4fe63f75e8dba21382929e8b1d0d2f2e0ca5091/lpx/Amap_remove_ads.lpx",
+    "sha256": "6da8813201a7146ef8123b9b3cff30622204f98284fec7791fdbb96cf0ecf9cc"
+  },
+  {
+    "name": "fkikelee-Reddit_remove_ads.lpx",
+    "url": "https://raw.githubusercontent.com/fkingikelee/fkikelee/f4fe63f75e8dba21382929e8b1d0d2f2e0ca5091/lpx/Reddit_remove_ads.lpx",
+    "sha256": "840763f88f4f0ec7ce70c0f960479c699e8bf5266b0929b074ef5b86fe992e02"
+  },
+  {
+    "name": "fkikelee-smzdm_remove_ads.lpx",
+    "url": "https://raw.githubusercontent.com/fkingikelee/fkikelee/f4fe63f75e8dba21382929e8b1d0d2f2e0ca5091/lpx/smzdm_remove_ads.lpx",
+    "sha256": "e312c3293e9669a62145433999e2a78b62e8e57ee5e13020cd4e8bc502e0f295"
+  },
+  {
+    "name": "fkikelee-JD_remove_ads.lpx",
+    "url": "https://raw.githubusercontent.com/fkingikelee/fkikelee/f4fe63f75e8dba21382929e8b1d0d2f2e0ca5091/lpx/JD_remove_ads.lpx",
+    "sha256": "00f436cd3d5f6a84ff55a6c52b6771542f3da12b5500bd3835b2fe64d9c0f494"
+  },
+  {
+    "name": "fkikelee-YouTube_remove_ads.lpx",
+    "url": "https://raw.githubusercontent.com/fkingikelee/fkikelee/f4fe63f75e8dba21382929e8b1d0d2f2e0ca5091/lpx/YouTube_remove_ads.lpx",
+    "sha256": "ec6e4738f0c4b632cca9dbd61bc8fafae7abd81108f4ab7aa177e1ff3d664def"
+  },
+  {
+    "name": "fkikelee-Weibo_remove_ads.lpx",
+    "url": "https://raw.githubusercontent.com/fkingikelee/fkikelee/f4fe63f75e8dba21382929e8b1d0d2f2e0ca5091/lpx/Weibo_remove_ads.lpx",
+    "sha256": "484fe6beaa2ca8cf4c004517fbcb79ab0d8587118ec9083def91cbe8a7e34dc2"
+  },
+  {
+    "name": "fkikelee-Remove_ads_by_keli.lpx",
+    "url": "https://raw.githubusercontent.com/fkingikelee/fkikelee/f4fe63f75e8dba21382929e8b1d0d2f2e0ca5091/lpx/Remove_ads_by_keli.lpx",
+    "sha256": "3f79243904d9718c9ec760442b2a669c4bdfea65770e3e33f6aa3f293524b801"
+  },
+  {
+    "name": "fkikelee-BlockAdvertisers.lpx",
+    "url": "https://raw.githubusercontent.com/fkingikelee/fkikelee/f4fe63f75e8dba21382929e8b1d0d2f2e0ca5091/lpx/BlockAdvertisers.lpx",
+    "sha256": "2947d7df2ceb8addb9b06d7651465f8166d61ebd02ce1d889d562c62739266c4"
+  },
+  {
+    "name": "fkikelee-WPS_checkin.lpx",
+    "url": "https://raw.githubusercontent.com/fkingikelee/fkikelee/f4fe63f75e8dba21382929e8b1d0d2f2e0ca5091/lpx/WPS_checkin.lpx",
+    "sha256": "70b8c9635cc943ef568cc16e62b1b9d5a2d990668eb8a8dca7fb519e139505ec"
+  },
+  {
+    "name": "fkikelee-AppleWeatherEnhancer.lpx",
+    "url": "https://raw.githubusercontent.com/fkingikelee/fkikelee/f4fe63f75e8dba21382929e8b1d0d2f2e0ca5091/lpx/AppleWeatherEnhancer.lpx",
+    "sha256": "ba40bd3a5878ea5b5cd3abcf51562ccdf54acf8424efd54d579f1129a02c64a6"
+  },
+  {
+    "name": "fkikelee-Spotify_lyrics_translation.lpx",
+    "url": "https://raw.githubusercontent.com/fkingikelee/fkikelee/f4fe63f75e8dba21382929e8b1d0d2f2e0ca5091/lpx/Spotify_lyrics_translation.lpx",
+    "sha256": "f5ed78f617c7d29031af45254f612c394109c46402fb6229a921254f4b070e90"
+  },
+  {
+    "name": "fkikelee-Pinterest_remove_ads.lpx",
+    "url": "https://raw.githubusercontent.com/fkingikelee/fkikelee/f4fe63f75e8dba21382929e8b1d0d2f2e0ca5091/lpx/Pinterest_remove_ads.lpx",
+    "sha256": "905ce81e2a26cb5421219b8f9009502d7c014291b3b3a5532e13dd6ad3a01d95"
+  },
+  {
+    "name": "fkikelee-YouTubeSubtitlesTranslation.lpx",
+    "url": "https://raw.githubusercontent.com/fkingikelee/fkikelee/f4fe63f75e8dba21382929e8b1d0d2f2e0ca5091/lpx/YouTubeSubtitlesTranslation.lpx",
+    "sha256": "dc30ad861a9b93b4c2a1d61b093262d83be96438f8a5add41e45c46a6caa4efa"
+  },
+  {
+    "name": "fkikelee-Sub-Store.lpx",
+    "url": "https://raw.githubusercontent.com/fkingikelee/fkikelee/f4fe63f75e8dba21382929e8b1d0d2f2e0ca5091/lpx/Sub-Store.lpx",
+    "sha256": "7a69388b97fde33abc896cbe0291de2aa54de462e24132cd169a822edfdd6211"
+  },
+  {
+    "name": "fkikelee-Douyu_remove_ads.lpx",
+    "url": "https://raw.githubusercontent.com/fkingikelee/fkikelee/f4fe63f75e8dba21382929e8b1d0d2f2e0ca5091/lpx/Douyu_remove_ads.lpx",
+    "sha256": "18f5254b9200a410f1c64aa501786eb56652a085ed41fcd0a8c3f09a519ac788"
+  },
+  {
+    "name": "romeo-Adblock4limbo.lpx",
+    "url": "https://raw.githubusercontent.com/ifflagged/Romeo/5685038ec50b505d6d24691b01b5ae8ca05a6142/Modules/Loon/ddgksf2013/Adblock4limbo.lpx",
+    "sha256": "f6413d5d5f6e5845805c6057717568b965e4f34fb7e7696d35067f8584929bf8"
+  },
+  {
+    "name": "romeo-Official-myblockads.lpx",
+    "url": "https://raw.githubusercontent.com/ifflagged/Romeo/5685038ec50b505d6d24691b01b5ae8ca05a6142/Modules/Loon/rucu6/Official/myblockads.lpx",
+    "sha256": "d130e6e8f7084a73d94e9e29b8cc9adf0fece241445521d9cf117bd5558a4a5f"
+  },
+  {
+    "name": "romeo-Beta-bilibili.lpx",
+    "url": "https://raw.githubusercontent.com/ifflagged/Romeo/5685038ec50b505d6d24691b01b5ae8ca05a6142/Modules/Loon/rucu6/Beta/bilibili.lpx",
+    "sha256": "4139029019c661987262ea157758cb8c39328456f69f95bd3e157dc8a76a06d2"
+  },
+  {
+    "name": "romeo-youtube_gholts.lpx",
+    "url": "https://raw.githubusercontent.com/ifflagged/Romeo/5685038ec50b505d6d24691b01b5ae8ca05a6142/Modules/Loon/rucu6/youtube_gholts.lpx",
+    "sha256": "61967bf845f9600f04cf5f709474b5f86ccaac8a5d1878af41dae19abafb5e42"
+  },
+  {
+    "name": "keywos-Bilibili.plugin",
+    "url": "https://raw.githubusercontent.com/Keywos/rule/a06d921d370ad6fca9e972a3f76e64d90bc8cfae/loon/Bilibili.plugin",
+    "sha256": "306805a4440bf42823df64b4f96cea19786ecc568e6844ea248fd75ed31df35c"
+  },
+  {
+    "name": "bm7-TikTokJP.plugin",
+    "url": "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/0b6897dc17e0c513d25449c935a9694818e32f0c/external/Loon/TikTokUnlock/TikTokJP/TikTokJP.plugin",
+    "sha256": "a4d88d165026f13f588dc5055f7991d014d8381d23daf6cd05dce6ceacdb265e"
   }
 ]

@@ -1,0 +1,55 @@
+{
+  "format": "loon",
+  "meta": {
+    "name": "TikTokJP",
+    "desc": "最后更新时间 2025-06-06 09:20:55",
+    "author": "Semporia",
+    "icon": "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/source/avatar.jpg",
+    "homepage": "https://github.com/Semporia/TikTok-Unlock",
+    "category": null,
+    "system": null,
+    "requirement": null,
+    "argumentsDesc": null
+  },
+  "off": null,
+  "arguments": [],
+  "hostname": [
+    {
+      "line": 35,
+      "items": "*.byteoversea.com, *.tik-tokapi.com, *.tiktokv.com"
+    }
+  ],
+  "force-http-hostname": [],
+  "skip-server-cert-verify": null,
+  "client-source-address": [],
+  "h2": null,
+  "url-rewrite": {
+    "29": "UrlRewriteDef { pattern: \"(?<=&mcc_mnc=)4\", head: None, replacement: \"2\", action: Redirect307 }",
+    "30": "UrlRewriteDef { pattern: \"(?<=\\\\d\\\\/\\\\?\\\\w{7}_\\\\w{4}=)1[6-9]..(?=.?.?&)\", head: None, replacement: \"18.4\", action: Redirect307 }",
+    "31": "UrlRewriteDef { pattern: \"(?<=_region=)CN(?=&)\", head: None, replacement: \"JP\", action: Redirect307 }",
+    "32": "UrlRewriteDef { pattern: \"^(https?:\\\\/\\\\/(tnc|dm)[\\\\w-]+\\\\.\\\\w+\\\\.com\\\\/.+)(\\\\?)(.+)\", head: None, replacement: \"$1$4\", action: Redirect302 }"
+  },
+  "header-rewrite": {},
+  "body-rewrite": {},
+  "map-local": {},
+  "request-body-mock": {},
+  "script": {},
+  "rules": {
+    "15": "DOMAIN-KEYWORD,-tiktokcdn-com => DIRECT",
+    "16": "DOMAIN-SUFFIX,byteoversea.com => DIRECT",
+    "17": "DOMAIN-SUFFIX,ibytedtos.com => DIRECT",
+    "18": "DOMAIN-SUFFIX,ipstatp.com => DIRECT",
+    "19": "DOMAIN-SUFFIX,muscdn.com => DIRECT",
+    "20": "DOMAIN-SUFFIX,musical.ly => DIRECT",
+    "21": "DOMAIN-SUFFIX,tik-tokapi.com => DIRECT",
+    "22": "DOMAIN-SUFFIX,tiktok.com => DIRECT",
+    "23": "DOMAIN-SUFFIX,tiktokcdn.com => DIRECT",
+    "24": "DOMAIN-SUFFIX,tiktokv.com => DIRECT",
+    "25": "USER-AGENT,tiktok* => DIRECT"
+  },
+  "rule-sets": [],
+  "resources": [],
+  "network": {},
+  "declared-scripts": [],
+  "ignored": []
+}

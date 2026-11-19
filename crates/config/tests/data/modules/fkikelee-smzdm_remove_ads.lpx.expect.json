@@ -1,0 +1,73 @@
+{
+  "format": "loon",
+  "meta": {
+    "name": "什么值得买去广告",
+    "desc": "移除开屏广告、信息流广告、各类横幅广告、搜索页广告、文章内广告，移除活动皮肤、精简我的页面。",
+    "author": "可莉🅥[https://github.com/luestr/ProxyResource/blob/main/README.md]",
+    "icon": "https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/smzdm.png",
+    "homepage": "https://hub.kelee.one",
+    "category": "去广告",
+    "system": null,
+    "requirement": null,
+    "argumentsDesc": null
+  },
+  "off": null,
+  "arguments": [],
+  "hostname": [
+    {
+      "line": 61,
+      "items": "app-api.smzdm.com, homepage-api.smzdm.com, h5.smzdm.com, haojia-api.smzdm.com, haojia.m.smzdm.com, user-api.smzdm.com, article-api.smzdm.com, s-api.smzdm.com, haojia-cdn.smzdm.com, post.m.smzdm.com"
+    }
+  ],
+  "force-http-hostname": [],
+  "skip-server-cert-verify": null,
+  "client-source-address": [],
+  "h2": null,
+  "url-rewrite": {
+    "17": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/app-api\\\\.smzdm\\\\.com\\\\/util\\\\/loading\\\\?)\", head: None, replacement: \"\", action: RejectDict }",
+    "27": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/app-api\\\\.smzdm\\\\.com\\\\/mychannel\\\\/list$)\", head: None, replacement: \"\", action: RejectDict }",
+    "41": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/user-api\\\\.smzdm\\\\.com\\\\/vip\\\\/bottom_card_list\\\\?)\", head: None, replacement: \"\", action: RejectDict }",
+    "43": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/article-api\\\\.smzdm\\\\.com\\\\/publish\\\\/get_bubble\\\\?)\", head: None, replacement: \"\", action: RejectDict }",
+    "45": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/s-api\\\\.smzdm\\\\.com\\\\/sou\\\\/search_default_keyword\\\\?)\", head: None, replacement: \"\", action: RejectDict }",
+    "53": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/s-api\\\\.smzdm\\\\.com\\\\/sou\\\\/popup_coupon\\\\?)\", head: None, replacement: \"\", action: RejectDict }"
+  },
+  "header-rewrite": {},
+  "body-rewrite": {
+    "19": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/app-api\\\\.smzdm\\\\.com\\\\/util\\\\/update$)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"if .data.silence_local_push != null then .data.silence_local_push = 0 else . end | if .data.baichuan_redirect_switch != null then .data.baichuan_redirect_switch = 0 else . end\") }",
+    "21": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/app-api\\\\.smzdm\\\\.com\\\\/util\\\\/update$)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"del(.data.silence_local_push_msg, .data.video_cache_num_configs, .data.haojia_widget, .data.widget, .data.operation_float)\") }",
+    "23": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/app-api\\\\.smzdm\\\\.com\\\\/util\\\\/update$)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"def r: if type==\\\"object\\\" then if has(\\\"ad_campaign_name\\\") and (.ad_campaign_name|type==\\\"string\\\") and (.ad_campaign_name|test(\\\"\\\\\\\\S\\\")) then empty else . end elif type==\\\"array\\\" then map(r) else . end; .data.operation_float |= map(map(r))\") }",
+    "25": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/homepage-api\\\\.smzdm\\\\.com\\\\/v3\\\\/home\\\\?)\", conditions: HeadConditionsDef { request: None, response: None }, action: JqFile(\"https://raw.githubusercontent.com/fkingikelee/fkikelee/main/Resource/kelee/JQLang/smzdm/home_smzdm_remove_ads.jq\") }",
+    "31": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/haojia-api\\\\.smzdm\\\\.com\\\\/home\\\\/list\\\\?)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"del(.data.header_operation.theme)\") }",
+    "33": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/haojia-api\\\\.smzdm\\\\.com\\\\/home\\\\/list\\\\?)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data.rows |= map(select(.cell_type == \\\"39001\\\")) | .data.banner_v2 |= map(select(.cell_type == \\\"21028\\\"))\") }",
+    "35": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/haojia\\\\.m\\\\.smzdm\\\\.com\\\\/detail_modul\\\\/user_related_modul\\\\?)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"del(.data.super_coupon)\") }",
+    "37": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/haojia\\\\.m\\\\.smzdm\\\\.com\\\\/detail_modul\\\\/other_modul\\\\?)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"del(.data.banner)\") }",
+    "39": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/user-api\\\\.smzdm\\\\.com\\\\/vip$)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"del(.data.activity_entrance_info, .data.big_banner, .data.top_banner, .data.banner_switch, .data.yaoqingshaiwu, .data.right_info)\") }",
+    "47": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/s-api\\\\.smzdm\\\\.com\\\\/sou\\\\/list_v10\\\\?)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data.rows |= map(select(.model_type != \\\"ads\\\")) | .data.top_aladdin |= map(select(has(\\\"ad\\\") | not))\") }",
+    "49": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/s-api\\\\.smzdm\\\\.com\\\\/sou\\\\/filter\\\\/tags\\\\/hot_tags\\\\?)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"del(.data.search_faxian, .data.tonglan, .data.hongbao)\") }",
+    "51": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/s-api\\\\.smzdm\\\\.com\\\\/sou\\\\/filter\\\\/tags\\\\/hot_tags\\\\?)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data.hot_tab |= (if type == \\\"array\\\" then map(select(.search_method != \\\"热点主题榜\\\")) else . end) | if .data.hot_tab then .data.hot_tab |= map(if .search_method == \\\"热搜榜搜索热榜\\\" and .rows then .rows |= map(select(.pos != null and ((.pos | tonumber) != null))) else . end) else . end\") }",
+    "55": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/haojia-api\\\\.smzdm\\\\.com\\\\/detail\\\\/\\\\d+\\\\?)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"del(.data.quan_log)\") }",
+    "56": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/haojia-cdn\\\\.smzdm\\\\.com\\\\/preload\\\\/\\\\d+\\\\/fiphone\\\\/v\\\\d+_\\\\d+_\\\\d+\\\\/wx\\\\d+\\\\/im\\\\d+\\\\/[0-9a-z]+\\\\/[0-9a-z]+\\\\.json$)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"del(.data.quan_log)\") }",
+    "58": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/post\\\\.m\\\\.smzdm\\\\.com\\\\/ajax_app\\\\/ajax_get_footer_list\\\\?)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"del(.data.tuiguang_ad, .data.activity_banner)\") }"
+  },
+  "map-local": {
+    "29": "MapLocalDef { pattern: \"(?i:^https:\\\\/\\\\/h5\\\\.smzdm\\\\.com\\\\/user\\\\/coupon\\\\/coupon_list\\\\?)\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"\", status: 404, header: {\"content-type\": \"text/plain; charset=utf-8\"}, content_type: \"text/plain; charset=utf-8\", request: false }"
+  },
+  "request-body-mock": {},
+  "script": {},
+  "rules": {
+    "14": "DOMAIN,adx-api.zdmimg.com => REJECT"
+  },
+  "rule-sets": [],
+  "resources": [
+    {
+      "url": "https://raw.githubusercontent.com/fkingikelee/fkikelee/main/Resource/kelee/JQLang/smzdm/home_smzdm_remove_ads.jq",
+      "kind": "jq",
+      "lines": [
+        25
+      ]
+    }
+  ],
+  "network": {},
+  "declared-scripts": [],
+  "ignored": []
+}

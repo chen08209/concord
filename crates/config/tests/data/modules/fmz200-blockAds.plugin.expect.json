@@ -1,0 +1,1973 @@
+{
+  "format": "loon",
+  "meta": {
+    "name": "广告拦截&净化合集",
+    "desc": "(支持约730款APP/小程序)针对部分APP和小程序广告进行拦截，某些APP要清除缓存或者重新安装拦截广告才会生效！规则明细可以查看本插件的注释",
+    "author": "奶思[https://github.com/fmz200]",
+    "icon": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/icons/apps/AdblockPlus.png",
+    "homepage": "https://github.com/fmz200/wool_scripts",
+    "category": "奶思的模块",
+    "system": "iOS, iPadOS",
+    "requirement": null,
+    "argumentsDesc": null
+  },
+  "off": null,
+  "arguments": [
+    {
+      "name": "12306_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "12306-脚本开关",
+      "line": 35
+    },
+    {
+      "name": "51xyk_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "51信用卡管家-脚本开关",
+      "line": 36
+    },
+    {
+      "name": "555_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "555影视-脚本开关",
+      "line": 37
+    },
+    {
+      "name": "albb_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "阿里巴巴-脚本开关",
+      "line": 38
+    },
+    {
+      "name": "alyp_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "阿里云盘-脚本开关",
+      "line": 39
+    },
+    {
+      "name": "aiqiyi_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "爱奇艺-脚本开关",
+      "line": 40
+    },
+    {
+      "name": "bdduditu_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "百度地图-脚本开关",
+      "line": 41
+    },
+    {
+      "name": "per_filter_video_thread",
+      "kind": {
+        "type": "select",
+        "options": [
+          "0",
+          "1"
+        ]
+      },
+      "number": false,
+      "default": "0",
+      "label": "百度贴吧-推荐页不展示视频贴",
+      "desc": "设置为1则推荐页不展示视频贴",
+      "line": 42
+    },
+    {
+      "name": "bohejmkh_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "薄荷健康-脚本开关",
+      "line": 43
+    },
+    {
+      "name": "displayUpList",
+      "kind": {
+        "type": "select",
+        "options": [
+          "show",
+          "hide",
+          "auto"
+        ]
+      },
+      "number": false,
+      "default": "show",
+      "label": "[动态]中[最常访问]的显示方式",
+      "line": 44
+    },
+    {
+      "name": "purifyComment",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "[评论区]过滤置顶评论广告",
+      "line": 45
+    },
+    {
+      "name": "optimizeRequest",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "优化评论区加载",
+      "line": 46
+    },
+    {
+      "name": "sponsorBlock",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "空降助手",
+      "line": 47
+    },
+    {
+      "name": "logLevel",
+      "kind": {
+        "type": "select",
+        "options": [
+          "error",
+          "warn",
+          "info",
+          "debug",
+          "off"
+        ]
+      },
+      "number": false,
+      "default": "error",
+      "label": "日志等级",
+      "line": 48
+    },
+    {
+      "name": "bilimanhua_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "哔哩哔哩漫画-脚本开关",
+      "line": 49
+    },
+    {
+      "name": "blued_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "Blued-脚本开关",
+      "line": 50
+    },
+    {
+      "name": "cdxb_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "财新-脚本开关",
+      "line": 51
+    },
+    {
+      "name": "cdnngogo_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "菜鸟裹裹-脚本开关",
+      "line": 52
+    },
+    {
+      "name": "davsdmpk_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "大众点评-脚本开关",
+      "line": 53
+    },
+    {
+      "name": "didiiuxk_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "滴滴出行-脚本开关",
+      "line": 54
+    },
+    {
+      "name": "dyls_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "电影猎手-脚本开关",
+      "line": 55
+    },
+    {
+      "name": "ddmc_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "叮咚买菜-脚本开关",
+      "line": 56
+    },
+    {
+      "name": "dshxfg_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "动画疯-脚本开关",
+      "line": 57
+    },
+    {
+      "name": "fwke_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "飞客茶馆-脚本开关",
+      "line": 58
+    },
+    {
+      "name": "ffbi_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "粉笔-脚本开关",
+      "line": 59
+    },
+    {
+      "name": "flightradar24_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "Flightradar24-脚本开关",
+      "line": 60
+    },
+    {
+      "name": "hlzh_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "航旅纵横-脚本开关",
+      "line": 61
+    },
+    {
+      "name": "hema_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "盒马-脚本开关",
+      "line": 62
+    },
+    {
+      "name": "hftx_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "汇付天下-脚本开关",
+      "line": 63
+    },
+    {
+      "name": "itzj_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "IT之家-脚本开关",
+      "line": 64
+    },
+    {
+      "name": "jhsh_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "建行生活-脚本开关",
+      "line": 65
+    },
+    {
+      "name": "jkds_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "京东-脚本开关",
+      "line": 66
+    },
+    {
+      "name": "jkxi_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "京喜-脚本开关",
+      "line": 67
+    },
+    {
+      "name": "kuan_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "酷安-脚本开关",
+      "line": 68
+    },
+    {
+      "name": "kuwoybyt_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "酷我音乐-脚本开关",
+      "line": 69
+    },
+    {
+      "name": "kxke_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "夸克-脚本开关",
+      "line": 70
+    },
+    {
+      "name": "glgclmmg_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "快手联盟,优量汇,穿山甲「广告联盟」-脚本开关",
+      "line": 71
+    },
+    {
+      "name": "keep_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "keep-脚本开关",
+      "line": 72
+    },
+    {
+      "name": "lvtusvuftk_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "旅途随身听-脚本开关",
+      "line": 73
+    },
+    {
+      "name": "lawson_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "罗森点点-脚本开关",
+      "line": 74
+    },
+    {
+      "name": "mafgwo_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "马蜂窝-脚本开关",
+      "line": 75
+    },
+    {
+      "name": "mddjba_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "买单吧-脚本开关",
+      "line": 76
+    },
+    {
+      "name": "mdmd_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "脉脉-脚本开关",
+      "line": 77
+    },
+    {
+      "name": "mhgotv_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "芒果TV-脚本开关",
+      "line": 78
+    },
+    {
+      "name": "meiyou_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "美柚-脚本开关",
+      "line": 79
+    },
+    {
+      "name": "pupuicui_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "朴朴超市-脚本开关",
+      "line": 80
+    },
+    {
+      "name": "51job_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "前程无忧-脚本开关",
+      "line": 81
+    },
+    {
+      "name": "quda_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "去哒-脚本开关",
+      "line": 82
+    },
+    {
+      "name": "rfrfuipk_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "人人视频-脚本开关",
+      "line": 83
+    },
+    {
+      "name": "reddit_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "Reddit-脚本开关",
+      "line": 84
+    },
+    {
+      "name": "smzdm_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "什么值得买-脚本开关",
+      "line": 85
+    },
+    {
+      "name": "sudaxnyr_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "苏打校园APP-脚本开关",
+      "line": 86
+    },
+    {
+      "name": "soul_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "Soul-脚本开关",
+      "line": 87
+    },
+    {
+      "name": "tab",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "Spotify-移除底栏创建按钮",
+      "desc": "此开关控制是否移除底栏创建按钮",
+      "line": 88
+    },
+    {
+      "name": "useractivity",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "Spotify-启用Apple设备接力",
+      "desc": "此开关控制是否使用Apple设备接力",
+      "line": 89
+    },
+    {
+      "name": "tcbc_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "淘宝-脚本开关",
+      "line": 90
+    },
+    {
+      "name": "tgxyxbwf_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "腾讯新闻-脚本开关",
+      "line": 91
+    },
+    {
+      "name": "vgtime_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "vgTime-脚本开关",
+      "line": 92
+    },
+    {
+      "name": "whyiyzdccidm_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "网易有道词典-脚本开关",
+      "line": 93
+    },
+    {
+      "name": "MY",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "[隐藏底部]漫游标签",
+      "line": 94
+    },
+    {
+      "name": "DT",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "false",
+      "label": "[隐藏底部]笔记标签",
+      "line": 95
+    },
+    {
+      "name": "FX",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "[隐藏底部]发现标签",
+      "line": 96
+    },
+    {
+      "name": "PRGG",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "[隐藏首页]问候语",
+      "line": 97
+    },
+    {
+      "name": "PRRK",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "false",
+      "label": "[隐藏首页]排行榜",
+      "line": 98
+    },
+    {
+      "name": "PRDRD",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "false",
+      "label": "[隐藏首页]每日推荐",
+      "line": 99
+    },
+    {
+      "name": "PRSCVPT",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "false",
+      "label": "[隐藏首页]推荐歌单",
+      "line": 100
+    },
+    {
+      "name": "PRST",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "false",
+      "label": "[隐藏首页]最近常听",
+      "line": 101
+    },
+    {
+      "name": "PRRR",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "[隐藏首页]雷达歌单",
+      "line": 102
+    },
+    {
+      "name": "HMPR",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "false",
+      "label": "[隐藏首页]音乐合伙人",
+      "line": 103
+    },
+    {
+      "name": "PRMST",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "[隐藏首页]推荐专属歌单",
+      "line": 104
+    },
+    {
+      "name": "PRCN",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "[隐藏首页]你的专属歌单",
+      "line": 105
+    },
+    {
+      "name": "lmjpxmvi_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "解除微信链接限制-脚本开关",
+      "line": 106
+    },
+    {
+      "name": "wfnibovj_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "温尼伯站-脚本开关",
+      "line": 107
+    },
+    {
+      "name": "xljnuiyivsuvgo_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "香蕉是一种水果-脚本开关",
+      "line": 108
+    },
+    {
+      "name": "xhs_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "小红书-脚本开关",
+      "line": 109
+    },
+    {
+      "name": "xnmh_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "小芒-脚本开关",
+      "line": 110
+    },
+    {
+      "name": "xnmiuhig_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "小米商城-脚本开关",
+      "line": 111
+    },
+    {
+      "name": "xntuisis_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "小兔充充-脚本开关",
+      "line": 112
+    },
+    {
+      "name": "yzku_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "优酷-脚本开关",
+      "line": 113
+    },
+    {
+      "name": "yzxiapp_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "悠洗APP-脚本开关",
+      "line": 114
+    },
+    {
+      "name": "youtube_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "YouTube-脚本开关",
+      "line": 115
+    },
+    {
+      "name": "vhuhgsjn_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "掌上公交-脚本开关",
+      "line": 116
+    },
+    {
+      "name": "vihu_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "知乎-脚本开关",
+      "line": 117
+    },
+    {
+      "name": "vsgogojihhks_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "中国国际航空-脚本开关",
+      "line": 118
+    },
+    {
+      "name": "vrvr_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "label": "转转-脚本开关",
+      "line": 119
+    }
+  ],
+  "hostname": [
+    {
+      "line": 8544,
+      "items": "gab.122.gov.cn, ad.12306.cn, api.21jingji.com, tianqi.2345.com, ad.life.360.cn, gateway.36kr.com, evs.500.com, api.u51.com, vip7.fzwdyy.cn, *.qyfxgd.cn, *.weilai555.com, *.ecoliving168.com, *.58cdn.com.cn, app.58.com, aes.acfun.cn, api-new.app.acfun.cn, gw.aihuishou.com, api.bjxkhc.com, b2baifanfan.baidu.com, manager.aiqiangua.com, list-app-m.i4.cn, mapi.txcmapp.com, icc.one, acs.m.taobao.com, heic.alicdn.com, guide-acs.m.taobao.com, poplayer.template.alibaba.com, api.alipan.com, member.alipan.com, api-cslp-emt.amazon.cn, www.ahzs10000.com, interface.aomiapp.com, sso.ifanr.com, www.onstar.com.cn, api.shanghaionstar.com, -i.vip.iqiyi.com, *.iqiyi.com, cache.bydauto.com.cn, aimg.babytreeimg.com, plough.babytree.com, mapiweb.babytree.com, go.babytree.com, www.baidu.com, fcvbjbcebos.baidu.com, cover.baidu.com, baichuan.baidu.com, api*.tuisong.baidu.com, afd.baidu.com, mobads.baidu.com, issuecdn.baidupcs.com, update.pan.baidu.com, sa*.tuisong.baidu.com, m.baidu.com, sofire.baidu.com, r6.mo.baidu.com, res.mi.baidu.com, mime.baidu.com, mbd.baidu.com, dss0.bdstatic.com, tb1.bdstatic.com, tb2.bdstatic.com, ss0.bdstatic.com, gss0.bdstatic.com, newclient.map.baidu.com, pan.baidu.com, ndstatic.cdn.bcebos.com, staticsns.cdn.bcebos.com, fc-video.cdn.bcebos.com, rp.hpplay.cn, tiebac.baidu.com, appwk.baidu.com, mres.aibank.com, www.banyuetanapp.com, cdnmobibank.bankofbeijing.com.cn, apps.api.ke.com, gateway.shouqiev.com, channel.beitaichufang.com, iapi.bishijie.com, pan-api.bitqiu.com, manga.bilibili.com, i*.hdslb.com, www.binance.info, www.yingwangtech.net, www.binance.com, social.blued.cn, bd-api.kuwo.cn, h5app.kuwo.cn, bodianimgcdn.kuwo.cn, api.boohee.com, bohe.sfo-tx-shanghai-01.saas.sensorsdata.cn, lego.boohee.com, status.boohee.com, api.sfacg.com, lens.leoao.com, res.pizzahut.com.cn, cdn-xyk-app.bankofbeijing.com.cn, grpc.biliapi.net, app.bilibili.com, api.bilibili.com, api.live.bilibili.com, www.bilibili.com, line3-h5-mobile-api.biligame.com, app-gw.csdn.net, gw.csdn.net, api.caijingmobile.com, api3.cls.cn, cn-acs.m.cainiao.com, amdc.m.taobao.com, wrapper.cyapi.cn, api.caiyunapp.com, starplucker.cyapi.cn, gg.caixin.com, ptmpcap.caocaokeji.cn, cap.caocaokeji.cn, fintechappdr.cgws.com, 182.92.244.70, ad.myfriday.cn, ios-api.lucklyworld.com, learn.chaoxing.com, pic1.chelaile.net.cn, api.chelaile.net.cn, atrace.chelaile.net.cn, web.chelaile.net.cn, cdn.*.chelaileapp.cn, gw.chuangkit.com, app.hbooker.com, beta-api.crunchyroll.com, js-ad.ayximgs.com, ap.dongdianqiu.com, se-api.djiits.com, dudian-oss.oss-cn-shenzhen.aliyuncs.com, imagepc.ctaiot.com, delivery-api.imdada.cn, sdk.alibaba.com.ailbaba.me, adservice.sigmob.cn, ssp.dzh.com.cn, e.dangdang.com, api.dangdang.com, mapi.dangdang.com, appdmkj.5idream.net, app.dewu.com, cdn.poizon.com, capis*.didapinche.com, adx-cn.anythinktech.com, www.didapinche.com, pt-starimg.didistatic.com, omgup*.xiaojukeji.com, res.xiaojukeji.com, common.diditaxi.com.cn, hd.xiaojukeji.com, freight.xiaojukeji.com, daijia.kuaidadi.com, ct.xiaojukeji.com, conf.diditaxi.com.cn, as.xiaojukeji.com, img.ddrk.me, ddrk.me, app.95598pay.com, 103.37.155.60, *.dianping.com, img.meituan.net, p.meituan.com, rms.meituan.com, www.dpfile.com, awp-assets.meituan.net, s3plus.meituan.net, p*.meituan.net, ddplus.meituan.net, api.gaoqingdianshi.com, cdn.dianshihome.com, app-v1.ecoliving168.com, img.admobile.top, webcdn.m.qq.com, *.pglstatp-toutiao.com, api.htp.ad-scope.com.cn, appgw.ddpai.com, init.sms.mob.com, apphw.ddpai.com, maicai.api.ddxq.mobi, gw.api.ddxq.mobi, user.api.ddxq.mobi, gw.alicdn.com, img.alicdn.com, dxy.com, dq.dxy.cn, app.ceair.com, api.gamer.com.tw, ump.sz.creditcard.ecitic.com, m.creditcard.ecitic.com, api.douban.com, daoyu.sdo.com, rtbapi.douyucdn.cn, staticlive.douyucdn.cn, capi.douyucdn.cn, douyucdn.cn, elemecdn.com, fuss10.elemecdn.com, cube.elemecdn.com, www1.elecfans.com, nr-op.elemecdn.com, cdn-evone-ceph.echargenet.com, pic.edaijia.cn, static.95508.com, gateway-api.dushu365.com, l*.51fanli.net, *.pangolin-sdk-toutiao.com, *.pangolin-sdk-toutiao.*, *.pstatp.com, *.pstatp.com.*, *.pglstatp-toutiao.com.*, gurd.snssdk.com, gurd.snssdk.com.*, i-lq.snssdk.com, i-lq.snssdk.com.*, *default.ixigua.com, api.flydigi.com, app.flymodem.com.cn, tiku.fenbi.com, fm.fenqile.com, external.fcbox.com, dsp.fcbox.com, consumer.fcbox.com, rtm.fcbox.com, dsa-mfp.fengshows.cn, api.fengshows.com, ecloud.tppension.cntaiping.com, apis.folidaymall.com, api*.futunn.com, app.variflight.com, m*.amap.com, optimus-ads.amap.com, amap-aos-info-nogw.amap.com, mobile.cebbank.com, yghsh.cebbank.com, mps.95508.com, gha.ghac.cn, gsp.gacmotor.com, zone.guiderank-app.com, cdn.133.cn, jt.rsscc.com, jp.rsscc.com, prom.mobile.gome.com.cn, api.gongkaoleida.com, yun.tuitiger.com, mi.gdt.qq.com, open.e.kuaishou.com, pagead2.googlesyndication.com, kano.guahao.cn, app.wy.guahao.com, awg.enmonster.com, aag.enmonster.com, guanyu.longfor.com, mbank.grcbank.com, dl.app.gtja.com, dl*.app.gtja.com, v.icbc.com.cn, pv.elife.icbc.com.cn, elife.icbc.com.cn, fuwu.nhsa.gov.cn, gugongmini.dpm.org.cn, m.prod.app.hsbcfts.com.cn, emisdatacenteraws.hafoo.com, hmbaby.simshine.cn, *.townmalls.cn, www.haixue.com, service.haiersmarthomes.com, gfp.veta.naver.com, api.hanju.koudaibaobao.com, home.umetrip.com, discardrp.umetrip.com, startup.umetrip.com, oss.umetrip.com, m.ibuscloud.com, ads.iconntech.com, smkmp.96225.com, api.haohaozhu.cn, notch.qdaily.com, app3.qdaily.com, open.fitdays.cn, hfapp-service.qweather.net, promote-trx.helipay.com, acs-m.freshippo.com, api.hengdianfilm.com, fbchina.flipchina.cn, api.touker.com, static.creditcard.hxb.com.cn, cmsapi.wifi8.com, cmsfile.wifi8.com, interface.hstong.com, res.hongyibo.com.cn, api4.bybutter.com, appapi.huazhu.com, hweb-hotel.huazhu.com, hweb-manager.huazhu.com, mcsp.cloudpnr.com, saas-ad.cloudpnr.com, api.huomao.com, games.mobileapi.hupu.com, du.hupucdn.com, i*.hoopchina.com.cn, goblin.hupu.com, api-ad-product.huxiu.com, cdn.wup.huya.com, business.msstatic.com, cdnfile1.msstatic.com, live-ads.huya.com, api-one-wscn.awtmt.com, api.wallstreetcn.com, napi.ithome.com, www.i3zh.com, mbank5.jsbchina.cn, cdn.jlbank.com.cn, yunbusiness.ccb.com, g.alicdn.com, waimai-guide.ele.me, api.m.jd.com, dns.jd.com, router-app-api.jdcloud.com, m.360buyimg.com, bdsp-x.jd.com, dsp-x.jd.com, ms.jr.jd.com, appconf.mail.163.com, support.you.163.com, jdread-api.jd.com, www.gcores.com, explorer.tratao.com, *.kakamobi.cn, smart.789.image.mucang.cn, richmanrules.ksedt.com, api.jxedt.com, richmanapi.jxedt.com, img.gdoil.cn, api.tipsoon.com, s.jiediankeji.com, img.jiemian.com, api.sogaha.cn, p*.pstatp.com, jad-api.jin10.com, jiucaigongshe.oss-cn-beijing.aliyuncs.com, dict-mobile.iciba.com, mobile-pic.cache.iciba.com, service.iciba.com, *.kingsoft-office-service.com, api-access.pangolin-sdk-toutiao.com, api.coolapk.com, www.coolapk.com, res.kfc.com.cn, bp-api.bestv.com.cn, bp-api.bestv.cn, api.vistopia.com.cn, open3.vistastory.com, api.gotokeep.com, kad.gotokeep.com, static1.keepcdn.com, pocketuni.net, p.kuaidi100.com, video-dsp.pddpic.com, t-dsp.pinduoduo.com, images.pinduoduo.com, api.kkmh.com, az4-api.ksapisrv.com, az4-api-idc.ksapisrv.com, az2-api.ksapisrv.com, az2-api-idc.ksapisrv.com, apissl.gifshow.com, apissl.ksapisrv.com, az2-api-js.gifshow.com, az2-live.ksapisrv.com, audiobookpay.kuwo.cn, mgxhtj.kuwo.cn, nmobi.kuwo.cn, searchrecterm.kuwo.cn, musicpay.kuwo.cn, vip1.kuwo.cn, www.oschina.net, open-cms-api.uc.cn, open-cms-api.quark.cn, cdn-oss.00bang.cn, api.00bang.cn, mobile.laichon.com, shop.laichon.com, mobile-api.imlaidian.com, api.laifeng.com, gmp.lakala.com, wallet.lakala.com, tk.lanjiyin.com.cn, tagit.hyhuo.com, 118.178.214.118, dapis.mting.info, display.wting.info, ios.lantouzi.com, tbgapplet.carlsberg.asia, dl-cu-hz.lechange.cn, api.club.lenovo.cn, abcapi.lenovoimage.com, api-ac.liepin.com, api-wanda.liepin.com, a.line.me, ad.line-scdn.net, w.line.me, gw.line.naver.jp, lan.line.me, buy.line.me, crs-event.line.me, obs.line-scdn.net, d.line-scdn.net, scdn.line-apps.com, sch.line.me, static.line-scdn.net, nelo2-col.linecorp.com, uts-front.line-apps.com, cix.line-apps.com, legy.line-apps.com, ec-bot-obs.line-scdn.net, app.aa-ab.com, ad.lofter.com, lofter.lf127.net, order-app-api.lbdj.com, plt.yorentown.com, lawsonapi.yorentown.com, www.iyingdi.cn, www.1314zhilv.com, api.internetofcity.cn, www.cmbc.com.cn, rs.creditcard.cmbc.com.cn, dispatcher.camera360.com, mada-travel.17u.cn, ebk.17u.cn, app.api.versa-ai.com, static01.versa-ai.com, qimg.cdnmama.com, mapi.mafengwo.cn, creditcardapp.bankcomm.cn, creditcardapp.bankcomm.com, creditcard.bankcomm.cn, creditcard.bankcomm.com, sfo.mddcloud.com.cn, mob.mddcloud.com.cn, toblog.ctobsnssdk.com, mobads-pre-config.cdn.bcebos.com, sdk1xyajs.data.kuiniuca.com, conf-darwin.xycdn.com, *.ubixioe.com, open.taou.com, h3.open.taou.com, mangaapi.manhuaren.com, *mangaapi.manhuaren.*, *.mgtv.com, app.missevan.com, p0.pipi.cn, api.mcd.cn, api.bevol.com, j-image.missfresh.cn, capi.mwee.cn, mea.meitudata.com, adui.tg.meitu.com, flowplus.meituan.net, cdb.meituan.com, peisongapi.meituan.com, x.seeyouyima.com, axxd.xmseeyouyima.com, config-service.seeyouyima.com, b-api.ins.miaopai.com, ggc.miguvideo.com, public-deliver9.miguvideo.com, display*-sc.miguvideo.com, recommend-dy.miguvideo.com, app-sc.miguvideo.com, common-sc.miguvideo.com, ggx*.miguvideo.com, ggic*.miguvideo.com, home.mi.com, api.mgzf.com, midc.cdn-static.abchina.com.cn, enjoy.cdn-static.abchina.com, 3g.csair.com, blog.nilbt.com, www.nfmovies.com, api.nj.nbtv.cn, gateway.benewtech.cn, ntt-app.benewtech.cn, oxadmin.cp.com.cn, v3.wufazhuce.com, app.api.d3yuiw4.com, api.21ec74.com, slapi.oray.net, supportda.ofo.com, ma.ofo.com, activity2.api.ofo.com, 103.91.210.141, adapi.izuiyou.com, pss.txffp.com, appapi.caiyicloud.com, api.pinduoduo.com, api.yangkeduo.com, mobile.yangkeduo.com, iobs.pingan.com.cn, hcz-member.pingan.com.cn, cdn.sdb.com.cn, pacdn.m.stock.pingan.com, mobile.1qianbao.com, image.spdbccc.com.cn, j1.pupuapi.com, image.pushplus.plus, www.pushplus.plus, lban.spdb.com.cn, wap.spdb.com.cn, adpai.thepaper.cn, access.mypikpak.com, appapi.51job*.com, cupid.51job*.com, adproxy.autohome.com.cn, app2.autoimg.cn, mobile-consumer-sapp.chery.cn, fmapp.chinafamilymart.com.cn, facade-api.black-unique.com, us.l.qq.com, y.gtimg.cn, music.y.qq.com, m.qianbao.qq.com, qidian.qpic.cn, mage.if.qidian.com, magev6.if.qidian.com, webapi.qmai.cn, miniapp.qmai.cn, open.e.kuaishou.cn, api-access.pangolin-sdk-toutiao-b.com, api-access.pangolin-sdk-toutiao1.com, api-cfg.wtzw.com, p1-lm.adukwai.com, lf-cdn-tos.bytescm.com, webcast-open.douyin.com, beta-luna.douyin.com, ether-pack.pangolin-sdk-toutiao.com, api-access.pangolin-sdk-toutiao?.com, sf*-fe-tos.pglstatp-toutiao.com, api.qbb6.com, open.qyer.com, media.qyer.com, a.qiumibao.com, iqushangwang.8quan.com, qde.qunar.com, homefront.qunar.com, client.qunar.com, capi.lkcoffee.com, ecapi.lkcoffee.com, m.lkcoffee.com, img0*.luckincoffeecdn.com, oneapph5.dongfeng-nissan.com.cn, app.peopleapp.com, stat.peopleapp.com, adstatic.peopleapp.com, dyncdn.me, gql.reddit.com, gql-fed.reddit.com, api.rr.tv, cms.daydaycook.com.cn, api.daydaycook.com.cn, app.meruki.cn, app.homeinns.com, api.mos.csvw.com, mapi.sfbest.com, ccsp-egmas.sf-express.com, ucmp.sf-express.com, mcs-mimp-web.sf-express.com, homepage-api.smzdm.com, haojia-api.smzdm.com, app-api.smzdm.com, user-api.smzdm.com, article-api.smzdm.com, qianbao.smzdm.com, s-api.smzdm.com, haojia.m.smzdm.com, api-sams.walmartmobile.cn, apis.lifeweek.com.cn, api.huachenjie.com, ad.shunchangzhixing.com, zlsdk.1rtb.net, api.gameplus.qq.com, ios.sspai.com, editor.sm.cn, ecard.shenzhentong.com, img01.10101111cdn.com, www.ymm56.com, sh-gateway.shihuo.cn, static.shihuocdn.cn, gw-passenger.01zhuanche.com, img.yun.01zhuanche, ut2.shuqistat.com, dsp.toutiao.com, sf3-be-pack.pglstatp-toutiao.com, sq.sljkj.com, ocean.shuqireader.com, img-tailor.11222.cn, message.shuqireader.com, feedback.uc.cn, *.shuqireader.com, 101.91.69.26, service.4gtv.tv, mapi.sichuanair.com, business-cdn.shouji.sogou.com, ios.sogou.com, android.sogou.com, h5api.sginput.qq.com, *.souhu.com, wxs-weixin.sd.zhumanggroup.com, 47.110.187.87, ssp.soulapp.cn, chat-live.soulapp.cn, api-chat.soulapp.cn, api-account.soulapp.cn, api-global.soulapp.me, api-a.soulapp.cn, api-pay.soulapp.cn, gateway-mobile-gray.soulapp.cn, post.soulapp.cn, api-user.soulapp.cn, *-spclient.spotify.com, spclient.wg.spotify.com, api.sodalife.xyz, api.bwton.com, szdmobile.suzhou.gov.cn, mpcs.suning.com, image.suning.com, luckman.suning.com, mrobot.pconline.com.cn, mrobot.pcauto.com.cn, agent-count.pconline.com.cn, ga-album-cdnqn.52tt.com, www.tailgdd.com, alt-r.my.com, imgx.jampp.com, bid.adview.cn, api.taptapdada.com, btrace.qq.com, api2.helper.qq.com, *.beacon.qq.com, lives.l.qq.com, imgcache.qq.com, mtteve.beacon.qq.com, vv.video.qq.com, qt.qq.com, 3gimg.qq.com, splashqqlive.gtimg.com, qzonestyle.gtimg.cn, discuz.gtimg.cn, bla.gtimg.com, mmgr.gtimg.com, bk.bingo.qq.com, static.gameplus.qq.com, 4gimg.map.qq.com, otheve.beacon.qq.com, r.inews.qq.com, news.ssp.qq.com, ccmsupport-sz.tenpay.com, sports3.gtimg.com, images.client.vip.xunlei.com, api-shoulei-ssl.xunlei.com, chl.tf.cn, wechat.tf.cn, cgbank.oss-cn-shenzhen.aliyuncs.com, tfsmy.chengdu.gov.cn, tft-app.cdtft.cn, ams-cdn.cdtft.cn, www.tsytv.com.cn, j5.dfcfw.com, appactive.1234567.com.cn, t1.market.xiaomi.com, api.cloud.189.cn, api.ncarzone.com, ossgw.alicdn.com, zconfig.alibabausercontent.com, *.ly.com, *.17usoft.com, *.17u.cn, mobilehotelapi.elong.com, quic-tcmapi.elong.com, truthsocial.com, *.i18n-pglstatp.com, mkt-gateway.tuhu.cn, cl-gateway.tuhu.cn, gateway.tuhu.cn, m.pvp.xoyo.com, client.tujia.com, m.tuniu.com, adm.10jqka.com.cn, iphone.ac.qq.com, stat.10jqka.com.cn, top-widgets-api.xiaozujian.com, api-marketing.zhinengxiyifang.cn, adsoss.zhinengxiyifang.cn, ads.zhinengxiyifang.cn, pubads.g.doubleclick.net, pagead2.googleadservices.com, app02.vgtime.com, img0*.benlailife.com, qiye.gaoding.com, interface.music.163.com, interface3.music.163.com, ipv4.music.163.com, interface9.music.163.com, god.gameyw.netease.com, app-conf.ds.163.com, kaola-haitao.oss.kaolacdn.com, sp.kaola.com, gw.kaola.com, *.music.126.net, img1.126.net, www.icourse163.org, nex.163.com, g1.163.com, client.mail.163.com, c.m.163.com, interface*.music.163.com, easyreadfs.nosdn.127.net, p.du.163.com, m.you.163.com, yanxuan.nosdn.127.net, dict.youdao.com, api-overmind.youdao.com, cdke.youdao.com, dictvip-business.youdao.com, dsp-impr2.youdao.com, impservice.dictapp.youdao.com, oral.youdao.com, oimage*.ydstatic.com, api.wmpvp.com, snailsleep.net, b.appsimg.com, mapi.appvipshop.com, ios.wps.cn, wanciwangdata.oss-cn-beijing.aliyuncs.com, recite.perfectlingo.com, misc-api-prd-mx.wandafilm.com, osg-static.sgcc.com.cn, osg-service.sgcc.com.cn, mp.weixin.qq.com, weixin110.qq.com, security.wechat.com, api.wfdata.club, overseas.weico.cc, thor.weidian.com, cds.wifi188.com, vue3-api.zhixiny.cn, api.51credit.com, img.wukongtv.com, api-release.wuta-cam.com, res-release.wuta-cam.com, *.pipiapps.com, *.fuliapps.com, *.xiangjiaoapps.com, *.xiangxiangapps.com, m.ctrip.com, ma-adx.ctrip.com, wcprd.hilton.com.cn, file.cibfintech.com, apiwz.midukanshu.com, upload-bbs.mihoyo.com, cstore-en-public-tx.seewo.com, edit.sinaapp.com, app.chinahxzq.com.cn, client-api-v2.oray.com, lchttpapi.xczim.com, pzoap.moedot.net, vapp.tmuyun.com, mobileapi.xiamenair.com, acs.m.goofish.com, g-acs.m.goofish.com, info.mina.xiaoaisound.com, marketing-aibox.v.mitvos.com, api.xbxxhz.com, shcss.suning.com, web2.realtech-inc.com, sdk.1rtb.net, gw.xiaocantech.com, smarket.dian.so, file.dian.so, xhtz.oss-cn-guangzhou.aliyuncs.com, mpos-pic.helipay.com, mgesq.api.mgtv.com, *.hitv.com, app-api.niu.com, api.petkit.cn, myusmile.online, wemallh5.usmile.com, www.myusmile.online, api.psy-1.com, lcen.xiaote.net, ad.xiaotucc.com, mapi.xiaotucc.com, portal-portm.meituan.com, mall.meituan.com, xxyx-client-api.xiaoxiaoyouxuan.com, statistic.live.126.net, www.xiaoxiongmeishu.com, spamblocker-api.zeekstudio.com, api.xiaoyi.com, api.xiaoyuzhoufm.com, edith.xiaohongshu.com, www.xiaohongshu.com, ci.xiaohongshu.com, rec.xiaohongshu.com, so.xiaohongshu.com, edith.rnote.com, www.rnote.com, ci.rnote.com, so.rnote.com, rec.rnote.com, api.jr.mi.com, api.m.mi.com, api-miprint.hannto.com, api.indeedpower.com, api-mifit*.huami.com, shopapi.io.mi.com, gslbali.ximalaya.com, search.ximalaya.com, searchwsa.ximalaya.com, mobile.ximalaya.com, mobilehera.ximalaya.com, mobwsa.ximalaya.com, m.ximalaya.com, mwsa.ximalaya.com, app.xinpianchang.com, bgw.xinyue.qq.com, operationapi.fosunhanig.com, api*.sparke.cn, static.xyzq.cn, static.api.m.panda.tv, api.xueqiu.com, open.xueqiu.com, stock.xueqiu.com, 39.103.79.14, 39.106.97.84, 47.95.49.75, 101.201.62.20, 101.201.62.26, 101.201.175.228, 124.250.48.3, 182.92.145.50, 182.92.251.113, portal-xunyou.qingcdn.com, imeclient.openspeech.cn, e-static.aia.com.cn, api2.yaduo.com, www.cntv.cn, cdn.cmgadx.com, mobile-api2011.elong.com, webboot.zhangyue.com, saad.ms.zhangyue.net, app.yinxiang.com, i.ys7.com, oneapp-api.faw-vw.com, www.vgtime.com, *.gamersky.com, service.busi.inke.cn, static.psbc.com, mcc.psbc.com, static.mobile-bank.psbc.com, d.psbc.com, pipi.4kya.com, m.yap.yahoo.com, patient-api.suh.cn, userpms-api.suh.cn, venus.yhd.com, a.sinopecsales.com, ocrifs.ejoy.sinopec.com, api.yikaobang.com.cn, api.17kjs.com, compus.xiaofubao.com, mapi-app.bestpay.com.cn, api.ycapp.yiche.com, cheyouapi.ycapp.yiche.com, ad.ysepay.com, ads.ysepay.com, api.winbull8.com, hz.yxzq.com, api5.youonbike.com, api.yonghuivip.com, new-app-api.ylyk.com, gongdu.youshu.cc, img.dailmo.com, img.allahall.com, app.zhoudamozi.com, rr*.googlevideo.com, youtubei.googleapis.com, api.ulife.group, acs.youku.com, push.m.youku.com, un-acs.youku.com, *.yuxueyuan.cn, xyst.yuanfudao.com, nnapp.cloudbae.cn, gw3.ykccn.com, restapi.iyunmai.com, m.airchina.com.cn, mlife.jf365.boc.cn, openapi.boc.cn, amemv.com, musical.com, snssdk.com, tiktokv.com, xyz.cnki.net, app.10099.com.cn, wap.bank.ecitic.com, imcs.citicbank.com, ecssmobile.e-chinalife.com, webappcfg.paas.cmbchina.com, mbmodule-openapi.paas.cmbchina.com, marketing.cmschina.com, client.app.coc.10086.cn, app.10086.cn, mcmm.caiyun.feixin.10086.cn, mrp.mcloud.139.com, ad.mcloud.139.com, middle.yun.139.com, cloud.189.cn, zt-app.go189.cn, m.client.10010.com, m1.ad.10010.com, res.mall.10010.cn, e.weather.com.cn, zgrb.epicc.com.cn, apicloud.zol.com.cn, c.zhangle.com, live.inst-service.htsc.com, geetest.htsc.com, 119.29.29.*, djcapp.game.qq.com, quanguo.mygolbs.com, wx.mygolbs.com, ossweb-img.qq.com, mlol.qt.qq.com, mbasecc.bas.cmbchina.com, mbasecc.bcs.cmbchina.com, intellicc.bas.cmbchina.com, intellicc.bcs.cmbchina.com, beehiveapi.58.com, portal.zjzwfw.gov.cn, app-izz.zhengzhou.gov.cn, apio.zhengqi100.com, zua.zhidiantianxia.cn, preprod.cdzghome.com, api.zhihu.com, www.zhihu.com, appcloud2.zhihu.com, m-cloud.zhihu.com, zhuanlan.zhihu.com, link.zhihu.com, direct.z-bank.com, hdgateway.zto.com, minipro.95504.net, sichuan.95504.net, app.badmintoncn.com, fastbuyer.zbj.com, z.onewo.com, app.zhuanzhuan.com, zjdr666.com, ztoread.ziroom.com, api.izuiyou.com, syh.zybang.com, www.zybang.com, ih2.ireader.com, book.img.ireader.com",
+      "error": "Invalid: \"cupid.51job*.comhostname = img01.51jobcdn.com\": unsupported character ' '\n\"res1.hubcloud.com.cnhostname = api.xiachufang.com\": unsupported character ' '"
+    }
+  ],
+  "force-http-hostname": [],
+  "skip-server-cert-verify": null,
+  "client-source-address": [],
+  "h2": null,
+  "url-rewrite": {
+    "count": 795,
+    "sha256": "5d9ea1b8b4f8f3a8bbf0dbccc4cfda28638632c16efbd186ea97fb6da20ea9ca",
+    "errors": {}
+  },
+  "header-rewrite": {
+    "4596": "HeaderRewriteDef { response: true, pattern: \"^https://grpc\\\\.biliapi\\\\.net/bilibili\\\\.app\\\\.interface\\\\.v1\\\\.Teenagers/ModeStatus$\", conditions: HeadConditionsDef { request: None, response: None }, edit: Del(\"grpc-status\") }",
+    "4596+1": "HeaderRewriteDef { response: true, pattern: \"^https://grpc\\\\.biliapi\\\\.net/bilibili\\\\.app\\\\.interface\\\\.v1\\\\.Teenagers/ModeStatus$\", conditions: HeadConditionsDef { request: None, response: None }, edit: Add(\"grpc-status\", \"0\") }",
+    "4597": "HeaderRewriteDef { response: true, pattern: \"^https://grpc\\\\.biliapi\\\\.net/bilibili\\\\.app\\\\.interface\\\\.v1\\\\.Search/DefaultWords$\", conditions: HeadConditionsDef { request: None, response: None }, edit: Del(\"grpc-status\") }",
+    "4597+1": "HeaderRewriteDef { response: true, pattern: \"^https://grpc\\\\.biliapi\\\\.net/bilibili\\\\.app\\\\.interface\\\\.v1\\\\.Search/DefaultWords$\", conditions: HeadConditionsDef { request: None, response: None }, edit: Add(\"grpc-status\", \"0\") }",
+    "4598": "HeaderRewriteDef { response: true, pattern: \"^https:\\\\/\\\\/grpc\\\\.biliapi\\\\.net\\\\/bilibili\\\\.app\\\\.(view\\\\.v1\\\\.View\\\\/TFInfo|viewunite\\\\.v1\\\\.View\\\\/(PlayPause|ViewEndPage))$\", conditions: HeadConditionsDef { request: None, response: None }, edit: Del(\"grpc-status\") }",
+    "4598+1": "HeaderRewriteDef { response: true, pattern: \"^https:\\\\/\\\\/grpc\\\\.biliapi\\\\.net\\\\/bilibili\\\\.app\\\\.(view\\\\.v1\\\\.View\\\\/TFInfo|viewunite\\\\.v1\\\\.View\\\\/(PlayPause|ViewEndPage))$\", conditions: HeadConditionsDef { request: None, response: None }, edit: Add(\"grpc-status\", \"0\") }"
+  },
+  "body-rewrite": {
+    "4600": "BodyRewriteDef { response: true, pattern: \"^http:\\\\/\\\\/[^?]+\\\\/resolve\\\\?host=(ap[ip]\\\\.bilibili\\\\.com|grpc\\\\.biliapi\\\\.net|api\\\\.live\\\\.bilibili\\\\.com)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".dns[]? |= (.ips = [] | .ttl = 86400)\") }",
+    "4601": "BodyRewriteDef { response: true, pattern: \"^https:\\\\/\\\\/api\\\\.live\\\\.bilibili\\\\.com\\\\/xlive\\\\/open-interface\\\\/v2\\\\/tracker\\\\/conf\\\\?\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data.domains = [\\\"wss://tracker.chat.bilibili.com\\\"]\") }",
+    "4602": "BodyRewriteDef { response: true, pattern: \"^https:\\\\/\\\\/api\\\\.bilibili\\\\.com\\\\/x\\\\/pd-proxy\\\\/tracker\\\\?\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data[][]? = \\\"stun.chat.bilibili.com:3478\\\"\") }",
+    "4603": "BodyRewriteDef { response: true, pattern: \"^https:\\\\/\\\\/api\\\\.bilibili\\\\.com\\\\/pgc\\\\/view\\\\/v2\\\\/app\\\\/season\\\\?\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"del(.data.payment)\") }",
+    "4604": "BodyRewriteDef { response: true, pattern: \"^https:\\\\/\\\\/api\\\\.bilibili\\\\.com\\\\/pgc\\\\/page\\\\/channel\\\\?\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data.modules |= map(select(.type != \\\"TIP\\\") | if .type == \\\"BANNER\\\" then .module_data.items |= map(select(.url | startswith(\\\"https://www.bilibili.com/blackboard/era/\\\") | not)) else . end)\") }",
+    "4606": "BodyRewriteDef { response: true, pattern: \"^https:\\\\/\\\\/app\\\\.bilibili\\\\.com\\\\/x\\\\/resource\\\\/show\\\\/skin\\\\?\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"del(.data.common_equip)\") }",
+    "4608": "BodyRewriteDef { response: true, pattern: \"^https:\\\\/\\\\/app\\\\.bilibili\\\\.com\\\\/x\\\\/resource\\\\/show\\\\/tab\\\\/v2\\\\?\", conditions: HeadConditionsDef { request: None, response: None }, action: JqFile(\"https://raw.githubusercontent.com/kokoryh/Sparkle/refs/heads/master/jq/bilibili.tab.jq\") }",
+    "4609": "BodyRewriteDef { response: true, pattern: \"^https:\\\\/\\\\/app\\\\.bilibili\\\\.com\\\\/x\\\\/v2\\\\/splash\\\\/(show|event\\\\/list2)\\\\?\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data |= with_entries(if .key | IN(\\\"show\\\", \\\"event_list\\\") then .value = [] else . end)\") }",
+    "4610": "BodyRewriteDef { response: true, pattern: \"^https:\\\\/\\\\/app\\\\.bilibili\\\\.com\\\\/x\\\\/v2\\\\/feed\\\\/index\\\\?\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"if .data.items then .data.items |= map(select((.banner_item == null) and (.ad_info == null) and (.card_goto == \\\"av\\\") and (.card_type | IN(\\\"small_cover_v2\\\", \\\"large_cover_single_v9\\\", \\\"large_cover_v1\\\")))) end\") }",
+    "4611": "BodyRewriteDef { response: true, pattern: \"^https:\\\\/\\\\/app\\\\.bilibili\\\\.com\\\\/x\\\\/v2\\\\/feed\\\\/index\\\\/story\\\\?\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"if .data.items then .data.items |= map(select((.ad_info == null) and (.card_goto | IN(\\\"vertical_ad_av\\\", \\\"vertical_ad_live\\\", \\\"vertical_ad_picture\\\") | not)) | del(.story_cart_icon, .free_flow_toast, .image_infos, .course_info, .game_info)) end\") }",
+    "4612": "BodyRewriteDef { response: true, pattern: \"^https:\\\\/\\\\/app\\\\.bilibili\\\\.com\\\\/x\\\\/v2\\\\/account\\\\/mine(\\\\/ipad)?\\\\?\", conditions: HeadConditionsDef { request: None, response: None }, action: JqFile(\"https://raw.githubusercontent.com/kokoryh/Sparkle/refs/heads/master/jq/bilibili.mine.jq\") }",
+    "4613": "BodyRewriteDef { response: true, pattern: \"^https:\\\\/\\\\/app\\\\.bilibili\\\\.com\\\\/x\\\\/v2\\\\/account\\\\/myinfo\\\\?\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data.vip |= if . != null and .status == 0 then . + { status: 1, type: 2, due_date: 9005270400000, role: 15 } else . end\") }",
+    "4740": "BodyRewriteDef { response: true, pattern: \"(?i:^https?:\\\\/\\\\/beta-api\\\\.crunchyroll\\\\.com\\\\/cms)\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"offset_ms\\\":\\\\d+\", \"offset_ms\\\":99999999999999\")]) }",
+    "4775": "BodyRewriteDef { response: true, pattern: \"(?i:^https?:\\\\/\\\\/adservice\\\\.sigmob\\\\.cn\\\\/extconfig)\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"false\", \"true\")]) }",
+    "4888": "BodyRewriteDef { response: true, pattern: \"(?i:^https?:\\\\/\\\\/maicai\\\\.api\\\\.ddxq\\\\.mobi\\\\/homeApi\\\\/newDetails)\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"suspension\", \"fmz200\")]) }",
+    "5036": "BodyRewriteDef { response: true, pattern: \"(?i:^https?:\\\\/\\\\/47\\\\.100\\\\.65\\\\.202\\\\/api\\\\/mobile\\\\/index\\\\.php\\\\?version=\\\\d&mobile=yes&module=basicdata&type=forumlist)\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"adv\", \"fmz200\")]) }",
+    "5382": "BodyRewriteDef { response: true, pattern: \"(?i:^https?:\\\\/\\\\/www\\\\.i3zh\\\\.com)\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"cm-pop-up-banners\", \"fmz200\")]) }",
+    "5429": "BodyRewriteDef { response: true, pattern: \"(?i:^https?:\\\\/\\\\/yunbusiness\\\\.ccb\\\\.com\\\\/basic_service\\\\/txCtrl\\\\?)\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"\\\"TAG_AD_INFO\\\"\", \"\\\"fmz200\\\"\")]) }",
+    "5436": "BodyRewriteDef { response: true, pattern: \"(?i:^https?:\\\\/\\\\/waimai-guide\\\\.ele\\\\.me\\\\/\\\\w+\\\\/mtop\\\\.venus\\\\.shopresourceservice\\\\.getshopresource)\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"posterList\", \"fmz200\")]) }",
+    "5504": "BodyRewriteDef { response: true, pattern: \"(?i:^https?:\\\\/\\\\/api\\\\.m\\\\.jd\\\\.com\\\\/client\\\\.action\\\\?functionId=lite_advertising)\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"jdLiteAdvertisingVO\", \"fmz200\")]) }",
+    "5505": "BodyRewriteDef { response: true, pattern: \"(?i:^https?:\\\\/\\\\/api\\\\.m\\\\.jd\\\\.com\\\\/client\\\\.action\\\\?functionId=lite_SmartPush)\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"pushData\", \"fmz200\")]) }",
+    "5526": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/bp-api\\\\.bestv\\\\.cn\\\\/cms\\\\/api\\\\/free\\\\/open\\\\/advertisingV2)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".dt = []\") }",
+    "5527": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/bp-api\\\\.bestv\\\\.cn\\\\/cms\\\\/api\\\\/c\\\\/search\\\\/hot\\\\/v(2|4))\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".dt.hot = [] | .dt.recommand = [] | .dt.bannerList = []\") }",
+    "5561": "BodyRewriteDef { response: true, pattern: \"(?i:^https?:\\\\/\\\\/p\\\\.kuaidi100\\\\.com\\\\/mobile\\\\/mobileapi\\\\.do$)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"del(.adsplash, .adIsConsumable, .adProductId, .nologin_tips, .index_banner, .me_banner, .index_banner_shadow, .adshongbao, .adsapp_homepage_ticket_pop, .adsoptimizationsend, .adsapp_activity_ad_array, .adbanner, .adposition, .adShowAgainTime)\") }",
+    "5562": "BodyRewriteDef { response: true, pattern: \"(?i:^https?:\\\\/\\\\/p\\\\.kuaidi100\\\\.com\\\\/apicenter\\\\/xcx\\\\.dox)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"del(.data.secondMenuList)\") }",
+    "5578": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/(apissl|az2-api(-js|-idc)?)\\\\.(gifshow|ksapisrv)\\\\.com\\\\/rest\\\\/system\\\\/startup\\\\?)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"del(.reskinConfig, .sidebarExSquareStyle.moreList, .sidebarExSquareStyle.topList)\") }",
+    "5579": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/(apissl|az2-api(-js|-idc)?)\\\\.(gifshow|ksapisrv)\\\\.com\\\\/rest\\\\/system\\\\/startup\\\\?)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".sidebarExSquareStyle.commonlyUsedList |= map(select(.title == \\\"设置\\\" or .title == \\\"历史记录\\\" or .title == \\\"草稿箱\\\" or .title == \\\"我的钱包\\\" or .title == \\\"小程序\\\" or .title == \\\"未成年人模式\\\" or .title == \\\"官方客服\\\" or .title == \\\"内容偏好\\\" or .title == \\\"离线模式\\\" or .title == \\\"稍后再看\\\" or .title == \\\"举报中心\\\" or .title == \\\"挂件\\\"))\") }",
+    "5580": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/az2-live\\\\.ksapisrv\\\\.com\\\\/rest\\\\/n\\\\/live\\\\/feed\\\\/square\\\\/refresh\\\\?)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"del(.data.banners)\") }",
+    "5583": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/az4-api(-idc)?\\\\.ksapisrv\\\\.com\\\\/rest\\\\/n\\\\/feed\\\\/selectionFast\\\\?)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"if (.feeds | type) == \\\"array\\\" then .feeds |= map(select(.ad | not)) else . end\") }",
+    "5584": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/az2-api-js\\\\.gifshow\\\\.com\\\\/rest\\\\/n\\\\/user\\\\/profile\\\\/v2\\\\?)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"del(.postRecommends)\") }",
+    "5841": "BodyRewriteDef { response: true, pattern: \"(?i:http:\\\\/\\\\/dili.sqcosmos.com\\\\/jiekou\\\\/mains\\\\/p\\\\d+.html)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".album |= map(select(.id != \\\"4154\\\" and .id != \\\"4165\\\"))\") }",
+    "6015": "BodyRewriteDef { response: true, pattern: \"(?i:^https?:\\\\/\\\\/mobile\\\\.yangkeduo\\\\.com\\\\/proxy\\\\/api\\\\/api\\\\/express\\\\/post\\\\/waybill\\\\/red_packet\\\\/goods_list$)\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"\\\"list\\\":\\\\[.+\\\\]\", \"\\\"list\\\":[]\")]) }",
+    "6043": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/j1\\\\.pupuapi\\\\.com\\\\/client\\\\/notification\\\\/message_center\\\\/unread_number)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data = []\") }",
+    "6137": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/beta-luna\\\\.douyin\\\\.com\\\\/luna\\\\/card\\\\?)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"if .card_items[0].priority_display != null then .card_items[0].priority_display = false else . end | if .card_items[0].is_show != null then .card_items[0].is_show = false else . end | if .preview_guide != null then .preview_guide = null else . end\") }",
+    "6139": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/beta-luna\\\\.douyin\\\\.com\\\\/luna\\\\/more-panel\\\\?)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"del(.blocks[1])\") }",
+    "6269": "BodyRewriteDef { response: true, pattern: \"(?i:^https?:\\\\/\\\\/capi\\\\.lkcoffee\\\\.com\\\\/resource\\\\/m\\\\/sys\\\\/app\\\\/adposNew)\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"\\\\{.+\\\\}\", \"{\\\"status\\\":\\\"SUCCESS\\\"}\")]) }",
+    "6271": "BodyRewriteDef { response: true, pattern: \"(?i:^https?:\\\\/\\\\/m\\\\.lkcoffee\\\\.com\\\\/ecapi\\\\/resource\\\\/m\\\\/member\\\\/exchange\\\\/page)\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"\\\\{.+\\\\}\", \"{\\\"status\\\":\\\"SUCCESS\\\"}\")]) }",
+    "6272": "BodyRewriteDef { response: true, pattern: \"(?i:^https?:\\\\/\\\\/m\\\\.lkcoffee\\\\.com\\\\/capi\\\\/resource\\\\/m\\\\/growUp\\\\/main)\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"\\\"popTitle\\\":\\\".+?\\\"\", \"\\\"popTitle\\\":\\\"\\\"\")]) }",
+    "6279": "BodyRewriteDef { response: true, pattern: \"(?i:^https?:\\\\/\\\\/dyncdn\\\\.me\\\\/static\\\\/\\\\d{0,2}\\\\/js\\\\/showads\\\\.js$)\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"true\", \"false\")]) }",
+    "6502": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/www\\\\.tailgdd\\\\.com\\\\/v8\\\\/smart\\\\/app\\\\/config\\\\/get$)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"if .data != null then .data = \\\"{}\\\" else . end\") }",
+    "6603": "BodyRewriteDef { response: true, pattern: \"(?i:^https?:\\\\/\\\\/tft-app\\\\.cdtft\\\\.cn\\\\/gateway-customer\\\\/tftapp\\\\/tft-ams\\\\/api\\\\/appAd)\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"officialAdvertResultVo\", \"fmz200\")]) }",
+    "6617": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/chl\\\\.tf\\\\.cn\\\\/channelmg\\\\/sys\\\\/socso\\\\/order\\\\/queryOrderInfo\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"imgUrl\", \"fmz200\")]) }",
+    "6693": "BodyRewriteDef { response: true, pattern: \"(?i:^https?:\\\\/\\\\/client\\\\.tujia\\\\.com\\\\/bnbapp-node\\\\/app\\\\/portal\\\\/getportalconfig\\\\/bnb\\\\/v2)\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"\\\"banners\\\":\\\\[.+\\\\],\", \"\\\"banners\\\":[],\")]) }",
+    "6790": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/misc-api-prd-mx\\\\.wandafilm\\\\.com\\\\/commend\\\\/common_banner_batch\\\\.api)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data.objects[\\\"OpenAPP-&-FlashAD\\\"] = [] | .data.objects[\\\"InTheaters-&-BoxAD\\\"] = []\") }",
+    "6792": "BodyRewriteDef { response: true, pattern: \"(?i:^https?:\\\\/\\\\/misc-api-prd-mx\\\\.wandafilm\\\\.com\\\\/commend\\\\/common_banner_batch\\\\.api\\\\?bannerInfos=%5B%7B%22cinemaI)\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"\\\"WX_index_mp-&-boxAD\\\"\", \"\\\"fmz200\\\"\")]) }",
+    "6809": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/app-conf\\\\.ds\\\\.163\\\\.com\\\\/v\\\\d\\\\/app\\\\/base\\\\/conf\\\\/static\\\\/start-config\\\\?)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"del(.result.updateConfig[2].itemList[94].itemList[2])\") }",
+    "6897": "BodyRewriteDef { response: true, pattern: \"(?i:^https?:\\\\/\\\\/mp\\\\.weixin\\\\.qq\\\\.com\\\\/mp\\\\/getappmsgad)\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"advertisement\", \"fmz200\")]) }",
+    "6989": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/(mobile|mobilehera|mobwsa)\\\\.ximalaya\\\\.com\\\\/discovery-feed\\\\/v\\\\d\\\\/mix\\\\/)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".heData |= map(select(.item.list[].bizType != \\\"SceneListenCard\\\"))\") }",
+    "6994": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/(mobile|mobilehera|mobwsa)\\\\.ximalaya\\\\.com\\\\/discovery-category\\\\/customCategories\\\\/)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".categoryList |= map(.itemList |= map(select(.title | test(\\\"直播|123狂欢节|SVIP\\\"; \\\"i\\\") | not))) | .customCategoryList |= map(select(.title | test(\\\"直播|123狂欢节|SVIP\\\"; \\\"i\\\") | not))\") }",
+    "6996": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/(mobile|mobilehera|mobwsa)\\\\.ximalaya\\\\.com\\\\/football-portal\\\\/diff2\\\\/batch\\\\?)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"del(.json.ad, .json.toc)\") }",
+    "6998": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/(mobile|mobilehera|mobwsa)\\\\.ximalaya\\\\.com\\\\/nexus-web\\\\/v\\\\d\\\\/tabs\\\\/customTabs\\\\?)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data.feedTabs |= map(select(.name != \\\"大赛\\\"))\") }",
+    "7008": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/mobwsa\\\\.ximalaya\\\\.com\\\\/mobile-playpage\\\\/playpage\\\\/tabs\\\\/v2\\\\/)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"del(.data.playpage.resourceMap.defaultResource, .data.playpage.resourceMap.playPageTip)\") }",
+    "7019": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/(mobile|mobilehera|mobwsa)\\\\.ximalaya\\\\.com\\\\/mobile-user\\\\/v\\\\d\\\\/homePage\\\\/)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"del(.data.freeListenV2)\") }",
+    "7023": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/(mobile|mobilehera|mobwsa)\\\\.ximalaya\\\\.com\\\\/mobile-user\\\\/v\\\\d\\\\/homePage\\\\/)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data.serviceModule.entrances |= map(select(.name == \\\"全部服务\\\"))\") }",
+    "7063": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/acs\\\\.m\\\\.goofish\\\\.com\\\\/gw\\\\/mtop\\\\.taobao\\\\.idlemtopsearch\\\\.search\\\\.shade\\\\/)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"del(.data)\") }",
+    "7065": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/acs\\\\.m\\\\.goofish\\\\.com\\\\/gw\\\\/mtop\\\\.taobao\\\\.idle\\\\.user\\\\.strategy\\\\.list\\\\/)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"del(.data)\") }",
+    "7067": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/acs\\\\.m\\\\.goofish\\\\.com\\\\/gw\\\\/mtop\\\\.taobao\\\\.idle\\\\.group\\\\.myself\\\\.banner\\\\/)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data.bannerList = []\") }",
+    "7069": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/acs\\\\.m\\\\.goofish\\\\.com\\\\/gw\\\\/mtop\\\\.taobao\\\\.idle\\\\.playboy\\\\.recommend\\\\/2\\\\.0)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data.recommends = [] | .data.items = [] | .data.next = false\") }",
+    "7071": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/acs\\\\.m\\\\.goofish\\\\.com\\\\/gw\\\\/mtop\\\\.taobao\\\\.idle\\\\.item\\\\.recommend\\\\.list\\\\/)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data.cardList = []\") }",
+    "7073": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/acs\\\\.m\\\\.goofish\\\\.com\\\\/gw\\\\/mtop\\\\.taobao\\\\.idle\\\\.fun\\\\.follow\\\\.often\\\\.visit)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data.sections = []\") }",
+    "7075": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/acs\\\\.m\\\\.goofish\\\\.com\\\\/gw\\\\/mtop\\\\.taobao\\\\.idle\\\\.circle\\\\.myself\\\\.banner\\\\/1\\\\.0)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data.bannerList = []\") }",
+    "7077": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/acs\\\\.m\\\\.goofish\\\\.com\\\\/gw\\\\/mtop\\\\.taobao\\\\.idle\\\\.circle\\\\.visited\\\\/1\\\\.0)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data.visitedCircleList = []\") }",
+    "7194": "BodyRewriteDef { response: true, pattern: \"(?i:^https?:\\\\/\\\\/lcen\\\\.xiaote\\\\.net\\\\/api\\\\/graphql)\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"screenSplashAd\", \"fmz200\")]) }",
+    "7228": "BodyRewriteDef { response: true, pattern: \"(?i:^https?:\\\\/\\\\/api\\\\.xiaoyuzhoufm\\\\.com\\\\/v1\\\\/discovery-feed\\\\/list)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data |= map(select(.type != \\\"DISCOVERY_HEADER\\\" and .type != \\\"DISCOVERY_BANNER\\\"))\") }",
+    "7230": "BodyRewriteDef { response: true, pattern: \"(?i:^https?:\\\\/\\\\/api\\\\.xiaoyuzhoufm\\\\.com\\\\/v1\\\\/(related-episode|operation-resource)\\\\/list)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data = []\") }",
+    "7388": "BodyRewriteDef { response: true, pattern: \"(?i:^https?:\\\\/\\\\/oneapp-api\\\\.faw-vw\\\\.com\\\\/search\\\\/firstPage\\\\/getPromptList\\\\/v1\\\\?.*)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\". = { returnStatus: \\\"SUCCEED\\\", hasMore: false, data: [] }\") }",
+    "7389": "BodyRewriteDef { response: true, pattern: \"(?i:^https?:\\\\/\\\\/oneapp-api\\\\.faw-vw\\\\.com\\\\/benefits\\\\/benefitsCard\\\\/getInfo\\\\/v1\\\\?.*)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\". = { returnStatus: \\\"SUCCEED\\\", hasMore: false, data: [] }\") }",
+    "7390": "BodyRewriteDef { response: true, pattern: \"(?i:^https?:\\\\/\\\\/oneapp-api\\\\.faw-vw\\\\.com\\\\/content\\\\/booth\\\\/getBoothList\\\\/v1\\\\?.*showPositionCode=VWAPP_HOME_BUOY)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\". = { returnStatus: \\\"SUCCEED\\\", hasMore: false, data: [] }\") }",
+    "7391": "BodyRewriteDef { response: true, pattern: \"(?i:^https?:\\\\/\\\\/oneapp-api\\\\.faw-vw\\\\.com\\\\/content\\\\/booth\\\\/getBoothList\\\\/v1\\\\?.*showPositionCode=VWAPP_(ICE|MEB)_(OPEN_SCREEN_ADS|CAR_ZHIHU_COLLEGE))\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\". = { returnStatus: \\\"SUCCEED\\\", hasMore: false, data: [] }\") }",
+    "7392": "BodyRewriteDef { response: true, pattern: \"(?i:^https?:\\\\/\\\\/oneapp-api\\\\.faw-vw\\\\.com\\\\/content\\\\/booth\\\\/getBoothList\\\\/v1\\\\?.*showPositionCode=VWAPP_(ICE|MEB)_HOME_(OWNER_BANNER|PROSPECTS_BANNER|CUSTOM_BANNER|KONGO|CUSTOM_KONGO))\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\". = { returnStatus: \\\"SUCCEED\\\", hasMore: false, data: [] }\") }",
+    "7393": "BodyRewriteDef { response: true, pattern: \"(?i:^https?:\\\\/\\\\/oneapp-api\\\\.faw-vw\\\\.com\\\\/content\\\\/(customize\\\\/getCustomizePageName|recommend\\\\/getRecommendInfoFlows|activity\\\\/getSquareActivityList|theme\\\\/getThemeList|post\\\\/getPostsByTags|evaluate\\\\/getEvaluateCards)\\\\/v1\\\\?.*)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\". = { returnStatus: \\\"SUCCEED\\\", hasMore: false, data: [] }\") }",
+    "7394": "BodyRewriteDef { response: true, pattern: \"(?i:^https?:\\\\/\\\\/oneapp-api\\\\.faw-vw\\\\.com\\\\/content\\\\/(collection\\\\/getCollectionList)\\\\/v1\\\\?.*)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\". = { returnStatus: \\\"SUCCEED\\\", hasMore: false, data: {} }\") }",
+    "7512": "BodyRewriteDef { response: true, pattern: \"(?i:http:\\\\/\\\\/.+\\\\.gamersky.com\\\\/.+\\\\/lists\\\\/getListElements)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".listElements |= map(select(has(\\\"adCategory\\\") | not))\") }",
+    "7635": "BodyRewriteDef { response: true, pattern: \"(?i:^https?:\\\\/\\\\/portal\\\\.zjzwfw\\\\.gov\\\\.cn\\\\/app_api\\\\/appHome\\\\/selectStartPic)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"if .data != null then .data = \\\"{}\\\" else . end\") }",
+    "7645": "BodyRewriteDef { response: true, pattern: \"(?i:^https?:\\\\/\\\\/app-izz\\\\.zhengzhou\\\\.gov\\\\.cn:10019\\\\/bizgw\\\\/gateway\\\\.do)\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"\\\"imgUrl19_5x9\\\":\\\".+?\\\"\", \"\\\"imgUrl19_5x9\\\":\\\"\\\"\")]) }",
+    "7661": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/api\\\\.zhihu\\\\.com\\\\/search\\\\/recommend_query\\\\/v2\\\\?)\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"\\\"recommend_queries\\\":\\\\{.+\\\\}\", \"\\\"recommend_queries\\\":{}\")]) }",
+    "7818": "BodyRewriteDef { response: true, pattern: \"(?i:^https?:\\\\/\\\\/app\\\\.zhuanzhuan\\\\.com\\\\/zz\\\\/v2\\\\/zzinfoshow\\\\/getfeedflowinfo\\\\?)\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"userRed\", \"fmz200\")]) }",
+    "7820": "BodyRewriteDef { response: true, pattern: \"(?i:^https?:\\\\/\\\\/app\\\\.zhuanzhuan\\\\.com\\\\/zz\\\\/v2\\\\/zzinfoshow\\\\/getchoicegoodsinfos)\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"infoData\", \"fmz200\")]) }"
+  },
+  "map-local": {
+    "count": 525,
+    "sha256": "9539a60a6f00ddb5d6250df5a985e058640c9210ae04964650d6dfbc2435f121",
+    "errors": {}
+  },
+  "request-body-mock": {},
+  "script": {
+    "count": 220,
+    "sha256": "6ff83d29eb0ee232049b480d1f557e310fad5366b75ba112c060e7102de824fc",
+    "errors": {}
+  },
+  "rules": {
+    "count": 2968,
+    "sha256": "610eec51bb33be9303d37aa74ba968d398c813427f7bcd2d436b21a75df523df",
+    "errors": {}
+  },
+  "rule-sets": [],
+  "resources": [
+    {
+      "url": "https://raw.githubusercontent.com/kokoryh/Sparkle/refs/heads/master/jq/bilibili.tab.jq",
+      "kind": "jq",
+      "lines": [
+        4608
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/kokoryh/Sparkle/refs/heads/master/jq/bilibili.mine.jq",
+      "kind": "jq",
+      "lines": [
+        4612
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Keywos/rule/main/mocks/caiyun.json",
+      "kind": "map-local",
+      "lines": [
+        4673
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/ccbLife/A3341AB05.json",
+      "kind": "map-local",
+      "lines": [
+        5430
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/kokoryh/Script/master/js/12306.js",
+      "kind": "script",
+      "lines": [
+        7868
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/51card.js",
+      "kind": "script",
+      "lines": [
+        7884,
+        7885
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/555Ad.js",
+      "kind": "script",
+      "lines": [
+        7889
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/cainiao/cainiao.js",
+      "kind": "script",
+      "lines": [
+        7908,
+        7994,
+        7995,
+        7997
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/myBlockAds.js",
+      "kind": "script",
+      "lines": [
+        7909,
+        7910,
+        8344,
+        8345,
+        8460
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/adrive/adrive.js",
+      "kind": "script",
+      "lines": [
+        7914,
+        7915
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/cnftp.js",
+      "kind": "script",
+      "lines": [
+        7920,
+        7921,
+        7922,
+        7923,
+        7925,
+        7927,
+        7929,
+        7931,
+        7933,
+        7935,
+        7937,
+        7939,
+        7941,
+        8182,
+        8184,
+        8185,
+        8187,
+        8189,
+        8190,
+        8192,
+        8477,
+        8479,
+        8481,
+        8483,
+        8485,
+        8487
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/baidumap.js",
+      "kind": "script",
+      "lines": [
+        7948
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/app2smile/rules/master/js/tieba-json.js",
+      "kind": "script",
+      "lines": [
+        7952
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/app2smile/rules/master/js/tieba-proto.js",
+      "kind": "script",
+      "lines": [
+        7953
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/bohe/bohe_ads.js",
+      "kind": "script",
+      "lines": [
+        7958,
+        7960,
+        7962
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/kokoryh/Sparkle/refs/heads/master/dist/bilibili.protobuf.request.js",
+      "kind": "script",
+      "lines": [
+        7966,
+        7967
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/kokoryh/Sparkle/refs/heads/master/dist/bilibili.json.js",
+      "kind": "script",
+      "lines": [
+        7968
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/kokoryh/Sparkle/refs/heads/master/dist/webpage.bilibili.js",
+      "kind": "script",
+      "lines": [
+        7969
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/kokoryh/Sparkle/refs/heads/master/dist/bilibili.protobuf.response.js",
+      "kind": "script",
+      "lines": [
+        7970
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/bilibiliManga.js",
+      "kind": "script",
+      "lines": [
+        7974,
+        7975,
+        7976,
+        7977
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/blued.js",
+      "kind": "script",
+      "lines": [
+        7982
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/caixin/caixinAd.js",
+      "kind": "script",
+      "lines": [
+        7989
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/header.js",
+      "kind": "script",
+      "lines": [
+        7993
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/dianping.js",
+      "kind": "script",
+      "lines": [
+        8005,
+        8006
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/didi/didiAds.js",
+      "kind": "script",
+      "lines": [
+        8010,
+        8011,
+        8012,
+        8013,
+        8014,
+        8016,
+        8017,
+        8018,
+        8019,
+        8021
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/dianyinglieshou.js",
+      "kind": "script",
+      "lines": [
+        8025
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/ddxq.js",
+      "kind": "script",
+      "lines": [
+        8030,
+        8032,
+        8034
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/NobyDa/Script/master/Bahamut/BahamutAnimeAds.js",
+      "kind": "script",
+      "lines": [
+        8039
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/fly.js",
+      "kind": "script",
+      "lines": [
+        8049
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/flyert.js",
+      "kind": "script",
+      "lines": [
+        8050
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/fenbi.js",
+      "kind": "script",
+      "lines": [
+        8054
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/foliday.js",
+      "kind": "script",
+      "lines": [
+        8058
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/umetrip/umetrip_ads.js",
+      "kind": "script",
+      "lines": [
+        8071
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/freshippo.js",
+      "kind": "script",
+      "lines": [
+        8075
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/huifutianxia_ads.js",
+      "kind": "script",
+      "lines": [
+        8080,
+        8081
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/ithome/ithome.js",
+      "kind": "script",
+      "lines": [
+        8089
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/ccbLife/ccbLifeAds.js",
+      "kind": "script",
+      "lines": [
+        8096
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/alicdn.js",
+      "kind": "script",
+      "lines": [
+        8098
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/jingdong/jingdong.js",
+      "kind": "script",
+      "lines": [
+        8102
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/jingxiAd.js",
+      "kind": "script",
+      "lines": [
+        8106
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/coolapk.js",
+      "kind": "script",
+      "lines": [
+        8113,
+        8114,
+        8115
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/VenenoSix24/Ivy-Script/refs/heads/main/Loon/script/Coolapk_Redirect.js",
+      "kind": "script",
+      "lines": [
+        8116
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/kuwo/kuwo.js",
+      "kind": "script",
+      "lines": [
+        8120,
+        8122,
+        8123,
+        8124,
+        8125
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/quark.js",
+      "kind": "script",
+      "lines": [
+        8129
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/app2smile/rules/master/js/adsense.js",
+      "kind": "script",
+      "lines": [
+        8133
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/keep.js",
+      "kind": "script",
+      "lines": [
+        8138,
+        8140,
+        8142,
+        8144,
+        8146
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/lvtusuishenting/ltsst-ad.js",
+      "kind": "script",
+      "lines": [
+        8154
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/lawson.js",
+      "kind": "script",
+      "lines": [
+        8158,
+        8159
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/mafengwo.js",
+      "kind": "script",
+      "lines": [
+        8166
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/mdb.js",
+      "kind": "script",
+      "lines": [
+        8170
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/maimai/maimai_ads.js",
+      "kind": "script",
+      "lines": [
+        8175,
+        8177
+      ]
+    },
+    {
+      "url": "https://github.com/fmz200/wool_scripts/raw/main/Scripts/mlxx/mlxx.js",
+      "kind": "script",
+      "lines": [
+        8197
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/meiyou/meiyou_ads.js",
+      "kind": "script",
+      "lines": [
+        8201,
+        8202
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/refs/heads/main/Scripts/miguvideo/miguvideo_ads.js",
+      "kind": "script",
+      "lines": [
+        8206
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/PupuSplashAds.js",
+      "kind": "script",
+      "lines": [
+        8219,
+        8221,
+        8223,
+        8226,
+        8229,
+        8232
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/qmai.js",
+      "kind": "script",
+      "lines": [
+        8239
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/51job.js",
+      "kind": "script",
+      "lines": [
+        8248,
+        8255,
+        8257
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/QuDa.js",
+      "kind": "script",
+      "lines": [
+        8262
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/rrtv_json.js",
+      "kind": "script",
+      "lines": [
+        8270,
+        8272,
+        8274,
+        8276,
+        8278,
+        8280,
+        8282,
+        8284,
+        8286
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/reddit.js",
+      "kind": "script",
+      "lines": [
+        8291
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/smzdm/smzdm_ads.js",
+      "kind": "script",
+      "lines": [
+        8298,
+        8299,
+        8300,
+        8301,
+        8302
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/smzdm/Smzdm.js",
+      "kind": "script",
+      "lines": [
+        8303,
+        8305,
+        8306,
+        8307,
+        8308,
+        8309,
+        8310,
+        8311
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/soda.js",
+      "kind": "script",
+      "lines": [
+        8315
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/template/req_replace_body.js",
+      "kind": "script",
+      "lines": [
+        8320
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/soul/soul_ads.js",
+      "kind": "script",
+      "lines": [
+        8322,
+        8323,
+        8324,
+        8325,
+        8326,
+        8327,
+        8328,
+        8329,
+        8330,
+        8331,
+        8332,
+        8333
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/001ProMax/Surge/refs/heads/main/Script/Spotify.Crack.Dev.js",
+      "kind": "script",
+      "lines": [
+        8337
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/app2smile/rules/master/js/qq-news.js",
+      "kind": "script",
+      "lines": [
+        8349
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/tuhu.js",
+      "kind": "script",
+      "lines": [
+        8353,
+        8354,
+        8355
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/app2smile/rules/master/js/vgtime.js",
+      "kind": "script",
+      "lines": [
+        8366
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/youdao/dict-youdao-ad.js",
+      "kind": "script",
+      "lines": [
+        8374
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Keywos/rule/main/script/wy/js/wyres.js",
+      "kind": "script",
+      "lines": [
+        8379,
+        8385,
+        8387,
+        8390,
+        8396,
+        8399
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zZPiglet/Task/master/asset/UnblockURLinWeChat.js",
+      "kind": "script",
+      "lines": [
+        8404
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Sliverkiss/QuantumultX/main/AdBlock/xmApp/wnbz.js",
+      "kind": "script",
+      "lines": [
+        8408
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/ishowshu/qx/refs/heads/main/script/goofish.js",
+      "kind": "script",
+      "lines": [
+        8416,
+        8418,
+        8420,
+        8422,
+        8424,
+        8426,
+        8428
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/NobyDa/Script/master/QuantumultX/File/xjsp.js",
+      "kind": "script",
+      "lines": [
+        8432
+      ]
+    },
+    {
+      "url": "https://github.com/fmz200/wool_scripts/raw/main/Scripts/xiaohongshu/xiaohongshu.js",
+      "kind": "script",
+      "lines": [
+        8437,
+        8438,
+        8439,
+        8441,
+        8442,
+        8444,
+        8446,
+        8447,
+        8448,
+        8449,
+        8451,
+        8452
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Sliverkiss/QuantumultX/main/AdBlock/xmApp/xmApp.js",
+      "kind": "script",
+      "lines": [
+        8456
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/xiaotucc.js",
+      "kind": "script",
+      "lines": [
+        8464
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/usmile.js",
+      "kind": "script",
+      "lines": [
+        8469
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/yx.js",
+      "kind": "script",
+      "lines": [
+        8491
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Maasea/sgmodule/refs/heads/master/Script/Youtube/youtube.response.js",
+      "kind": "script",
+      "lines": [
+        8496
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/zhangshanggongjiao.js",
+      "kind": "script",
+      "lines": [
+        8503
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/cmschina/cmschina.js",
+      "kind": "script",
+      "lines": [
+        8508
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/zhihu/zhihu.js",
+      "kind": "script",
+      "lines": [
+        8513,
+        8514,
+        8515,
+        8516,
+        8517,
+        8518,
+        8520,
+        8522,
+        8523,
+        8524,
+        8526,
+        8527
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/airchina.js",
+      "kind": "script",
+      "lines": [
+        8531
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/zhuanzhuan/zhuanzhuan.js",
+      "kind": "script",
+      "lines": [
+        8536
+      ]
+    }
+  ],
+  "network": {},
+  "declared-scripts": [
+    7868,
+    7884,
+    7885,
+    7889,
+    7908,
+    7909,
+    7910,
+    7914,
+    7915,
+    7920,
+    7921,
+    7922,
+    7923,
+    7925,
+    7927,
+    7929,
+    7931,
+    7933,
+    7935,
+    7937,
+    7939,
+    7941,
+    7948,
+    7952,
+    7953,
+    7958,
+    7960,
+    7962,
+    7966,
+    7967,
+    7968,
+    7969,
+    7970,
+    7974,
+    7975,
+    7976,
+    7977,
+    7982,
+    7989,
+    7993,
+    7994,
+    7995,
+    7997,
+    8005,
+    8006,
+    8010,
+    8011,
+    8012,
+    8013,
+    8014,
+    8016,
+    8017,
+    8018,
+    8019,
+    8021,
+    8025,
+    8030,
+    8032,
+    8034,
+    8039,
+    8049,
+    8050,
+    8054,
+    8058,
+    8071,
+    8075,
+    8080,
+    8081,
+    8089,
+    8096,
+    8098,
+    8102,
+    8106,
+    8113,
+    8114,
+    8115,
+    8116,
+    8120,
+    8122,
+    8123,
+    8124,
+    8125,
+    8129,
+    8133,
+    8138,
+    8140,
+    8142,
+    8144,
+    8146,
+    8154,
+    8158,
+    8159,
+    8166,
+    8170,
+    8175,
+    8177,
+    8182,
+    8184,
+    8185,
+    8187,
+    8189,
+    8190,
+    8192,
+    8197,
+    8201,
+    8202,
+    8206,
+    8219,
+    8221,
+    8223,
+    8226,
+    8229,
+    8232,
+    8239,
+    8248,
+    8255,
+    8257,
+    8262,
+    8270,
+    8272,
+    8274,
+    8276,
+    8278,
+    8280,
+    8282,
+    8284,
+    8286,
+    8291,
+    8298,
+    8299,
+    8300,
+    8301,
+    8302,
+    8303,
+    8305,
+    8306,
+    8307,
+    8308,
+    8309,
+    8310,
+    8311,
+    8315,
+    8320,
+    8322,
+    8323,
+    8324,
+    8325,
+    8326,
+    8327,
+    8328,
+    8329,
+    8330,
+    8331,
+    8332,
+    8333,
+    8337,
+    8344,
+    8345,
+    8349,
+    8353,
+    8354,
+    8355,
+    8366,
+    8374,
+    8379,
+    8385,
+    8387,
+    8390,
+    8396,
+    8399,
+    8404,
+    8408,
+    8416,
+    8418,
+    8420,
+    8422,
+    8424,
+    8426,
+    8428,
+    8432,
+    8437,
+    8438,
+    8439,
+    8441,
+    8442,
+    8444,
+    8446,
+    8447,
+    8448,
+    8449,
+    8451,
+    8452,
+    8456,
+    8460,
+    8464,
+    8469,
+    8477,
+    8479,
+    8481,
+    8483,
+    8485,
+    8487,
+    8491,
+    8496,
+    8503,
+    8508,
+    8513,
+    8514,
+    8515,
+    8516,
+    8517,
+    8518,
+    8520,
+    8522,
+    8523,
+    8524,
+    8526,
+    8527,
+    8531,
+    8536
+  ],
+  "ignored": []
+}

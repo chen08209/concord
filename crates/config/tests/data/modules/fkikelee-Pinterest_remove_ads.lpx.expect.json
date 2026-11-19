@@ -1,0 +1,41 @@
+{
+  "format": "loon",
+  "meta": {
+    "name": "Pinterest去广告",
+    "desc": "移除瀑布流、更多探索内容中的广告",
+    "author": "可莉🅥[https://github.com/luestr/ProxyResource/blob/main/README.md]",
+    "icon": "https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/Pinterest.png",
+    "homepage": "https://hub.kelee.one",
+    "category": "去广告",
+    "system": null,
+    "requirement": null,
+    "argumentsDesc": null
+  },
+  "off": null,
+  "arguments": [],
+  "hostname": [
+    {
+      "line": 19,
+      "items": "api.pinterest.com"
+    }
+  ],
+  "force-http-hostname": [],
+  "skip-server-cert-verify": null,
+  "client-source-address": [],
+  "h2": null,
+  "url-rewrite": {},
+  "header-rewrite": {},
+  "body-rewrite": {
+    "14": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/api\\\\.pinterest\\\\.com\\\\/v\\\\d\\\\/feeds\\\\/home\\\\/\\\\?)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data |= map(select(.is_promoted == false or .is_promoted == \\\"false\\\"))\") }",
+    "16": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/api\\\\.pinterest\\\\.com\\\\/v\\\\d\\\\/pins\\\\/\\\\d+\\\\/related\\\\/modules\\\\/\\\\?)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data |= map(select(.is_promoted == false or .is_promoted == \\\"false\\\"))\") }"
+  },
+  "map-local": {},
+  "request-body-mock": {},
+  "script": {},
+  "rules": {},
+  "rule-sets": [],
+  "resources": [],
+  "network": {},
+  "declared-scripts": [],
+  "ignored": []
+}

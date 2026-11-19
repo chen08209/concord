@@ -218,11 +218,22 @@ value after `=` ends only at a quote followed by a space or the end of the line,
 JSON's own quotes, and a field that starts with a quote not closed that way is taken as written, so a body rewrite's
 `"key":\{.+\}` matches the key with its quotes.
 
-A host reads a module (a Surge `.sgmodule` for now) with `mitm.module.read`, which answers with each line by its line
-number: what goes into the MITM lists, the rules and rule sets with their policies for the host to map, the DNS,
-hosts and route changes in mihomo's keys, the remote files it reads, and every line Concord does not take with the
+A host reads a module (a Surge `.sgmodule` or a Loon plugin) with `mitm.readModule`, which answers with each line by
+its line number: what goes into the MITM lists, the rules and rule sets with their policies for the host to map, the
+DNS, hosts and route changes in mihomo's keys, the remote files it reads, and every line Concord does not take with the
 reason. A module's `force-http-engine-hosts` comes back as a list of its own, `force-http-hostname`, for the host to
-decide on.
+decide on. A `map-local` line's `data-type=json`, which Loon writes and Surge's manual does not list, reads as text
+sent as `application/json`.
+A Loon plugin's `[Rewrite]` and `[Script]` lines read in both of Loon's syntaxes. In the `if … then` form the
+`[Argument]` values come in with their types: a test on arguments alone is decided as the module is read, a line
+whose test fails is left out as `disabled`, and a header test's `^` and `$` stand for the start and end of that
+header's value. A value known only per request, such as a header written into an action's text or a capture outside
+a URL rewrite, leaves its line out as `runtimeValue`; a condition the MITM lists cannot hold, such as `||` across
+the URL and the method, as `condition`. A batch of JSON edits becomes one jq filter and a batch of body replacements
+one rewrite; a batch of header edits is one rewrite per header. `reject_video` answers with an empty `video/mp4`
+body, `response.json.jq_file` names a jq file fetched as a script is, and a mock whose file is base64 is decoded when
+the rules are built. In Loon's old syntax a script's URL regex ignores case, as Loon's does, and
+`argument=[{a},{b}]` hands the script its arguments as a JSON object.
 
 Shadowsocks supports `gost-plugin` in WebSocket mode, including TLS and its default per-connection smux v1 stream.
 Gost relay supports TCP, destination-bound UDP, forward mode, TLS and per-connection smux v1.

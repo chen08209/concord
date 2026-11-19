@@ -1,0 +1,215 @@
+{
+  "format": "loon",
+  "meta": {
+    "name": "MyBlockAds",
+    "desc": "Walalala 自用去广告大合集。",
+    "author": "RuCu6[https://github.com/RuCu6]",
+    "icon": "https://rucu6.pages.dev/Icons/app/walalala.png",
+    "homepage": null,
+    "category": null,
+    "system": null,
+    "requirement": null,
+    "argumentsDesc": null
+  },
+  "off": null,
+  "arguments": [],
+  "hostname": [
+    {
+      "line": 518,
+      "items": "ad.12306.cn, mobile.12306.cn, list-app-m.i4.cn, *api.alipan.com, member.alipan.com, acs.m.taobao.com, gw.alicdn.com, heic.alicdn.com, guide-acs.m.taobao.com, poplayer.template.alibaba.com, pan.baidu.com, 2023.redircdn.com, www.washpayer.com, oneapph5.dongfeng-nissan.com.cn, api.douban.com, img3.doubanio.com, qnmob3.doubanio.com, image.mybank.icbc.com.cn, hfapp-service.qweather.net, acs-m.freshippo.com, gab.122.gov.cn, api.coolapk.com, adserviceretry.kglink.cn, gateway.kugou.com, p0.pipi.cn, mme.api.moji.com, sns.api.moji.com, flowplus.meituan.net, img.meituan.net, s3plus.meituan.net, home.mi.com, gql.reddit.com, gql-fed.reddit.com, a.cpiccdn.com, osg-service.sgcc.com.cn, api.xiachufang.com, mp.weixin.qq.com, weixin110.qq.com, security.wechat.com, marketing-aibox.v.mitvos.com, api.m.mi.com, shop-api.retail.mi.com, xiaomishop.retail.mi.com, gateway.sccncdn.com, gateway.starcharge.com, api-gateway-pan.xunlei.com, api-shoulei-ssl.xunlei.com, conf-m-ssl.xunlei.com, login-service.mobile-bank.psbc.com, wallet.95516.com, mobilepaas.abchina.com.cn, ad.mcloud.139.com, jzts.cmpassport.com"
+    }
+  ],
+  "force-http-hostname": [],
+  "skip-server-cert-verify": null,
+  "client-source-address": [],
+  "h2": null,
+  "url-rewrite": {
+    "359": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/api\\\\.alipan\\\\.com\\\\/adrive\\\\/v1\\\\/file\\\\/getTopFolders)\", head: None, replacement: \"\", action: RejectDict }",
+    "360": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/member\\\\.alipan\\\\.com\\\\/v2\\\\/activity\\\\/sign_in_luckyBottle)\", head: None, replacement: \"\", action: RejectDict }",
+    "363": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/acs\\\\.m\\\\.taobao\\\\.com\\\\/gw\\\\/mtop\\\\.fliggy\\\\.crm\\\\.screen\\\\.(?:allresource|predict))\", head: None, replacement: \"\", action: RejectDict }",
+    "364": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/acs\\\\.m\\\\.taobao\\\\.com\\\\/gw\\\\/mtop\\\\.alibaba\\\\.advertisementservice\\\\.getadv)\", head: None, replacement: \"\", action: RejectDict }",
+    "365": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/acs\\\\.m\\\\.taobao\\\\.com\\\\/gw\\\\/mtop\\\\.alimama\\\\.etao\\\\.config\\\\.query\\\\/.+?etao_advertise)\", head: None, replacement: \"\", action: RejectDict }",
+    "366": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/acs\\\\.m\\\\.taobao\\\\.com\\\\/gw\\\\/mtop\\\\.alimusic\\\\.common\\\\.mobileservice\\\\.startinit)\", head: None, replacement: \"\", action: RejectDict }",
+    "367": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/acs\\\\.m\\\\.taobao\\\\.com\\\\/gw\\\\/mtop\\\\.etao\\\\.noah\\\\.query\\\\/.+tao_splash)\", head: None, replacement: \"\", action: RejectDict }",
+    "368": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/acs\\\\.m\\\\.taobao\\\\.com\\\\/gw\\\\/mtop\\\\.film\\\\.mtopadvertiseapi\\\\.queryadvertise)\", head: None, replacement: \"\", action: RejectDict }",
+    "369": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/acs\\\\.m\\\\.taobao\\\\.com\\\\/gw\\\\/mtop\\\\.o2o\\\\.ad\\\\.gateway\\\\.get)\", head: None, replacement: \"\", action: RejectDict }",
+    "370": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/acs\\\\.m\\\\.taobao\\\\.com\\\\/gw\\\\/mtop\\\\.trip\\\\.activity\\\\.querytmsresources)\", head: None, replacement: \"\", action: RejectDict }",
+    "371": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/guide-acs\\\\.m\\\\.taobao\\\\.com\\\\/gw\\\\/mtop\\\\.cainiao\\\\.adx\\\\.flyad\\\\.getad)\", head: None, replacement: \"\", action: RejectDict }",
+    "372": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/guide-acs\\\\.m\\\\.taobao\\\\.com\\\\/gw\\\\/mtop\\\\.relationrecommend\\\\.pailitaorecommend\\\\.recommend)\", head: None, replacement: \"\", action: RejectDict }",
+    "373": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/guide-acs\\\\.m\\\\.taobao\\\\.com\\\\/gw\\\\/mtop\\\\.taobao\\\\.(?:volvo\\\\.secondfloor\\\\.getconfig|shot\\\\.resources\\\\.load|wireless\\\\.home\\\\.(newface|splash)\\\\.awesome\\\\.get))\", head: None, replacement: \"\", action: RejectDict }",
+    "374": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/(?:gw|heic)\\\\.alicdn\\\\.com\\\\/imgextra\\\\/i\\\\d\\\\/\\\\d*\\\\/?[\\\\w!]+-\\\\d-(?:octopus|tps)-(?:1080|1125)-\\\\d{4}\\\\.(?:jpg|png)_(?:1\\\\d{3}|9\\\\d{2})x(?:\\\\d|1\\\\d{3}|9\\\\d{2})q[59]0)\", head: None, replacement: \"\", action: RejectDict }",
+    "377": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/pan\\\\.baidu\\\\.com\\\\/(?:act\\\\/|aipic\\\\/|aisearch\\\\/|api\\\\/getsyscfg\\\\?|buy\\\\/adx?\\\\/|rest\\\\/))\", head: None, replacement: \"\", action: RejectDict }",
+    "381": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/www\\\\.washpayer\\\\.com\\\\/(?:ad\\\\/getBannerAd|ad\\\\/user-adword|user\\\\/getBannerList))\", head: None, replacement: \"\", action: RejectDict }",
+    "385": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/oneapph5\\\\.dongfeng-nissan\\\\.com\\\\.cn\\\\/mb-gw\\\\/(?:dndc-gateway\\\\/nissan\\\\/platform\\\\/api\\\\/advertisement\\\\/app\\\\/ad-content|ly-mp-iov-forwarding-service\\\\/iov\\\\/login\\\\/advertapp\\\\/listByCarSeries))\", head: None, replacement: \"\", action: RejectDict }",
+    "388": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/api\\\\.douban\\\\.com\\\\/v2\\\\/app_ads\\\\/splash\\\\w+)\", head: None, replacement: \"\", action: RejectDict }",
+    "389": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/(?:img|qnmob)3\\\\.doubanio\\\\.com\\\\/view\\\\/dale-online\\\\/dale_ad\\\\/public\\\\/\\\\w+)\", head: None, replacement: \"\", action: RejectDict }",
+    "394": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/hfapp-service\\\\.qweather\\\\.net\\\\/v2\\\\.0\\\\/app\\\\/ad\\\\/list\\\\?)\", head: None, replacement: \"\", action: RejectDict }",
+    "397": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/acs-m\\\\.freshippo\\\\.com\\\\/gw\\\\/mtop\\\\.wdk\\\\.render\\\\.querysinglepage\\\\/)\", head: None, replacement: \"\", action: RejectDict }",
+    "403": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/gab\\\\.122\\\\.gov\\\\.cn\\\\/eapp\\\\/m\\\\/sysquery\\\\/adver)\", head: None, replacement: \"\", action: RejectDict }",
+    "406": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/api\\\\.coolapk\\\\.com\\\\/v6\\\\/search\\\\?.*type=hotSearch)\", head: None, replacement: \"\", action: RejectDict }",
+    "409": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/p0\\\\.pipi\\\\.cn\\\\/(?:adAdmin|mediaplus\\\\/maoyantong_ads_fe)\\\\/\\\\w+\\\\.jpe?g\\\\?imageMogr2\\\\/quality\\\\/)\", head: None, replacement: \"\", action: RejectDict }",
+    "410": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/p0\\\\.pipi\\\\.cn\\\\/(?:adAdmin|mediaplus\\\\/maoyantong_ads_fe)\\\\/\\\\w+\\\\.(?:jpe?g|png)\\\\?imageMogr2\\\\/thumbnail\\\\/(?:860x0|880x0|!165x165|!1049x1169))\", head: None, replacement: \"\", action: RejectDict }",
+    "414": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/sns\\\\.api\\\\.moji\\\\.com\\\\/(?:forum|user\\\\/dynamic_v[89]\\\\/json)\\\\/)\", head: None, replacement: \"\", action: RejectDict }",
+    "417": "UrlRewriteDef { pattern: \"(?i:^http:\\\\/\\\\/app-cdn\\\\.2q10\\\\.com\\\\/app\\\\/ical\\\\/honored\\\\?)\", head: None, replacement: \"\", action: RejectDict }",
+    "420": "UrlRewriteDef { pattern: \"(?i:^http:\\\\/\\\\/wmapi\\\\.meituan\\\\.com\\\\/api\\\\/v7\\\\/(?:loadInfo|openscreen|startpicture))\", head: None, replacement: \"\", action: RejectDict }",
+    "421": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/flowplus\\\\.meituan\\\\.net\\\\/v1\\\\/mss_\\\\w+\\\\/linglong\\\\/\\\\d+\\\\.jpg)\", head: None, replacement: \"\", action: RejectDict }",
+    "422": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/img\\\\.meituan\\\\.net\\\\/bizad\\\\/bizad_brandCpt_\\\\d+\\\\.jpg)\", head: None, replacement: \"\", action: RejectDict }",
+    "423": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/s3plus\\\\.meituan\\\\.net\\\\/ocean-blk-index\\\\/index\\\\/blk_conf_\\\\d+\\\\.json)\", head: None, replacement: \"\", action: RejectDict }",
+    "424": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/s3plus\\\\.meituan\\\\.net\\\\/v1\\\\/mss_\\\\w+\\\\/(?:brandcpt-vedio|waimai-alita)\\\\/\\\\w+\\\\.zip$)\", head: None, replacement: \"\", action: RejectDict }",
+    "425": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/s3plus\\\\.meituan\\\\.net\\\\/v1\\\\/mss_\\\\w+\\\\/nebulafile\\\\/\\\\w+)\", head: None, replacement: \"\", action: RejectDict }",
+    "428": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/home\\\\.mi\\\\.com\\\\/cgi-op\\\\/api\\\\/v1\\\\/recommendation\\\\/(?:banner|carousel\\\\/banners|myTab|openingBanner))\", head: None, replacement: \"\", action: RejectDict }",
+    "434": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/a\\\\.cpiccdn\\\\.com\\\\/config-center\\\\/api\\\\/configfile\\\\/images\\\\/\\\\d{8}\\\\/\\\\d{13}_(?:(?:630|945|1035)_\\\\d{2,4}|123_48|136_136|207_210|408_408|750_750|1125_\\\\d{4})\\\\.(gif|jpg|png)$)\", head: None, replacement: \"\", action: RejectDict }",
+    "437": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/osg-service\\\\.sgcc\\\\.com\\\\.cn:18600\\\\/emss-pfa-appset-front\\\\/bootpageoutter\\\\/)\", head: None, replacement: \"\", action: RejectDict }",
+    "440": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/api\\\\.xiachufang\\\\.com\\\\/v2\\\\/ad\\\\/)\", head: None, replacement: \"\", action: RejectDict }",
+    "444": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/mp\\\\.weixin\\\\.qq\\\\.com\\\\/mp\\\\/(?:cps_product_info|getappmsgad|getbizbanner|jsmonitor|masonryfeed|relatedarticle|relatedsearchword))\", head: None, replacement: \"\", action: RejectDict }",
+    "447": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/marketing-aibox\\\\.v\\\\.mitvos\\\\.com\\\\/(?:advertise|payGuide\\\\/halfScreenMulti)\\\\/)\", head: None, replacement: \"\", action: RejectDict }",
+    "451": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/api\\\\.m\\\\.mi\\\\.com\\\\/(?:v1\\\\/(?:app\\\\/popup_info|home\\\\/page_feed|home\\\\/recommendBlank|misearch\\\\/search_input|product\\\\/recommendv2)|v2\\\\/search\\\\/search_default))\", head: None, replacement: \"\", action: RejectDict }",
+    "455": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/shop-api\\\\.retail\\\\.mi\\\\.com\\\\/mtop\\\\/mf\\\\/(?:cart|home|personal)\\\\/recommend)\", head: None, replacement: \"\", action: RejectDict }",
+    "456": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/shop-api\\\\.retail\\\\.mi\\\\.com\\\\/mtop\\\\/(?:act\\\\/mishopSearch\\\\/searchInput|mf\\\\/home\\\\/v1\\\\/feed))\", head: None, replacement: \"\", action: RejectDict }",
+    "457": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/shop-api\\\\.retail\\\\.mi\\\\.com\\\\/mtop\\\\/navi\\\\/(?:rec\\\\/merge\\\\/|skywheel\\\\/(?:homePage\\\\/bottomFloatLayer|mishop\\\\/splash|shop\\\\/resourceAms|ucenter\\\\/pendant|ucenter\\\\/popup)))\", head: None, replacement: \"\", action: RejectDict }",
+    "458": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/xiaomishop\\\\.retail\\\\.mi\\\\.com\\\\/mtop\\\\/xiaomishop\\\\/product\\\\/compose)\", head: None, replacement: \"\", action: RejectDict }",
+    "462": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/gateway\\\\.sccncdn\\\\.com\\\\/app\\\\/v2\\\\/apiV2\\\\/advertisement\\\\/marke\\\\/list\\\\/)\", head: None, replacement: \"\", action: RejectDict }",
+    "463": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/gateway\\\\.starcharge\\\\.com\\\\/app\\\\/(?:api\\\\/advertisement|v2\\\\/apiV2\\\\/advertisement\\\\/marke)\\\\/list)\", head: None, replacement: \"\", action: RejectDict }",
+    "466": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/api-shoulei-ssl\\\\.xunlei\\\\.com\\\\/flowhub\\\\/v1\\\\/slots:batchGet)\", head: None, replacement: \"\", action: RejectDict }",
+    "470": "UrlRewriteDef { pattern: \"(?i:^https:\\\\/\\\\/login-service\\\\.mobile-bank\\\\.psbc\\\\.com\\\\/sn10\\\\/api\\\\/public\\\\/v1\\\\/(?:getStartUpAdvPicture|qryPopInfo)\\\\/)\", head: None, replacement: \"\", action: RejectDict }"
+  },
+  "header-rewrite": {},
+  "body-rewrite": {
+    "380": "BodyRewriteDef { response: true, pattern: \"(?i:^http:\\\\/\\\\/ad\\\\.5tao5ai\\\\.com\\\\/common\\\\/getReceipt\\\\?)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"del(.payload.adInfo)\") }",
+    "382": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/www\\\\.washpayer\\\\.com\\\\/common\\\\/getReceipt)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"del(.payload.adInfo)\") }",
+    "413": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/mme\\\\.api\\\\.moji\\\\.com\\\\/json\\\\/entrance\\\\/list$)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"del(.entrance_region_res_list[] | select(.region_name == \\\"皇冠区域\\\" or .region_name == \\\"banner区\\\")) | .entrance_region_res_list[].entrance_res_list |= if . then map(select(.entrance_name | . != \\\"墨迹钱包\\\" and . != \\\"墨圈\\\")) else . end\") }",
+    "431": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/gql(-fed)?\\\\.reddit\\\\.com)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"jq-path=https://rucu6.pages.dev/JQLang/reddit.jq\") }",
+    "441": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/api\\\\.xiachufang\\\\.com\\\\/v2\\\\/homepage\\\\/paged_waterfall_recommendations\\\\.json)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".multiplex_cells |= map(select(.recommendation_cell.label != \\\"广告\\\"))\") }",
+    "450": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/api\\\\.m\\\\.mi\\\\.com\\\\/v1\\\\/order\\\\/expressView)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"del(.data.bottom.ad_info)\") }",
+    "452": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/shop-api\\\\.retail\\\\.mi\\\\.com\\\\/mtop\\\\/act\\\\/mishopSearch\\\\/mainSearch)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"if .data.recProductList != null then .data.recProductList = \\\"[]\\\" else . end\") }",
+    "453": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/shop-api\\\\.retail\\\\.mi\\\\.com\\\\/mtop\\\\/mf\\\\/home\\\\/v1\\\\/index)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"del(.data.floors[0].data.left_icon_config, .data.floors[0].data.right_icon_config)\") }",
+    "454": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/shop-api\\\\.retail\\\\.mi\\\\.com\\\\/mtop\\\\/mf\\\\/usercenter\\\\/personalHome)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"del(.data.carouselAD)\") }",
+    "459": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/xiaomishop\\\\.retail\\\\.mi\\\\.com\\\\/mtop\\\\/xiaomishop\\\\/product\\\\/info)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"del(.data.carouselAdInfo, .data.product.floatWindow)\") }",
+    "467": "BodyRewriteDef { response: true, pattern: \"(?i:^https:\\\\/\\\\/conf-m-ssl\\\\.xunlei\\\\.com\\\\/external\\\\/[0-9-a-z]+\\\\?)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"del(.values.me_config.common_service_list)\") }"
+  },
+  "map-local": {
+    "356": "MapLocalDef { pattern: \"(?i:^https:\\\\/\\\\/list-app-m\\\\.i4\\\\.cn\\\\/(?:adclickcb|getHotSearchList|getopfstadinfo)\\\\.xhtml)\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"\", status: 404, header: {\"content-type\": \"text/plain; charset=utf-8\"}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "400": "MapLocalDef { pattern: \"(?i:^http:\\\\/\\\\/image1\\\\.ccb\\\\.com\\\\/newsinfo\\\\/eBranch\\\\/check\\\\/(?:nf\\\\/newfin\\\\/activity|po\\\\/poortheme\\\\/activity)\\\\/\\\\w+\\\\.png)\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"\", status: 404, header: {\"content-type\": \"text/plain; charset=utf-8\"}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "473": "MapLocalDef { pattern: \"(?i:^https:\\\\/\\\\/wallet\\\\.95516\\\\.com(:10533)?\\\\/s\\\\/wl\\\\/icon\\\\/large\\\\/1)\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"\", status: 404, header: {\"content-type\": \"text/plain; charset=utf-8\"}, content_type: \"text/plain; charset=utf-8\", request: false }"
+  },
+  "request-body-mock": {},
+  "script": {
+    "477": "ScriptDef { name: \"12306_splash\", path: \"https://rucu6.pages.dev/Scripts/12306.js\", kind: HttpRequest, pattern: Some(\"(?i:^https:\\\\/\\\\/ad\\\\.12306\\\\.cn\\\\/ad\\\\/ser\\\\/getAdList$)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(20.0), argument: None }",
+    "478": "ScriptDef { name: \"12306_ads\", path: \"https://rucu6.pages.dev/Scripts/header.js\", kind: HttpRequest, pattern: Some(\"(?i:^https:\\\\/\\\\/mobile\\\\.12306\\\\.cn\\\\/otsmobile\\\\/app\\\\/mgs\\\\/mgw\\\\.htm$)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: false, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(20.0), argument: None }",
+    "481": "ScriptDef { name: \"aliyun_mine\", path: \"https://rucu6.pages.dev/Scripts/adrive.js\", kind: HttpResponse, pattern: Some(\"(?i:^https:\\\\/\\\\/(biz)?api\\\\.alipan\\\\.com\\\\/apps\\\\/v\\\\d\\\\/users?\\\\/home\\\\/(?:news|widgets))\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(20.0), argument: None }",
+    "482": "ScriptDef { name: \"aliyun_board\", path: \"https://rucu6.pages.dev/Scripts/adrive.js\", kind: HttpResponse, pattern: Some(\"(?i:^https:\\\\/\\\\/member\\\\.alipan\\\\.com\\\\/v1\\\\/users\\\\/onboard_list)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(20.0), argument: None }",
+    "485": "ScriptDef { name: \"taobao_1\", path: \"https://rucu6.pages.dev/Scripts/myblockads.js\", kind: HttpResponse, pattern: Some(\"(?i:^https:\\\\/\\\\/guide-acs\\\\.m\\\\.taobao\\\\.com\\\\/gw\\\\/mtop\\\\.taobao\\\\.(?:cloudvideo\\\\.video\\\\.query|wireless\\\\.home\\\\.splash\\\\.awesome\\\\.get))\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(20.0), argument: None }",
+    "486": "ScriptDef { name: \"taobao_2\", path: \"https://rucu6.pages.dev/Scripts/myblockads.js\", kind: HttpResponse, pattern: Some(\"(?i:^https:\\\\/\\\\/poplayer\\\\.template\\\\.alibaba\\\\.com\\\\/\\\\w+\\\\.json)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(20.0), argument: None }",
+    "489": "ScriptDef { name: \"caoliu\", path: \"https://rucu6.pages.dev/Scripts/myblockads.js\", kind: HttpResponse, pattern: Some(\"(?i:^https:\\\\/\\\\/2023\\\\.redircdn\\\\.com\\\\/web\\\\/mob_post\\\\.js\\\\?)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(20.0), argument: None }",
+    "492": "ScriptDef { name: \"changyuan\", path: \"https://rucu6.pages.dev/Scripts/changyuan.js\", kind: HttpResponse, pattern: Some(\"(?i:^https:\\\\/\\\\/www\\\\.washpayer\\\\.com\\\\/user\\\\/message\\\\/equipmentPara\\\\?)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(20.0), argument: None }",
+    "495": "ScriptDef { name: \"coolapk\", path: \"https://rucu6.pages.dev/Scripts/coolapk.js\", kind: HttpResponse, pattern: Some(\"(?i:^https:\\\\/\\\\/api\\\\.coolapk\\\\.com\\\\/v6\\\\/(?:feed\\\\/detail|feed\\\\/replyList|page\\\\/dataList|main\\\\/dataList|main\\\\/indexV8|main\\\\/init))\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(20.0), argument: None }",
+    "498": "ScriptDef { name: \"kg_gateway\", path: \"https://rucu6.pages.dev/Scripts/kugou.js\", kind: HttpResponse, pattern: Some(\"(?i:^https:\\\\/\\\\/gateway\\\\.kugou\\\\.com\\\\/(?:adp\\\\/ad\\\\/v1\\\\/mine_top_banner|ads\\\\.gateway\\\\/v2\\\\/home_card))\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(20.0), argument: None }",
+    "499": "ScriptDef { name: \"kg_linkcn\", path: \"https://rucu6.pages.dev/Scripts/kugou.js\", kind: HttpResponse, pattern: Some(\"(?i:^https?:\\\\/\\\\/adserviceretry\\\\.kglink\\\\.cn\\\\/v\\\\d\\\\/mobile\\\\w+)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(20.0), argument: None }",
+    "502": "ScriptDef { name: \"wechat\", path: \"https://rucu6.pages.dev/Scripts/wechat.js\", kind: HttpResponse, pattern: Some(\"(?i:^https\\\\:\\\\/\\\\/(?:weixin110\\\\.qq|security\\\\.wechat)\\\\.com\\\\/cgi-bin\\\\/mmspamsupport-bin\\\\/newredirectconfirmcgi\\\\?)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(20.0), argument: None }",
+    "505": "ScriptDef { name: \"mi_mall\", path: \"https://rucu6.pages.dev/Scripts/myblockads.js\", kind: HttpResponse, pattern: Some(\"(?i:^https:\\\\/\\\\/api\\\\.m\\\\.mi\\\\.com\\\\/v1\\\\/app\\\\/start)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(20.0), argument: None }",
+    "508": "ScriptDef { name: \"thunder\", path: \"https://rucu6.pages.dev/Scripts/myblockads.js\", kind: HttpResponse, pattern: Some(\"(?i:^https:\\\\/\\\\/api-gateway-pan\\\\.xunlei\\\\.com\\\\/content\\\\/v1\\\\/aggregate\\\\/info\\\\?)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(20.0), argument: None }",
+    "511": "ScriptDef { name: \"abchina\", path: \"https://rucu6.pages.dev/Scripts/header.js\", kind: HttpRequest, pattern: Some(\"(?i:^https:\\\\/\\\\/mobilepaas\\\\.abchina\\\\.com\\\\.cn:441\\\\/mgw\\\\.htm$)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: false, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(20.0), argument: None }",
+    "514": "ScriptDef { name: \"cloud139_1\", path: \"https://rucu6.pages.dev/Scripts/cloud139.js\", kind: HttpResponse, pattern: Some(\"(?i:^https:\\\\/\\\\/ad\\\\.mcloud\\\\.139\\\\.com\\\\/advertapi\\\\/adv-filter\\\\/)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(20.0), argument: None }",
+    "515": "ScriptDef { name: \"cloud139_2\", path: \"https://rucu6.pages.dev/Scripts/cloud139.js\", kind: HttpResponse, pattern: Some(\"(?i:^https:\\\\/\\\\/jzts\\\\.cmpassport\\\\.com\\\\/personalized\\\\/getPushContent)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(20.0), argument: None }"
+  },
+  "rules": {
+    "count": 232,
+    "sha256": "5104dc4573e97828db17515f1eb98c59d0c0d39d29c8870d580185183598161b",
+    "errors": {}
+  },
+  "rule-sets": [],
+  "resources": [
+    {
+      "url": "https://rucu6.pages.dev/Scripts/12306.js",
+      "kind": "script",
+      "lines": [
+        477
+      ]
+    },
+    {
+      "url": "https://rucu6.pages.dev/Scripts/header.js",
+      "kind": "script",
+      "lines": [
+        478,
+        511
+      ]
+    },
+    {
+      "url": "https://rucu6.pages.dev/Scripts/adrive.js",
+      "kind": "script",
+      "lines": [
+        481,
+        482
+      ]
+    },
+    {
+      "url": "https://rucu6.pages.dev/Scripts/myblockads.js",
+      "kind": "script",
+      "lines": [
+        485,
+        486,
+        489,
+        505,
+        508
+      ]
+    },
+    {
+      "url": "https://rucu6.pages.dev/Scripts/changyuan.js",
+      "kind": "script",
+      "lines": [
+        492
+      ]
+    },
+    {
+      "url": "https://rucu6.pages.dev/Scripts/coolapk.js",
+      "kind": "script",
+      "lines": [
+        495
+      ]
+    },
+    {
+      "url": "https://rucu6.pages.dev/Scripts/kugou.js",
+      "kind": "script",
+      "lines": [
+        498,
+        499
+      ]
+    },
+    {
+      "url": "https://rucu6.pages.dev/Scripts/wechat.js",
+      "kind": "script",
+      "lines": [
+        502
+      ]
+    },
+    {
+      "url": "https://rucu6.pages.dev/Scripts/cloud139.js",
+      "kind": "script",
+      "lines": [
+        514,
+        515
+      ]
+    }
+  ],
+  "network": {},
+  "declared-scripts": [
+    477,
+    478,
+    481,
+    482,
+    485,
+    486,
+    489,
+    492,
+    495,
+    498,
+    499,
+    502,
+    505,
+    508,
+    511,
+    514,
+    515
+  ],
+  "ignored": []
+}

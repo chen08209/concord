@@ -1,0 +1,123 @@
+{
+  "format": "loon",
+  "meta": {
+    "name": "WPS每日签到",
+    "desc": "WPS每日签到并兑换会员，需要进入此插件的主页链接，阅读使用说明操作。",
+    "author": "小白脸",
+    "icon": "https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/WPS.png",
+    "homepage": "https://github.com/luestr/ProxyResource/blob/main/Resource/Markdown/WPS/README.md",
+    "category": "签到",
+    "system": null,
+    "requirement": null,
+    "argumentsDesc": null
+  },
+  "off": null,
+  "arguments": [
+    {
+      "name": "CaptureCookie",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "false",
+      "label": "捕获Cookie",
+      "desc": "此开关控制插件是否捕获Cookie",
+      "line": 14
+    },
+    {
+      "name": "AK",
+      "kind": {
+        "type": "text"
+      },
+      "number": false,
+      "default": "",
+      "label": "百度API Key",
+      "desc": "这里需要输入有效的百度API Key",
+      "line": 15
+    },
+    {
+      "name": "SK",
+      "kind": {
+        "type": "text"
+      },
+      "number": false,
+      "default": "",
+      "label": "百度Secret Key",
+      "desc": "这里需要输入有效的百度Secret Key",
+      "line": 16
+    },
+    {
+      "name": "DAY",
+      "kind": {
+        "type": "text"
+      },
+      "number": false,
+      "default": "1",
+      "label": "兑换天数",
+      "desc": "每日签到时自动兑换的天数，可不做更改。",
+      "line": 17
+    },
+    {
+      "name": "MAX_RETRIES",
+      "kind": {
+        "type": "text"
+      },
+      "number": false,
+      "default": "5",
+      "label": "失败重试次数",
+      "desc": "仅允许填写阿拉伯数字",
+      "line": 18
+    },
+    {
+      "name": "CRONEXP",
+      "kind": {
+        "type": "text"
+      },
+      "number": false,
+      "default": "0 8 * * *",
+      "label": "定时参数",
+      "desc": "这里需要输入符合CRON表达式的参数",
+      "line": 19
+    }
+  ],
+  "hostname": [
+    {
+      "line": 27,
+      "items": "moapi.wps.cn"
+    }
+  ],
+  "force-http-hostname": [],
+  "skip-server-cert-verify": null,
+  "client-source-address": [],
+  "h2": null,
+  "url-rewrite": {},
+  "header-rewrite": {},
+  "body-rewrite": {},
+  "map-local": {},
+  "request-body-mock": {},
+  "script": {
+    "24": "ScriptDef { name: \"WPS每日签到\", path: \"https://raw.githubusercontent.com/fkingikelee/fkikelee/main/Resource/kelee/JavaScript/WPS/WPS_checkin.js\", kind: Cron, pattern: None, conditions: HeadConditionsDef { request: None, response: None }, requires_body: false, binary_body: false, max_size: 0, cronexp: \"0 8 * * *\", event: \"\", timeout: Some(120.0), argument: Some(Object {\"AK\": Null, \"SK\": Null, \"MAX_RETRIES\": String(\"5\")}) }"
+  },
+  "rules": {},
+  "rule-sets": [],
+  "resources": [
+    {
+      "url": "https://raw.githubusercontent.com/fkingikelee/fkikelee/main/Resource/kelee/JavaScript/WPS/WPS_checkin.js",
+      "kind": "script",
+      "lines": [
+        24
+      ]
+    }
+  ],
+  "network": {},
+  "declared-scripts": [
+    22,
+    24
+  ],
+  "ignored": [
+    {
+      "line": 22,
+      "reason": "disabled"
+    }
+  ]
+}

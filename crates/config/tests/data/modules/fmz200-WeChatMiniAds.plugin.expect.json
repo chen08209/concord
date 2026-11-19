@@ -1,0 +1,265 @@
+{
+  "format": "loon",
+  "meta": {
+    "name": "微信小程序去广告",
+    "desc": "收录常用小程序的去广告，作者署名在插件内。",
+    "author": "可莉🅥[https://gitlab.com/lodepuly/vpn_tool/-/blob/master/README.md]",
+    "icon": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/icons/apps/wechat.png",
+    "homepage": "https://gitlab.com/lodepuly/vpn_tool/-/blob/master/README.md",
+    "category": "去广告",
+    "system": null,
+    "requirement": null,
+    "argumentsDesc": null
+  },
+  "off": null,
+  "arguments": [],
+  "hostname": [
+    {
+      "line": 329,
+      "items": "3pp.starbucks.com.cn, aag.enmonster.com, activity.yonghuivip.com, ad.maoyan.com, ad.xiaotucc.com, ads.ishansong.com, alittle-tea.oss-cn-shanghai.aliyuncs.com, api-fouth-mem.huazhu.com, api-marketing.zhinengxiyifang.cn, api.hellobike.com, api.hengdianfilm.com, api.hongyibo.com.cn, api.kuaidihelp.com, api.maoyan.com, api.mcd.cn, api.pinduoduo.com, api.prod.dj.mstand.cn, api.songguo7.com, api.yonghuivip.com, apiproxy.zuche.com, apis.alenable.com, app.95504.net, app.homeinns.com, applets.jtexpress.com.cn, appuser-static.huolala.cn, as.xiaojukeji.com, capis*.didapinche.com, cappapi.alittle-tea.com, cbd-gateway-service-applets.hualala.com, ccmsupport-sz.tenpay.com, coco-com.e.verystar.net, creditcardapp.bankcomm.com, customer-app.sto.cn, daijia.kuaidadi.com, dock.tenchii.com, dsp.fcbox.com, file.dian.so, flow.dmall.com, fscdn.zto.com, gw-passenger-wap.01zhuanche.com, hdgateway.zto.com, htwkop.xiaojukeji.com, images.qmai.cn, lawsonapi.yorentown.com, m.ctrip.com, mapi.xiaotucc.com, mbmodule-openapi.paas.cmbchina.com, member.lxjchina.com.cn, miniapp.sexytea2013.com, minicap.caocaokeji.cn, minifm.maxxipoint.com, minipro.95504.net, miniprogram.ishansong.com, mkt-gateway.tuhu.cn, mobile-api.imlaidian.com, mxsa.mxbc.net, newton.gumingnc.com, passenger.t3go.cn, passengerapi.saicmobility.com, plt.yorentown.com, qapi.huolala.cn, r2.gzyct.com, res.hongyibo.com.cn, res.pizzahut.com.cn, s.jiediankeji.com, saas-ad.cloudpnr.com, sauron-report.yonghuivip.com, smarket.dian.so, sto-customer-app.oss-cn-shanghai.aliyuncs.com, supplier-api.imdada.cn, suyun-guest.daojia.com, tbgapplet.carlsberg.asia, tm-api.pin-dao.cn, ucmp.sf-express.com, ump.ems.com.cn, vod-movie.maoyan.com, webapi.qmai.cn, webchatapp.fcbox.com, wechat-api.i-xiaoma.com.cn, www.deppon.com, wx.bthhotels.com, wx.maoyan.com, wxapp.bestwehotel.com, wxproj.seeyouyima.com, wxs-weixin.sd.zhumanggroup.com, mcsp.cloudpnr.com"
+    }
+  ],
+  "force-http-hostname": [],
+  "skip-server-cert-verify": null,
+  "client-source-address": [],
+  "h2": null,
+  "url-rewrite": {
+    "31": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/webapi\\\\.qmai\\\\.cn\\\\/web\\\\/catering\\\\/advertising\\\\/\", head: None, replacement: \"\", action: RejectDict }",
+    "32": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/webapi\\\\.qmai\\\\.cn\\\\/web\\\\/cmk-center\\\\/marketing\\\\/canvas\\\\/advert-reach\", head: None, replacement: \"\", action: Reject }",
+    "34": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/images\\\\.qmai\\\\.cn\\\\/s214925\\\\/2023\", head: None, replacement: \"\", action: RejectDict }",
+    "37": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/creditcardapp\\\\.bankcomm\\\\.com\\\\/cnsvPmpaMdbcardWeb\\\\/page\\\\/getGuidePageAds\", head: None, replacement: \"\", action: Reject }",
+    "40": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/mbmodule-openapi\\\\.paas\\\\.cmbchina\\\\.com\\\\/graphic\\\\/v2\\\\/module\\\\/graphic\", head: None, replacement: \"\", action: Reject }",
+    "43": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/webchatapp\\\\.fcbox\\\\.com\\\\/fcboxactivityweb\\\\/api\\\\/v2\\\\/clientPage\\\\/modulesAggregated\\\\?\", head: None, replacement: \"\", action: RejectDict }",
+    "45": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/webchatapp\\\\.fcbox\\\\.com\\\\/fcboxactivityweb\\\\/api\\\\/v2\\\\/clientPage\\\\/getHomeLiveInfo$\", head: None, replacement: \"\", action: RejectDict }",
+    "47": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/dsp\\\\.fcbox\\\\.com\\\\/adSearch\\\\/\", head: None, replacement: \"\", action: RejectDict }",
+    "49": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/webchatapp\\\\.fcbox\\\\.com\\\\/post\\\\/suggestion\\\\/query$\", head: None, replacement: \"\", action: RejectDict }",
+    "51": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/webchatapp\\\\.fcbox\\\\.com\\\\/fcboxactivityweb\\\\/marketingEntrance\\\\/v2\\\\/infoWithItems$\", head: None, replacement: \"\", action: RejectDict }",
+    "53": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/webchatapp\\\\.fcbox\\\\.com\\\\/fcboxactivityweb\\\\/marketingEntrance\\\\/info$\", head: None, replacement: \"\", action: RejectDict }",
+    "57": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/app\\\\.95504\\\\.net\\\\/app\\\\/json\\\\/page_ad\\\\/initPageAd\\\\?ver=\", head: None, replacement: \"\", action: Reject }",
+    "59": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/minipro\\\\.95504\\\\.net\\\\/app\\\\/json\\\\/ad\\\\/getPopAdData\", head: None, replacement: \"\", action: Reject }",
+    "61": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/minipro\\\\.95504\\\\.net\\\\/app\\\\/json\\\\/ad\\\\/getIndexAdData\", head: None, replacement: \"\", action: Reject }",
+    "64": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/flow\\\\.dmall\\\\.com\\\\/app\\\\/home\\\\/pops\", head: None, replacement: \"\", action: Reject }",
+    "67": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/api\\\\.yonghuivip\\\\.com\\\\/api\\\\/fp\\\\/homepage\\\\/pop\", head: None, replacement: \"\", action: Reject }",
+    "68": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/activity\\\\.yonghuivip\\\\.com\\\\/api\\\\/app\\\\/fp\\\\/homepage\\\\/pop\", head: None, replacement: \"\", action: Reject }",
+    "69": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/activity\\\\.yonghuivip\\\\.com\\\\/api\\\\/\\\\/web\\\\/shensuan\\\\/ad\", head: None, replacement: \"\", action: Reject }",
+    "70": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/sauron-report\\\\.yonghuivip\\\\.com\\\\/collect\", head: None, replacement: \"\", action: Reject }",
+    "73": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/res\\\\.pizzahut\\\\.com\\\\.cn\\\\/CRM\", head: None, replacement: \"\", action: RejectDict }",
+    "82": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/api\\\\.mcd\\\\.cn\\\\/bff\\\\/portal\\\\/home\\\\/hotActivity\", head: None, replacement: \"\", action: RejectDict }",
+    "85": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/3pp\\\\.starbucks\\\\.com\\\\.cn\\\\/wxmem\\\\/popup\", head: None, replacement: \"\", action: RejectDict }",
+    "86": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/3pp\\\\.starbucks\\\\.com\\\\.cn\\\\/wxmem\\\\/index\\\\/banner\", head: None, replacement: \"\", action: RejectDict }",
+    "87": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/3pp\\\\.starbucks\\\\.com\\\\.cn\\\\/wxmem\\\\/index\\\\/global\", head: None, replacement: \"\", action: RejectDict }",
+    "90": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/wechat-api\\\\.i-xiaoma\\\\.com\\\\.cn\\\\/app\\\\/v1\\\\/bus\\\\/wechat\\\\/content\", head: None, replacement: \"\", action: RejectDict }",
+    "93": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/apiproxy\\\\.zuche\\\\.com\\\\/resource\\\\/carrctapi\\\\/home\\\\/marketing\", head: None, replacement: \"\", action: RejectDict }",
+    "94": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/apiproxy\\\\.zuche\\\\.com\\\\/resource\\\\/carrctapi\\\\/home\\\\/page\\\\/advertising\", head: None, replacement: \"\", action: RejectDict }",
+    "97": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/miniprogram\\\\.ishansong\\\\.com\\\\/cms\\\\/faq\\\\/query\", head: None, replacement: \"\", action: RejectDict }",
+    "98": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/ads\\\\.ishansong\\\\.com\\\\/advert\", head: None, replacement: \"\", action: RejectDict }",
+    "103": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/ump\\\\.ems\\\\.com\\\\.cn\\\\/mailAd$\", head: None, replacement: \"\", action: Reject }",
+    "106": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/minicap\\\\.caocaokeji\\\\.cn\\\\/advert-bss\\\\/pullAdvert\", head: None, replacement: \"\", action: RejectDict }",
+    "109": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/r2\\\\.gzyct\\\\.com\\\\/qrcode\\\\/advert\", head: None, replacement: \"\", action: RejectDict }",
+    "112": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/applets\\\\.jtexpress\\\\.com\\\\.cn\", head: None, replacement: \"\", action: RejectDict }",
+    "115": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/api\\\\.hellobike\\\\.com\\\\/api\\\\?adx\", head: None, replacement: \"\", action: RejectDict }",
+    "118": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/api\\\\.kuaidihelp\\\\.com\\\\/g_order_core\\\\/v2\\\\/mina\\\\/User\\\\/getBannerList\", head: None, replacement: \"\", action: RejectDict }",
+    "121": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/wxproj\\\\.seeyouyima\\\\.com\\\\/data\\\\/today_tips\", head: None, replacement: \"\", action: RejectDict }",
+    "124": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/suyun-guest\\\\.daojia\\\\.com\\\\/api\\\\/kuaigou\\\\/banjia\\\\/review\", head: None, replacement: \"\", action: RejectDict }",
+    "127": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/qapi\\\\.huolala\\\\.cn\\\\/ads\", head: None, replacement: \"\", action: RejectDict }",
+    "128": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/qapi\\\\.huolala\\\\.cn\\\\/home_new_user\", head: None, replacement: \"\", action: RejectDict }",
+    "129": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/qapi\\\\.huolala\\\\.cn\\\\/get_service_list\", head: None, replacement: \"\", action: RejectDict }",
+    "130": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/appuser-static\\\\.huolala\\\\.cn\\\\/imgs\", head: None, replacement: \"\", action: RejectDict }",
+    "133": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/apis\\\\.alenable\\\\.com\\\\/mall\\\\/v1\\\\/api\\\\/mall\\\\/skin\\\\/user\\\\/get\", head: None, replacement: \"\", action: RejectDict }",
+    "134": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/apis\\\\.alenable\\\\.com\\\\/ycx\\\\/v1\\\\/api\\\\/adPut\", head: None, replacement: \"\", action: RejectDict }",
+    "137": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/dock\\\\.tenchii\\\\.com\\\\/DockCard\\\\/api\\\\/mini\\\\/card\\\\/list\", head: None, replacement: \"\", action: RejectDict }",
+    "140": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/customer-app\\\\.sto\\\\.cn\\\\/api\\\\/app\\\\/banner\\\\/banner\", head: None, replacement: \"\", action: RejectDict }",
+    "141": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/sto-customer-app\\\\.oss-cn-shanghai\\\\.aliyuncs\\\\.com\\\\/images\", head: None, replacement: \"\", action: RejectDict }",
+    "144": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/supplier-api\\\\.imdada\\\\.cn\\\\/fe\\\\/public\\\\/ad\\\\/spot\\\\?forwardServiceName=growth-activity\", head: None, replacement: \"\", action: RejectDict }",
+    "147": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/hdgateway\\\\.zto\\\\.com\\\\/getApolloConfig\", head: None, replacement: \"\", action: Reject }",
+    "148": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/hdgateway\\\\.zto\\\\.com\\\\/track\", head: None, replacement: \"\", action: Reject }",
+    "149": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/hdgateway\\\\.zto\\\\.com\\\\/getAdInfo\", head: None, replacement: \"\", action: Reject }",
+    "150": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/hdgateway\\\\.zto\\\\.com\\\\/listJumperShow\", head: None, replacement: \"\", action: Reject }",
+    "151": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/fscdn\\\\.zto\\\\.com\\\\/fs1\", head: None, replacement: \"\", action: Reject }",
+    "154": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/mobile-api\\\\.imlaidian\\\\.com\\\\/api\\\\/args\", head: None, replacement: \"\", action: RejectDict }",
+    "157": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/wxs-weixin\\\\.sd\\\\.zhumanggroup\\\\.com\\\\/api\\\\/v2\\\\/ad\", head: None, replacement: \"\", action: RejectDict }",
+    "160": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/s\\\\.jiediankeji\\\\.com\\\\/adv\", head: None, replacement: \"\", action: RejectDict }",
+    "163": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/smarket\\\\.dian\\\\.so\", head: None, replacement: \"\", action: RejectDict }",
+    "164": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/file\\\\.dian\\\\.so\\\\/c\\\\/leto\", head: None, replacement: \"\", action: RejectDict }",
+    "167": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/aag\\\\.enmonster\\\\.com\\\\/apa\\\\/index\\\\/advert\\\\/skin\", head: None, replacement: \"\", action: Reject }",
+    "170": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/ad\\\\.xiaotucc\\\\.com\\\\/advert\", head: None, replacement: \"\", action: Reject }",
+    "173": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/api-marketing\\\\.zhinengxiyifang\\\\.cn\\\\/api\\\\/v2\\\\/cloudcode\\\\/wechat\\\\/bid\", head: None, replacement: \"\", action: Reject }",
+    "176": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/api\\\\.songguo7\\\\.com\\\\/(\\\\w{3})?mp\\\\/v2\\\\/misc\\\\/(toast|user_operate_info|unlock_without_order|unlock_operate_info)\", head: None, replacement: \"\", action: RejectDict }",
+    "183": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/ccmsupport-sz\\\\.tenpay\\\\.com\\\\/cgi-bin\\\\/common\\\\/ccm_page_element.cgi\", head: None, replacement: \"\", action: Reject }",
+    "186": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/tm-api\\\\.pin-dao\\\\.cn\\\\/home\\\\/api\\\\/index\\\\/activeConfig\\\\/v2\", head: None, replacement: \"\", action: RejectDict }",
+    "187": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/tm-api\\\\.pin-dao\\\\.cn\\\\/home\\\\/api\\\\/resource\\\\/config\\\\/homeBannerNodes\", head: None, replacement: \"\", action: RejectDict }",
+    "190": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/api-fouth-mem\\\\.huazhu\\\\.com\\\\/api\\\\/rights\\\\/bannerList\", head: None, replacement: \"\", action: RejectDict }",
+    "193": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/wxapp\\\\.bestwehotel\\\\.com\\\\/gw3\\\\/app-mini\\\\/trip-hotel-banner\\\\/activity\\\\/getActivityInfo\", head: None, replacement: \"\", action: RejectDict }",
+    "196": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/wx\\\\.bthhotels\\\\.com\\\\/miniapp\\\\/weixin\\\\/v1\\\\/home\\\\/index_banner\", head: None, replacement: \"\", action: RejectDict }",
+    "197": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/app\\\\.homeinns\\\\.com\\\\/api\\\\/v6\\\\/indexs\", head: None, replacement: \"\", action: RejectDict }",
+    "198": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/app\\\\.homeinns\\\\.com\\\\/api\\\\/v5\\\\/local\", head: None, replacement: \"\", action: RejectDict }",
+    "199": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/app\\\\.homeinns\\\\.com\\\\/api\\\\/v5\\\\/index\", head: None, replacement: \"\", action: RejectDict }",
+    "202": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/mxsa\\\\.mxbc\\\\.net\\\\/api\\\\/v1\\\\/adinfo\\\\/adplace\\\\/query\", head: None, replacement: \"\", action: RejectDict }",
+    "205": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/htwkop\\\\.xiaojukeji\\\\.com\\\\/gateway\\\\?api=cms\\\\.htw\\\\.delivery\", head: None, replacement: \"\", action: RejectDict }",
+    "206": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/htwkop\\\\.xiaojukeji\\\\.com\\\\/gateway\\\\?api=hm\\\\.fa\\\\.combineHomepageInfo\", head: None, replacement: \"\", action: RejectDict }",
+    "207": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/htwkop\\\\.xiaojukeji\\\\.com\\\\/gateway\\\\?api=hm\\\\.fa\\\\.mallRecommend\", head: None, replacement: \"\", action: RejectDict }",
+    "210": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/lawsonapi\\\\.yorentown\\\\.com\\\\/area\\\\/sh-lawson\\\\/app\\\\/v1\\\\/mina\\\\/systemSetting\", head: None, replacement: \"\", action: RejectDict }",
+    "211": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/plt\\\\.yorentown\\\\.com\\\\/pltapp\\\\/v1\\\\/banner\", head: None, replacement: \"\", action: RejectDict }",
+    "214": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/member\\\\.lxjchina\\\\.com\\\\.cn\\\\/mini-server\\\\/home\\\\/page\\\\/banner\", head: None, replacement: \"\", action: RejectDict }",
+    "217": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/cbd-gateway-service-applets\\\\.hualala\\\\.com\\\\/arch\\\\/api\\\\/banner\\\\/QueryBannerImgList\", head: None, replacement: \"\", action: RejectDict }",
+    "220": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/alittle-tea\\\\.oss-cn-shanghai\\\\.aliyuncs\\\\.com\\\\/images\\\\/platform\\\\/alittle\", head: None, replacement: \"\", action: RejectDict }",
+    "226": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/api\\\\.prod\\\\.dj\\\\.mstand\\\\.cn\\\\/scrm\\\\/app\\\\/mdm\\\\/index\\\\/listAdv\\\\?types\", head: None, replacement: \"\", action: RejectDict }",
+    "229": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/gw-passenger-wap\\\\.01zhuanche\\\\.com\\\\/gw-passenger-wap\\\\/zhuanche-passenger-token\\\\/commonSkipToken\\\\/common\\\\/getAdList\", head: None, replacement: \"\", action: RejectDict }",
+    "232": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/www\\\\.deppon\\\\.com\\\\/gwapi\\\\/memberService\\\\/eco\\\\/member\\\\/grade\\\\/commonInterface\", head: None, replacement: \"\", action: RejectDict }",
+    "235": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/passengerapi\\\\.saicmobility\\\\.com\\\\/(ad\\\\/requestAd|pay\\\\/v1\\\\/queryOpenedCouponPackages)\", head: None, replacement: \"\", action: RejectDict }",
+    "238": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/passenger\\\\.t3go\\\\.cn\\\\/passenger-activity-api\\\\/notoken\\\\/api\\\\/v1\\\\/resource\\\\/getSource\", head: None, replacement: \"\", action: RejectDict }",
+    "241": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/m\\\\.ctrip\\\\.com\\\\/restapi\\\\/soa2\\\\/13916\\\\/tripAds\", head: None, replacement: \"\", action: RejectDict }",
+    "242": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/m\\\\.ctrip\\\\.com\\\\/restapi\\\\/soa2\\\\/12673\\\\/queryWeChatHotEvent\", head: None, replacement: \"\", action: RejectDict }",
+    "246": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/ad\\\\.maoyan\\\\.com\\\\/api\\\\/position\\\\/detail\", head: None, replacement: \"\", action: RejectDict }",
+    "248": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/wx\\\\.maoyan\\\\.com\\\\/maoyansh\\\\/api\\\\/mobile\\\\/(hotMatchList|eSportsIps)\", head: None, replacement: \"\", action: RejectDict }",
+    "250": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/vod-movie\\\\.maoyan\\\\.com\\\\/vod\\\\/video\\\\/onlineMovies\\\\.json\", head: None, replacement: \"\", action: RejectDict }",
+    "252": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/wx\\\\.maoyan\\\\.com\\\\/maoyansh\\\\/myshow\\\\/ajax\\\\/movie\\\\/wonderShow\", head: None, replacement: \"\", action: RejectDict }",
+    "254": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/wx\\\\.maoyan\\\\.com\\\\/maoyansh\\\\/myshow\\\\/ajax\\\\/performances\\\\/calendar\\\\/0\", head: None, replacement: \"\", action: RejectDict }",
+    "256": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/wx\\\\.maoyan\\\\.com\\\\/maoyansh\\\\/myshow\\\\/ajax\\\\/performances\\\\/rob\\\\/main\", head: None, replacement: \"\", action: RejectDict }",
+    "258": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/wx\\\\.maoyan\\\\.com\\\\/maoyansh\\\\/myshow\\\\/ajax\\\\/celebrityBasicList\\\\/query\", head: None, replacement: \"\", action: RejectDict }",
+    "260": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/wx\\\\.maoyan\\\\.com\\\\/maoyansh\\\\/myshow\\\\/ajax\\\\/recommend\\\\/performances\", head: None, replacement: \"\", action: RejectDict }",
+    "262": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/api\\\\.maoyan\\\\.com\\\\/sns\\\\/common\\\\/feed\\\\/channel\\\\/v2\\\\/list\\\\.json\", head: None, replacement: \"\", action: RejectDict }",
+    "264": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/wx\\\\.maoyan\\\\.com\\\\/maoyansh\\\\/myshow\\\\/ajax\\\\/ad\\\\/detail\", head: None, replacement: \"\", action: RejectDict }",
+    "267": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/mkt-gateway\\\\.tuhu\\\\.cn\\\\/mkt-scene-marketing-service\\\\/api\\\\/scene\\\\/queryScheme\", head: None, replacement: \"\", action: RejectDict }",
+    "270": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/api\\\\.hengdianfilm\\\\.com\\\\/\\\\/cinema\\\\/queryAvailableBannerInfo\\\\/2\\\\?cid=\", head: None, replacement: \"\", action: RejectDict }",
+    "271": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/api\\\\.hengdianfilm\\\\.com\\\\/\\\\/cinema\\\\/queryAvailableBannerInfo\\\\/4\\\\?cid=\", head: None, replacement: \"\", action: RejectDict }",
+    "274": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/tbgapplet\\\\.carlsberg\\\\.asia\\\\/tuborg\\\\/banner\\\\/(loading|index)\", head: None, replacement: \"\", action: RejectDict }",
+    "277": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/api\\\\.pinduoduo\\\\.com\\\\/api\\\\/ktt_gateway\\\\/activity\\\\/feeds\\\\/personal_home_page\\\\/\", head: None, replacement: \"\", action: Reject }",
+    "280": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/ucmp\\\\.sf-express\\\\.com\\\\/proxy\\\\/operation-platform\\\\/info-flow-adver\\\\/query\", head: None, replacement: \"\", action: RejectDict }",
+    "281": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/ucmp\\\\.sf-express\\\\.com\\\\/proxy\\\\/esgcempcore\\\\/memberGoods\\\\/pointMallService\\\\/goodsList\", head: None, replacement: \"\", action: RejectDict }",
+    "284": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/as\\\\.xiaojukeji\\\\.com\\\\/ep\\\\/as\\\\/conf\\\\?ns=daijia-front&name=\", head: None, replacement: \"\", action: RejectDict }",
+    "285": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/daijia\\\\.kuaidadi\\\\.com\\\\/gateway\\\\?api=prado\\\\.cms\\\\.delivery\\\\.batch&apiVe\", head: None, replacement: \"\", action: RejectDict }"
+  },
+  "header-rewrite": {},
+  "body-rewrite": {
+    "288": "BodyRewriteDef { response: true, pattern: \"^https:\\\\/\\\\/mcsp\\\\.cloudpnr\\\\.com\\\\/api\\\\/miniapp\\\\/popular\\\\/T_MINIAPP$\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"del(.data)\") }",
+    "289": "BodyRewriteDef { response: true, pattern: \"^https:\\\\/\\\\/saas-ad\\\\.cloudpnr\\\\.com\\\\/huifuad-base-api\\\\/api\\\\/tactics\\\\/ad$\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"del(.data[0], .data[1], .data[2])\") }"
+  },
+  "map-local": {},
+  "request-body-mock": {},
+  "script": {
+    "293": "ScriptDef { name: \"企迈点单系统去广告\", path: \"https://raw.githubusercontent.com/Repcz/Tool/X/Loon/Script/lodepuly/WexinMiniPrograms/kff/kff.js\", kind: HttpResponse, pattern: Some(\"(?i)^https:\\\\/\\\\/webapi\\\\.qmai\\\\.cn\\\\/web\\\\/catering\\\\/design\\\\/homePage-Config\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "296": "ScriptDef { name: \"EMS中国邮政物流速递去广告\", path: \"https://raw.githubusercontent.com/Repcz/Tool/X/Loon/Script/lodepuly/WexinMiniPrograms/ems/ems.js\", kind: HttpResponse, pattern: Some(\"(?i)^https:\\\\/\\\\/ump\\\\.ems\\\\.com\\\\.cn\\\\/new-generation-extend\\\\/redis\\\\/pageInfoByChannel\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "299": "ScriptDef { name: \"小兔充充去广告\", path: \"https://raw.githubusercontent.com/Repcz/Tool/X/Loon/Script/lodepuly/WexinMiniPrograms/xiaotucc/xiaotucc.js\", kind: HttpResponse, pattern: Some(\"(?i)^https:\\\\/\\\\/mapi\\\\.xiaotucc\\\\.com\\\\/(mall\\\\/main|main_page\\\\/index\\\\/getActivity)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "302": "ScriptDef { name: \"全家微会员去广告\", path: \"https://raw.githubusercontent.com/Repcz/Tool/X/Loon/Script/lodepuly/WexinMiniPrograms/FamilyMart/FamilyMart.js\", kind: HttpResponse, pattern: Some(\"(?i)^https:\\\\/\\\\/minifm\\\\.maxxipoint\\\\.com\\\\/banner\\\\/list\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "305": "ScriptDef { name: \"罗森点点去广告\", path: \"https://raw.githubusercontent.com/Repcz/Tool/X/Loon/Script/lodepuly/WexinMiniPrograms/lawson/lawson.js\", kind: HttpResponse, pattern: Some(\"(?i)^https:\\\\/\\\\/lawsonapi\\\\.yorentown\\\\.com\\\\/area\\\\/sh-lawson\\\\/app\\\\/v1\\\\/home\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "308": "ScriptDef { name: \"茶颜悦色去广告\", path: \"https://raw.githubusercontent.com/Repcz/Tool/X/Loon/Script/lodepuly/WexinMiniPrograms/chayanyuese/chayanyuese_remove_ads.js\", kind: HttpResponse, pattern: Some(\"(?i)^https:\\\\/\\\\/miniapp\\\\.sexytea2013\\\\.com\\\\/cms\\\\/slot\\\\/queryByCodes\\\\?codes=INDEX_TOP_BANNER\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "311": "ScriptDef { name: \"COCO点单去广告\", path: \"https://raw.githubusercontent.com/Repcz/Tool/X/Loon/Script/lodepuly/WexinMiniPrograms/coco/coco.js\", kind: HttpResponse, pattern: Some(\"(?i)^https:\\\\/\\\\/coco-com\\\\.e\\\\.verystar\\\\.net\\\\/v1\\\\/home\\\\/info\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "314": "ScriptDef { name: \"滴滴青桔去广告\", path: \"https://raw.githubusercontent.com/Repcz/Tool/X/Loon/Script/lodepuly/WexinMiniPrograms/qingju/qingju.js\", kind: HttpResponse, pattern: Some(\"(?i)^https:\\\\/\\\\/htwkop\\\\.xiaojukeji\\\\.com\\\\/gateway\\\\?api=hm\\\\.fa\\\\.homeConfig\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "317": "ScriptDef { name: \"一点点+去广告\", path: \"https://raw.githubusercontent.com/Repcz/Tool/X/Loon/Script/lodepuly/WexinMiniPrograms/alittle-tea/alittle-tea.js\", kind: HttpResponse, pattern: Some(\"(?i)^https:\\\\/\\\\/cappapi\\\\.alittle-tea\\\\.com\\\\/open\\\\?method=catering\\\\.set\\\\.ad\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "320": "ScriptDef { name: \"M Stand去广告\", path: \"https://raw.githubusercontent.com/Repcz/Tool/X/Loon/Script/lodepuly/WexinMiniPrograms/M_Stand/M_Stand.js\", kind: HttpResponse, pattern: Some(\"(?i)^https:\\\\/\\\\/api\\\\.prod\\\\.dj\\\\.mstand\\\\.cn\\\\/scrm\\\\/mini\\\\/app\\\\/index\\\\/info\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "323": "ScriptDef { name: \"T3出行去广告\", path: \"https://raw.githubusercontent.com/Repcz/Tool/X/Loon/Script/lodepuly/WexinMiniPrograms/T3/T3.js\", kind: HttpResponse, pattern: Some(\"(?i)^https:\\\\/\\\\/passenger\\\\.t3go\\\\.cn\\\\/(solution\\\\-|common\\\\-)?(passenger\\\\-)?(activity\\\\-|app\\\\-)?api\\\\/notoken\\\\/(trip\\\\/)?api\\\\/(home\\\\/|common\\\\/)?(v[1-3]\\\\/)?(ad\\\\/getNegativescreen|solution\\\\/passenger\\\\/open\\\\/getHomeMenu|leftmenu|getHomeInfoGlobal)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "326": "ScriptDef { name: \"古茗去广告\", path: \"https://raw.githubusercontent.com/Repcz/Tool/X/Loon/Script/lodepuly/WexinMiniPrograms/ming/ming.js\", kind: HttpResponse, pattern: Some(\"(?i)^https:\\\\/\\\\/newton\\\\.gumingnc\\\\.com\\\\/newton-buyer\\\\/newton\\\\/buyer\\\\/(ump|touch|external\\\\/front)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }"
+  },
+  "rules": {
+    "16": "DOMAIN,wxsnsdy.wxs.qq.com => REJECT",
+    "17": "DOMAIN,wxsmsdy.video.qq.com => REJECT",
+    "18": "DOMAIN,wxsnsdythumb.wxs.qq.com => REJECT",
+    "21": "DOMAIN,ads-shopping.shouqianba.com => REJECT",
+    "24": "DOMAIN,ad.maoyan.com => REJECT",
+    "27": "DOMAIN,e.jparking.cn => REJECT"
+  },
+  "rule-sets": [],
+  "resources": [
+    {
+      "url": "https://raw.githubusercontent.com/Repcz/Tool/X/Loon/Script/lodepuly/WexinMiniPrograms/kff/kff.js",
+      "kind": "script",
+      "lines": [
+        293
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Repcz/Tool/X/Loon/Script/lodepuly/WexinMiniPrograms/ems/ems.js",
+      "kind": "script",
+      "lines": [
+        296
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Repcz/Tool/X/Loon/Script/lodepuly/WexinMiniPrograms/xiaotucc/xiaotucc.js",
+      "kind": "script",
+      "lines": [
+        299
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Repcz/Tool/X/Loon/Script/lodepuly/WexinMiniPrograms/FamilyMart/FamilyMart.js",
+      "kind": "script",
+      "lines": [
+        302
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Repcz/Tool/X/Loon/Script/lodepuly/WexinMiniPrograms/lawson/lawson.js",
+      "kind": "script",
+      "lines": [
+        305
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Repcz/Tool/X/Loon/Script/lodepuly/WexinMiniPrograms/chayanyuese/chayanyuese_remove_ads.js",
+      "kind": "script",
+      "lines": [
+        308
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Repcz/Tool/X/Loon/Script/lodepuly/WexinMiniPrograms/coco/coco.js",
+      "kind": "script",
+      "lines": [
+        311
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Repcz/Tool/X/Loon/Script/lodepuly/WexinMiniPrograms/qingju/qingju.js",
+      "kind": "script",
+      "lines": [
+        314
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Repcz/Tool/X/Loon/Script/lodepuly/WexinMiniPrograms/alittle-tea/alittle-tea.js",
+      "kind": "script",
+      "lines": [
+        317
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Repcz/Tool/X/Loon/Script/lodepuly/WexinMiniPrograms/M_Stand/M_Stand.js",
+      "kind": "script",
+      "lines": [
+        320
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Repcz/Tool/X/Loon/Script/lodepuly/WexinMiniPrograms/T3/T3.js",
+      "kind": "script",
+      "lines": [
+        323
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Repcz/Tool/X/Loon/Script/lodepuly/WexinMiniPrograms/ming/ming.js",
+      "kind": "script",
+      "lines": [
+        326
+      ]
+    }
+  ],
+  "network": {},
+  "declared-scripts": [
+    293,
+    296,
+    299,
+    302,
+    305,
+    308,
+    311,
+    314,
+    317,
+    320,
+    323,
+    326
+  ],
+  "ignored": []
+}
