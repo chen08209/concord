@@ -1,4 +1,5 @@
 use std::path::{Component, Path};
+use std::sync::Arc;
 
 use concord_config::mitm::text::{decode_base64, quote};
 use concord_config::mitm::{
@@ -28,6 +29,8 @@ pub struct UrlRewrite {
     head: Option<Pattern>,
     pub replacement: String,
     pub action: UrlAction,
+    /// The module whose line it is; none for the profile's own.
+    pub(crate) module: Option<Arc<str>>,
 }
 
 #[derive(Debug)]
@@ -47,6 +50,8 @@ pub struct HeaderRewrite {
     pattern: Pattern,
     conditions: HeadConditions,
     edit: HeaderEdit,
+    /// The module whose line it is; none for the profile's own.
+    pub(crate) module: Option<Arc<str>>,
 }
 
 #[derive(Debug)]
@@ -67,6 +72,8 @@ pub struct BodyRewrite {
     pattern: Pattern,
     conditions: HeadConditions,
     action: BodyAction,
+    /// The module whose line it is; none for the profile's own.
+    pub(crate) module: Option<Arc<str>>,
 }
 
 #[derive(Debug)]
@@ -76,17 +83,19 @@ pub struct MapLocal {
     pub status: StatusCode,
     pub header: HeaderMap,
     pub body: Vec<u8>,
+    /// The module whose line it is; none for the profile's own.
+    pub(crate) module: Option<Arc<str>>,
 }
 
 #[derive(Debug, Default)]
 pub struct Rules {
     pub(crate) url_rewrites: Vec<UrlRewrite>,
     pub(crate) header_rewrites: Vec<HeaderRewrite>,
-    pub(crate) body_rewrites: Vec<std::sync::Arc<BodyRewrite>>,
+    pub(crate) body_rewrites: Vec<Arc<BodyRewrite>>,
     pub(crate) map_locals: Vec<MapLocal>,
     /// Loon's `mock-request-body`: bodies a request goes upstream with instead of its own.
     pub(crate) request_mocks: Vec<MapLocal>,
-    pub(crate) scripts: Vec<std::sync::Arc<Script>>,
+    pub(crate) scripts: Vec<Arc<Script>>,
     indexes: index::Indexes,
 }
 
@@ -112,6 +121,7 @@ pub(crate) fn compile_url_rewrite(def: &UrlRewriteDef) -> Result<UrlRewrite, Lin
         head: def.head.as_deref().map(Pattern::new).transpose()?,
         replacement: def.replacement.clone(),
         action: def.action,
+        module: None,
     })
 }
 
@@ -132,6 +142,7 @@ pub(crate) fn compile_header_rewrite(def: &HeaderRewriteDef) -> Result<HeaderRew
         pattern: Pattern::new(&def.pattern)?,
         conditions: HeadConditions::compile(&def.conditions)?,
         edit,
+        module: None,
     })
 }
 
@@ -214,6 +225,7 @@ pub(crate) fn compile_body_rewrite(
         pattern: Pattern::new(&def.pattern)?,
         conditions: HeadConditions::compile(&def.conditions)?,
         action,
+        module: None,
     })
 }
 
@@ -318,6 +330,7 @@ pub(crate) fn compile_map_local(
         status: def.status,
         header,
         body,
+        module: None,
     };
     let data = match def.body {
         MapLocalBody::TinyGif => "",
@@ -425,7 +438,7 @@ impl Rules {
         url: &str,
         response: bool,
         heads: &Heads<'_>,
-    ) -> Vec<std::sync::Arc<BodyRewrite>> {
+    ) -> Vec<Arc<BodyRewrite>> {
         self.body_rewrite_candidates(url)
             .filter(|rule| rule.response == response && rule.pattern.is_match(url))
             .filter(|rule| heads.allow(&rule.conditions))

@@ -1,3 +1,5 @@
+use concord_config::rule::{Cond, RuleDef};
+
 use crate::eval::{Ev, EvResult, Node, has_domain_suffix};
 use crate::runs::{DomainRun, IpRun};
 use crate::table::RuleTable;
@@ -19,6 +21,12 @@ impl HostMatch {
     }
 }
 
+impl Op {
+    pub(crate) fn host(idx: u32, how: HostMatch, extended: bool) -> Op {
+        Op::Host { idx, how, extended }
+    }
+}
+
 pub(crate) enum Op {
     Leaf {
         idx: u32,
@@ -28,6 +36,7 @@ pub(crate) enum Op {
     Host {
         idx: u32,
         how: HostMatch,
+        extended: bool,
     },
     Domain(u32),
     Ip(u32),
@@ -69,18 +78,18 @@ impl Prog {
                         unknown |= ev.unknown;
                     }
                 }
-                Op::Host { idx, how } => {
+                Op::Host { idx, how, extended } => {
                     if self
                         .table
                         .payload(*idx)
-                        .is_some_and(|payload| how.matches(ev.host, payload))
+                        .is_some_and(|payload| host_holds(ev, *how, *extended, payload))
                     {
                         return Ok(true);
                     }
                 }
                 Op::Domain(run) => {
                     if let Some(run) = self.domain_runs.get(*run as usize)
-                        && run.next_from(ev.host, run.start, &self.table).is_some()
+                        && run.next_in(ev, run.start, &self.table).is_some()
                     {
                         return Ok(true);
                     }
@@ -103,4 +112,34 @@ impl Prog {
         ev.unknown = unknown;
         Ok(false)
     }
+}
+
+/// Whether a lone domain rule holds for the flow's name, or for any of its names when the
+/// rule asks for `extended-matching`.
+pub(crate) fn host_holds(ev: &Ev<'_>, how: HostMatch, extended: bool, payload: &str) -> bool {
+    how.matches(ev.host, payload)
+        || extended
+            && ev
+                .other_hosts()
+                .into_iter()
+                .flatten()
+                .any(|host| how.matches(host, payload))
+}
+
+/// How to match a lone domain rule from its payload alone. The payload shows the rule
+/// to the user, so it only stands in for the condition when the two agree.
+pub(crate) fn host_match(def: &RuleDef, payload: Option<&str>) -> Option<HostMatch> {
+    let (how, pattern) = match &def.cond {
+        Cond::Domain(pattern) => (HostMatch::Exact, pattern),
+        Cond::DomainSuffix(pattern) => (HostMatch::Suffix, pattern),
+        Cond::DomainKeyword(pattern) => (HostMatch::Keyword, pattern),
+        _ => return None,
+    };
+    let payload = payload?;
+    let same = if pattern.is_ascii() {
+        payload.eq_ignore_ascii_case(pattern)
+    } else {
+        payload == pattern.to_lowercase()
+    };
+    same.then_some(how)
 }

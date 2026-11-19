@@ -13,7 +13,7 @@ use crate::eval::{GeoIpSource, Node, PortKind, ProcessMode, inbound_bit};
 use crate::geo::{GeoError, GeoFile};
 use crate::kind::RuleKind;
 use crate::payload::rule_payload;
-use crate::prog::{HostMatch, Op, Prog};
+use crate::prog::{Op, Prog, host_match};
 use crate::program::{CompileEnv, CompileError, Demands, RouteProgram};
 use crate::ruleset::GeoFault;
 use crate::ruleset::RuleSetHandle;
@@ -23,7 +23,7 @@ use crate::text::go_lower;
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum Class {
-    Domain,
+    Domain(bool),
     Ip { src: bool, resolves: bool },
     Other,
 }
@@ -34,7 +34,7 @@ fn class_of(def: &RuleDef) -> Class {
         | Cond::DomainSuffix(_)
         | Cond::DomainKeyword(_)
         | Cond::DomainWildcard(_)
-        | Cond::DomainRegex(_) => Class::Domain,
+        | Cond::DomainRegex(_) => Class::Domain(def.extended),
         Cond::IpCidr(_) | Cond::IpCidr6(_) => Class::Ip {
             src: def.src,
             resolves: !def.no_resolve && !def.src,
@@ -267,7 +267,7 @@ impl ListBuilder {
         let idx = index as u32;
         if let Some(how) = host_match(def, self.table.payload(idx)) {
             cx.demands.domain = true;
-            self.ops.push(Op::Host { idx, how });
+            self.ops.push(Op::host(idx, how, def.extended));
             return Ok(());
         }
         let loc = Loc {
@@ -275,7 +275,8 @@ impl ListBuilder {
             index,
             line: &def.text,
         };
-        self.nodes.push(node_for_def(cx, def, &loc)?);
+        self.nodes
+            .push(Node::extended(node_for_def(cx, def, &loc)?, def.extended));
         self.ops.push(Op::Leaf {
             idx,
             node: self.nodes.len() as u32 - 1,
@@ -298,10 +299,10 @@ impl ListBuilder {
             return Ok(());
         }
         match run.class {
-            Class::Domain => {
+            Class::Domain(extended) => {
                 cx.demands.domain = true;
-                self.domain_runs
-                    .push(DomainRun::build(start, end, run.domains, &self.table));
+                let built = DomainRun::build(start, end, extended, run.domains, &self.table);
+                self.domain_runs.push(built);
                 self.ops.push(Op::Domain(self.domain_runs.len() as u32 - 1));
             }
             Class::Ip { src, resolves } => {
@@ -365,24 +366,6 @@ fn compile_list<D: Borrow<RuleDef>>(
         domain_runs: list.domain_runs.into_boxed_slice(),
         ip_runs: list.ip_runs.into_boxed_slice(),
     })
-}
-
-/// How to match a lone domain rule from its payload alone. The payload shows the rule
-/// to the user, so it only stands in for the condition when the two agree.
-fn host_match(def: &RuleDef, payload: Option<&str>) -> Option<HostMatch> {
-    let (how, pattern) = match &def.cond {
-        Cond::Domain(pattern) => (HostMatch::Exact, pattern),
-        Cond::DomainSuffix(pattern) => (HostMatch::Suffix, pattern),
-        Cond::DomainKeyword(pattern) => (HostMatch::Keyword, pattern),
-        _ => return None,
-    };
-    let payload = payload?;
-    let same = if pattern.is_ascii() {
-        payload.eq_ignore_ascii_case(pattern)
-    } else {
-        payload == pattern.to_lowercase()
-    };
-    same.then_some(how)
 }
 
 /// mihomo runs a top-level `SUB-RULE` aimed at a proxy as a rule that never matches.

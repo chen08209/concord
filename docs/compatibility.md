@@ -250,8 +250,10 @@ A host reads a module (a Surge `.sgmodule`, a Loon plugin, a Quantumult X snippe
 `mitm.readModule`, which answers with each line by its line number: what goes into the MITM lists, the rules and rule sets with their policies for the host to map, the
 DNS, hosts and route changes in mihomo's keys, the remote files it reads, and every line Concord does not take with the
 reason. A module's `force-http-engine-hosts` comes back as a list of its own, `force-http-hostname`, for the host to
-decide on. A rule's `extended-matching` is read and reported as `extendedMatching`, but not applied: the rule
-matches the domain only, not the SNI or the Host header. A `map-local` line's `data-type=json`, which Loon writes and Surge's manual does not list, reads as text
+decide on. A rule's `extended-matching` is reported as `extendedMatching`. On a DOMAIN, DOMAIN-SUFFIX, DOMAIN-KEYWORD or
+DOMAIN-WILDCARD rule, here and in a profile's own rules, it matches the name the flow was dialed by, the name sniffed
+from it, and the Host header of a request the MITM engine routes one by one, any of them; the SNI is known only with
+sniffing on, which Surge does always. On a URL-REGEX, RULE-SET or DOMAIN-SET rule it is not applied. A `map-local` line's `data-type=json`, which Loon writes and Surge's manual does not list, reads as text
 sent as `application/json`.
 A Loon plugin's `[Rewrite]` and `[Script]` lines read in both of Loon's syntaxes. In the `if … then` form the
 `[Argument]` values come in with their types: a test on arguments alone is decided as the module is read, a line

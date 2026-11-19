@@ -181,7 +181,7 @@ pub enum IgnoreReason {
     /// A condition Concord cannot test, as `||` across the URL and a header.
     Condition,
     /// A value only the request at hand fills in, as the condition's capture inside a header
-    /// value; a URL rewrite's replacement may name the URL's.
+    /// value or Surge's `{{{GATEWAY_ADDRESS}}}`; a URL rewrite's replacement may name the URL's.
     RuntimeValue,
 }
 

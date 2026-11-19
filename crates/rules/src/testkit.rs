@@ -74,6 +74,8 @@ pub(crate) struct Flow {
     pub dscp: u8,
     /// The request's URL and User-Agent, once read.
     pub http: Option<(&'static str, Option<&'static str>)>,
+    /// The name sniffed from the flow, which the rules see in place of `host`.
+    pub sniffed: Option<&'static str>,
     pub connect_agent: Option<&'static str>,
 }
 
@@ -94,6 +96,7 @@ impl Flow {
             dscp: 0,
             http: None,
             connect_agent: None,
+            sniffed: None,
         }
     }
 
@@ -147,9 +150,20 @@ pub(crate) fn drive(
 ) -> Trace {
     let meta = flow.meta();
     let mut state = RouteState::seed(&meta.dst);
+    if let Some(name) = flow.sniffed {
+        state.dialed = state.host.take();
+        state.host = Some(name.into());
+    }
     state.http = flow.http.map(|(url, user_agent)| {
+        let host = url
+            .split_once("://")
+            .map_or("", |(_, rest)| rest)
+            .split(['/', ':', '?'])
+            .next()
+            .unwrap_or_default();
         Arc::new(concord_common::HttpFacts {
             url: url.into(),
+            host: host.to_ascii_lowercase().into(),
             user_agent: user_agent.map(Into::into),
         })
     });

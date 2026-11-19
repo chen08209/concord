@@ -147,6 +147,10 @@ pub struct RuleDef {
     pub target: String,
     pub no_resolve: bool,
     pub src: bool,
+    /// Surge's `extended-matching` on a DOMAIN, DOMAIN-SUFFIX, DOMAIN-KEYWORD or
+    /// DOMAIN-WILDCARD rule: the name the flow was dialed by and the request's Host header
+    /// are matched too.
+    pub extended: bool,
     pub text: String,
 }
 
@@ -373,14 +377,25 @@ pub fn parse_rule(line: &str) -> Result<RuleDef> {
         return Err(ConfigError::new("format invalid"));
     }
     let (cond, src, no_resolve) = build_cond(&parts)?;
+    let extended = parts.params.iter().any(|p| p == EXTENDED_MATCHING)
+        && matches!(
+            cond,
+            Cond::Domain(_)
+                | Cond::DomainSuffix(_)
+                | Cond::DomainKeyword(_)
+                | Cond::DomainWildcard(_)
+        );
     Ok(RuleDef {
         cond,
         target: parts.target,
         no_resolve,
         src,
+        extended,
         text: line.to_string(),
     })
 }
+
+pub const EXTENDED_MATCHING: &str = "extended-matching";
 
 fn flags(params: &[String]) -> (bool, bool) {
     let src = params.iter().any(|p| p == "src");
@@ -757,6 +772,15 @@ mod tests {
             assert_eq!(rule.text, line);
             assert!(!rule.target.is_empty());
         }
+    }
+
+    #[test]
+    fn extended_matching_marks_only_the_four_name_rules() {
+        assert!(ok("DOMAIN-SUFFIX,a.com,REJECT,extended-matching").extended);
+        assert!(ok("DOMAIN-WILDCARD,*.a.com,REJECT,extended-matching").extended);
+        assert!(!ok("DOMAIN-SUFFIX,a.com,REJECT").extended);
+        assert!(!ok("DOMAIN-REGEX,a,REJECT,extended-matching").extended);
+        assert!(!ok("IP-CIDR,10.0.0.0/8,REJECT,extended-matching").extended);
     }
 
     #[test]

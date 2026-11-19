@@ -5581,7 +5581,7 @@
         },
         "extendedMatching": {
           "type": "boolean",
-          "description": "Surge's `extended-matching`, read but not applied: the rule matches the domain\nonly, not the SNI or the Host header."
+          "description": "Surge's `extended-matching`. A DOMAIN, DOMAIN-SUFFIX, DOMAIN-KEYWORD or\nDOMAIN-WILDCARD rule also matches the name the flow was dialed by and the Host\nheader of a request the MITM engine routes, and sees the SNI only when sniffing is\non; on any other rule it is not applied."
         }
       },
       "required": [
@@ -6002,7 +6002,7 @@
         {
           "type": "string",
           "const": "runtimeValue",
-          "description": "A value only the request at hand fills in, as the condition's capture inside a header\nvalue; a URL rewrite's replacement may name the URL's."
+          "description": "A value only the request at hand fills in, as the condition's capture inside a header\nvalue or Surge's `{{{GATEWAY_ADDRESS}}}`; a URL rewrite's replacement may name the URL's."
         }
       ],
       "description": "Why a line takes no effect; a host shows each in its own words."

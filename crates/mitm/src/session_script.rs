@@ -112,7 +112,12 @@ impl Session {
         let Some(result) = self.run_script(script, &address, invocation).await else {
             return;
         };
-        target.cap.note("script", PHASE_REQUEST, &script.name);
+        target.cap.note(
+            "script",
+            PHASE_REQUEST,
+            &script.name,
+            script.module.as_deref(),
+        );
         if result.abort {
             target.abort = true;
             self.answered(target, ANSWER_SCRIPT, RULE_SCRIPT, &script.name);
@@ -216,7 +221,12 @@ impl Session {
         let Some(result) = self.run_script(script, &address, invocation).await else {
             return Ok(());
         };
-        target.cap.note("script", PHASE_RESPONSE, &script.name);
+        target.cap.note(
+            "script",
+            PHASE_RESPONSE,
+            &script.name,
+            script.module.as_deref(),
+        );
         if result.abort {
             tracing::info!(
                 "[MITM] script {} aborted the response of {address}",

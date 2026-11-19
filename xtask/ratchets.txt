@@ -4,7 +4,7 @@ file-lines crates/config/src/profile.rs 833 raised from 821: the modules the mit
 file-lines crates/config/src/proxy/parse.rs 1090 raised from 1088: gost-relay is parsed in its own module and registered as a supported proxy type; MASQUE dispatches to its separate parser; back down when proxy dispatch leaves parse.rs
 file-lines crates/config/src/share_link/decode.rs 940
 file-lines crates/proxy/src/vmess/crypto.rs 809
-file-lines crates/rules/src/compile.rs 818 raised from 804: URL-REGEX and USER-AGENT compile like every other condition, and classical rule sets read their quoted payloads; no split planned yet
+file-lines crates/rules/src/compile.rs 801
 file-lines crates/tls/src/record.rs 997 raised from 996: the key schedule lock is taken through concord_common::sync, which needs its own import
 file-lines crates/tun/src/stack/driver.rs 838 raised from 809: the driver drains the adopted UDP sessions' replies each round, offers the queue poller to adopted sessions, polls with the waker that drops its own drain's wakes and ends a round's reads at a byte budget; no split planned yet
 fn-lines crates/config/src/profile.rs::load_raw 206 raised from 201: modules edit the raw profile before it is read and their rules are checked as the profile's own
@@ -20,7 +20,7 @@ fn-lines crates/netstack/src/engine.rs::TcpStack::poll 129 raised from 123: a co
 fn-lines crates/netstack/src/tcp/recovery.rs::Tcb::process_ack 126
 fn-lines crates/proxy/src/link.rs::build_link 150
 fn-lines crates/rules/src/compile.rs::node_for_cond 175 raised from 158: deferred ASN rules, REMATCH-NAME, and URL-REGEX and USER-AGENT compilation; back down when metadata predicates leave node_for_cond
-fn-lines crates/rules/src/eval.rs::Ev::eval 156 raised from 132: deferred ASN negation, REMATCH-NAME evaluation, and the dispatch to the HTTP rules; back down when metadata predicates leave eval
+fn-lines crates/rules/src/eval.rs::Ev::eval 151 raised from 132: deferred ASN negation, REMATCH-NAME evaluation, and the dispatch to the HTTP rules; back down when metadata predicates leave eval
 fn-lines crates/rules/src/run.rs::Run::step 126
 fn-lines crates/tls/src/reality/handshake.rs::RealityClient::run 175 raised from 173: native JLS authentication failure skips the browser fallback; back down to 120 when handshake result and fallback handling leave run
 fn-lines crates/tls/src/reality/hello.rs::build_client_hello 217 raised from 212: native JLS encodes the Go certificate signature-algorithms extension; back down to 120 when extension encoding moves into its own functions

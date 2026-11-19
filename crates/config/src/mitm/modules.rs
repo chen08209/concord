@@ -17,7 +17,7 @@ use super::module::{
 use super::{BodyActionDef, MapLocalBody, MitmDef, MitmLine, Read};
 use crate::Map;
 use crate::raw::RawConfig;
-use crate::rule::RuleLines;
+use crate::rule::{EXTENDED_MATCHING, RuleLines};
 
 /// The MITM engine's directory under the home directory, and its resources directory: the
 /// engine's `AUTHORITY_DIR` and the `resources` it keeps there.
@@ -291,12 +291,14 @@ impl Modules {
                         .cloned()
                         .unwrap_or_else(|| name.clone()),
                 };
-                let suffix = if rule.def.no_resolve {
-                    ",no-resolve"
-                } else {
-                    ""
-                };
-                let line = format!("{},{target}{suffix}", rule.def.rule);
+                let mut line = format!("{},{target}", rule.def.rule);
+                if rule.def.no_resolve {
+                    line.push_str(",no-resolve");
+                }
+                if rule.def.extended_matching {
+                    line.push(',');
+                    line.push_str(EXTENDED_MATCHING);
+                }
                 match check(&line) {
                     Ok(()) => lines.push(line),
                     Err(err) => module.refused_rules.push(RefusedRule {

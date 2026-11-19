@@ -94,8 +94,10 @@ dto! {
         pub rule: String,
         pub policy: MitmModulePolicy,
         pub no_resolve: bool,
-        /// Surge's `extended-matching`, read but not applied: the rule matches the domain
-        /// only, not the SNI or the Host header.
+        /// Surge's `extended-matching`. A DOMAIN, DOMAIN-SUFFIX, DOMAIN-KEYWORD or
+        /// DOMAIN-WILDCARD rule also matches the name the flow was dialed by and the Host
+        /// header of a request the MITM engine routes, and sees the SNI only when sniffing is
+        /// on; on any other rule it is not applied.
         pub extended_matching: bool,
     }
 
@@ -263,6 +265,6 @@ pub enum MitmIgnoreReason {
     /// A condition Concord cannot test, as `||` across the URL and a header.
     Condition,
     /// A value only the request at hand fills in, as the condition's capture inside a header
-    /// value; a URL rewrite's replacement may name the URL's.
+    /// value or Surge's `{{{GATEWAY_ADDRESS}}}`; a URL rewrite's replacement may name the URL's.
     RuntimeValue,
 }

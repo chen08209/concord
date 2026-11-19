@@ -220,6 +220,8 @@ pub struct Script {
     pub argument: Option<serde_json::Value>,
     pub(crate) program: Arc<dyn ScriptProgram>,
     pub(crate) key: [u8; 32],
+    /// The module whose line it is; none for the profile's own.
+    pub(crate) module: Option<Arc<str>>,
 }
 
 impl std::fmt::Debug for Script {
@@ -328,6 +330,7 @@ pub(crate) fn compile_script(
         argument: def.argument.clone(),
         program,
         key,
+        module: None,
     })
 }
 

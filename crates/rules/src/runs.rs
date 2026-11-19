@@ -6,6 +6,7 @@ use std::net::IpAddr;
 use aho_corasick::{AhoCorasick, AhoCorasickKind, MatchKind};
 use concord_config::filter::Matcher;
 
+use crate::eval::Ev;
 use crate::index::{HashIdx, SuffixHash, hash_key};
 use crate::table::{RuleTable, TableBuilder};
 use crate::text::wildcard_match;
@@ -30,6 +31,8 @@ enum Keywords {
 pub(crate) struct DomainRun {
     pub(crate) start: u32,
     pub(crate) end: u32,
+    /// Its rules ask for `extended-matching`.
+    extended: bool,
     exact: HashIdx,
     suffix: HashIdx,
     subdomain: HashIdx,
@@ -49,6 +52,7 @@ impl DomainRun {
     pub(crate) fn build(
         start: u32,
         end: u32,
+        extended: bool,
         items: Vec<(u32, DomainItem)>,
         table: &TableBuilder,
     ) -> DomainRun {
@@ -91,6 +95,7 @@ impl DomainRun {
         DomainRun {
             start,
             end,
+            extended,
             exact: HashIdx::build(exact),
             suffix: HashIdx::build(suffix),
             subdomain: HashIdx::build(subdomain),
@@ -102,6 +107,21 @@ impl DomainRun {
 
     pub(crate) fn heap_bytes(&self) -> usize {
         self.exact.heap_bytes() + self.suffix.heap_bytes() + self.subdomain.heap_bytes()
+    }
+
+    /// As [DomainRun::next_from] for the flow's name, and for its other names when the run's
+    /// rules ask for `extended-matching`.
+    pub(crate) fn next_in(&self, ev: &Ev<'_>, from: u32, table: &RuleTable) -> Option<u32> {
+        let first = self.next_from(ev.host, from, table);
+        if !self.extended {
+            return first;
+        }
+        ev.other_hosts()
+            .into_iter()
+            .flatten()
+            .filter_map(|host| self.next_from(host, from, table))
+            .chain(first)
+            .min()
     }
 
     /// The smallest rule index in `from..end` whose condition holds for `host`.

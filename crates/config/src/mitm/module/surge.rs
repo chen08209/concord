@@ -26,6 +26,8 @@ use crate::mitm::{
     parse_header_rewrite, parse_map_local, parse_script, parse_url_rewrite, source_items,
 };
 
+/// Surge's stand-in for the router of the network in use, which only a redirect can name.
+const GATEWAY_ADDRESS: &str = "{{{GATEWAY_ADDRESS}}}";
 const LOON_SECTIONS: [&str; 4] = ["rewrite", "argument", "remote rule", "plugin"];
 const QX_SECTIONS: [&str; 3] = ["rewrite_local", "filter_local", "task_local"];
 /// Quantumult X's sections that name remote files, which the host fetches and reads itself.
@@ -258,6 +260,9 @@ impl<'a> Reader<'a> {
                 self.read_rule(read, number);
             }
             "ip rewrite" => self.read_rule(ip_rewrite(line), number),
+            "url rewrite" if line.contains(GATEWAY_ADDRESS) => {
+                self.ignore(number, IgnoreReason::RuntimeValue, None);
+            }
             "url rewrite" => lists.url_rewrite.push(at(number, parse_url_rewrite(line))),
             "header rewrite" => lists
                 .header_rewrite

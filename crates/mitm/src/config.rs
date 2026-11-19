@@ -88,7 +88,7 @@ fn each<T>(
     key: &'static str,
     lines: &[MitmLine<T>],
     visit: &mut Visit<'_>,
-    mut read: impl FnMut(&T) -> LineRead,
+    mut read: impl FnMut(&T, Option<&Arc<str>>) -> LineRead,
 ) {
     for line in lines {
         visit(
@@ -96,7 +96,7 @@ fn each<T>(
             line.index,
             &line.text,
             line.origin.as_deref(),
-            read(&line.read),
+            read(&line.read, line.origin.as_ref()),
         );
     }
 }
@@ -129,20 +129,20 @@ impl Config {
 
     /// Puts each line of `def` in force, list by list, and hands it with how it read to `visit`.
     fn add_lines(&mut self, def: &MitmDef, env: &ParseEnv, visit: &mut Visit<'_>) {
-        each("hostname", &def.hostname, visit, |read| {
+        each("hostname", &def.hostname, visit, |read, _| {
             read_hosts(&mut self.hosts, read)
         });
         each(
             "skip-server-cert-verify-hostname",
             &def.skip_server_cert_verify_hostname,
             visit,
-            |read| read_hosts(&mut self.skip_verify_hosts, read),
+            |read, _| read_hosts(&mut self.skip_verify_hosts, read),
         );
         each(
             "client-source-address",
             &def.client_source_address,
             visit,
-            |read| {
+            |read, _| {
                 let entries = self.sources.add(&read.items);
                 let view =
                     (!entries.is_empty()).then_some(LineView::Sources(SourcesView { entries }));
@@ -150,46 +150,62 @@ impl Config {
             },
         );
         let rules = &mut self.rules;
-        each("url-rewrite", &def.url_rewrite, visit, |read| {
-            compiled(read, compile_url_rewrite, |rule| {
+        each("url-rewrite", &def.url_rewrite, visit, |read, module| {
+            compiled(read, compile_url_rewrite, |mut rule| {
+                rule.module = module.cloned();
                 let view = rule.view();
                 rules.url_rewrites.push(rule);
                 view
             })
         });
-        each("header-rewrite", &def.header_rewrite, visit, |read| {
-            compiled(read, compile_header_rewrite, |rule| {
-                let view = rule.view();
-                rules.header_rewrites.push(rule);
-                view
-            })
-        });
-        each("body-rewrite", &def.body_rewrite, visit, |read| {
+        each(
+            "header-rewrite",
+            &def.header_rewrite,
+            visit,
+            |read, module| {
+                compiled(read, compile_header_rewrite, |mut rule| {
+                    rule.module = module.cloned();
+                    let view = rule.view();
+                    rules.header_rewrites.push(rule);
+                    view
+                })
+            },
+        );
+        each("body-rewrite", &def.body_rewrite, visit, |read, module| {
             let body = |def: &_| compile_body_rewrite(def, &env.resources);
-            compiled(read, body, |rule| {
+            compiled(read, body, |mut rule| {
+                rule.module = module.cloned();
                 let view = rule.view();
                 rules.body_rewrites.push(Arc::new(rule));
                 view
             })
         });
         let local = |def: &_| compile_map_local(def, &env.resources);
-        each("map-local", &def.map_local, visit, |read| {
-            compiled(read, local, |(rule, view)| {
+        each("map-local", &def.map_local, visit, |read, module| {
+            compiled(read, local, |(mut rule, view)| {
+                rule.module = module.cloned();
                 rules.map_locals.push(rule);
                 view
             })
         });
-        each("request-body-mock", &def.request_body_mock, visit, |read| {
-            compiled(read, local, |(rule, view)| {
-                rules.request_mocks.push(rule);
-                view
-            })
-        });
-        each("script", &def.script, visit, |read| {
+        each(
+            "request-body-mock",
+            &def.request_body_mock,
+            visit,
+            |read, module| {
+                compiled(read, local, |(mut rule, view)| {
+                    rule.module = module.cloned();
+                    rules.request_mocks.push(rule);
+                    view
+                })
+            },
+        );
+        each("script", &def.script, visit, |read, module| {
             compiled(
                 read,
                 |def| compile_script(def, &env.resources, &env.scripts),
-                |script| {
+                |mut script| {
+                    script.module = module.cloned();
                     let view = script.view();
                     rules.scripts.push(Arc::new(script));
                     view

@@ -125,6 +125,7 @@ impl FlowState {
     pub fn route_state(&self) -> RouteState {
         RouteState {
             host: self.rule_host().cloned(),
+            dialed: self.sniff_host.as_ref().and(self.host.clone()),
             ip: self.dst_ip,
             ip_resolved: self.ip_resolved,
             process: self.process.clone(),

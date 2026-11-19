@@ -103,6 +103,18 @@ pub(crate) enum Node {
     And(Box<[Node]>),
     Or(Box<[Node]>),
     Not(Box<Node>),
+    /// A domain rule with `extended-matching`, which holds for any of the flow's names.
+    Extended(Box<Node>),
+}
+
+impl Node {
+    pub(crate) fn extended(node: Node, extended: bool) -> Node {
+        if extended {
+            Node::Extended(Box::new(node))
+        } else {
+            node
+        }
+    }
 }
 
 pub(crate) fn inbound_bit(kind: InboundKind) -> u8 {
@@ -137,6 +149,17 @@ pub(crate) struct Ev<'a> {
 }
 
 impl<'a> Ev<'a> {
+    /// The names besides `host` an `extended-matching` rule is matched against.
+    pub(crate) fn other_hosts(&self) -> [Option<&'a str>; 2] {
+        let state = self.state;
+        let host = self.host;
+        let other = |name: Option<&'a str>| name.filter(|name| !name.is_empty() && *name != host);
+        [
+            other(state.dialed.as_deref()),
+            other(state.http.as_deref().map(|http| &*http.host)),
+        ]
+    }
+
     pub(crate) fn new(
         flow: &'a FlowMeta,
         state: &'a RouteState,
@@ -219,6 +242,28 @@ impl<'a> Ev<'a> {
         Ok(self.state.process.as_deref().map_or(("", "", None), |p| {
             (p.name.as_str(), p.path.as_str(), p.uid)
         }))
+    }
+
+    fn not(&mut self, child: &Node) -> EvResult {
+        let matched = self.eval(child)?;
+        if matched {
+            self.unknown = false;
+        }
+        Ok(!matched && !self.unknown)
+    }
+
+    fn any_name(&mut self, child: &Node) -> EvResult {
+        let host = self.host;
+        let mut matched = self.eval(child)?;
+        for other in self.other_hosts().into_iter().flatten() {
+            if matched {
+                break;
+            }
+            self.host = other;
+            matched = self.eval(child)?;
+        }
+        self.host = host;
+        Ok(matched)
     }
 
     pub(crate) fn eval(&mut self, node: &Node) -> EvResult {
@@ -368,13 +413,8 @@ impl<'a> Ev<'a> {
                 self.unknown = unknown;
                 false
             }
-            Node::Not(child) => {
-                let matched = self.eval(child)?;
-                if matched {
-                    self.unknown = false;
-                }
-                !matched && !self.unknown
-            }
+            Node::Not(child) => self.not(child)?,
+            Node::Extended(child) => self.any_name(child)?,
         })
     }
 }

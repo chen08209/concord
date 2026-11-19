@@ -24,7 +24,7 @@ const ADS: &str = "\
 dns-server = %INSERT% 8.8.8.8
 skip-proxy = %APPEND% bypass.test
 [Rule]
-DOMAIN,ad.test,REJECT-TINYGIF
+DOMAIN,ad.test,REJECT-TINYGIF,extended-matching
 URL-REGEX,^https://a\\.test/x,PROXY
 DOMAIN,b.test,Nowhere
 RULE-SET,https://rules.test/ads.list,REJECT
@@ -69,7 +69,7 @@ fn a_module_rule_goes_ahead_of_the_profiles_with_its_policy_mapped() {
     assert_eq!(
         rules,
         [
-            "DOMAIN,ad.test,REJECT-TINYGIF",
+            "DOMAIN,ad.test,REJECT-TINYGIF,extended-matching",
             r"URL-REGEX,^https://a\.test/x,sel",
             &format!("RULE-SET,{set},REJECT"),
             "DOMAIN,own.test,DIRECT",
@@ -214,7 +214,7 @@ fn a_module_read_from_its_path_takes_the_text_the_engine_read() {
     assert!(mitm_warnings.is_empty(), "{mitm_warnings:?}");
     assert_eq!(
         profile.rules.iter().next(),
-        Some("DOMAIN,ad.test,REJECT-TINYGIF")
+        Some("DOMAIN,ad.test,REJECT-TINYGIF,extended-matching")
     );
 }
 

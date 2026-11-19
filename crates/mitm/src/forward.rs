@@ -71,20 +71,29 @@ impl Session {
                 rules.script_for(&address, false, &heads),
             )
         };
-        let mut rewritten = false;
+        let mut rewritten = Vec::new();
         for rule in header_rules {
-            rewritten |= match rule.whole_head() {
+            if match rule.whole_head() {
                 Some((pattern, with)) => replace_request_head(out, target.version, pattern, with),
                 None => rule.apply(&mut out.headers),
-            };
+            } {
+                rewritten.push(rule.module.clone());
+            }
         }
-        if rewritten {
-            target.cap.note("header-rewrite", PHASE_REQUEST, "");
+        if !rewritten.is_empty() {
+            target
+                .cap
+                .note_each("header-rewrite", PHASE_REQUEST, &rewritten);
             tracing::info!("[MITM] rewrite request headers of {address}");
         }
         if let Some(mock) = mock {
             mock_body(out, &mock.header, &mock.body);
-            target.cap.note("request-body-mock", PHASE_REQUEST, "");
+            target.cap.note(
+                "request-body-mock",
+                PHASE_REQUEST,
+                "",
+                mock.module.as_deref(),
+            );
             tracing::info!("[MITM] mock the request body of {address}");
         }
         let grpc = is_grpc(&out.headers);
@@ -97,10 +106,13 @@ impl Session {
                 .await
         {
             let body = std::mem::replace(&mut out.body, empty());
+            let modules = modules_of(&body_rules);
             match rewrite_body(&mut out.headers, body, out.length, max_body, body_rules).await {
                 Ok((body, length)) => {
                     out.set_body(body, length);
-                    target.cap.note("body-rewrite", PHASE_REQUEST, "");
+                    target
+                        .cap
+                        .note_each("body-rewrite", PHASE_REQUEST, &modules);
                     tracing::info!("[MITM] rewrite request body of {address}");
                 }
                 Err(err) => {
@@ -196,15 +208,19 @@ impl Session {
                 rules.script_for(&address, true, &heads),
             )
         };
-        let mut rewritten = false;
+        let mut rewritten = Vec::new();
         for rule in header_rules {
-            rewritten |= match rule.whole_head() {
+            if match rule.whole_head() {
                 Some((pattern, with)) => replace_response_head(head, pattern, with),
                 None => rule.apply(&mut head.headers),
-            };
+            } {
+                rewritten.push(rule.module.clone());
+            }
         }
-        if rewritten {
-            target.cap.note("header-rewrite", PHASE_RESPONSE, "");
+        if !rewritten.is_empty() {
+            target
+                .cap
+                .note_each("header-rewrite", PHASE_RESPONSE, &rewritten);
             tracing::info!("[MITM] rewrite response headers of {address}");
         }
         if head.status == StatusCode::SWITCHING_PROTOCOLS {
@@ -220,11 +236,14 @@ impl Session {
                 .await
         {
             let source = std::mem::replace(body, empty());
+            let modules = modules_of(&body_rules);
             let (rewritten, length) =
                 rewrite_body(&mut head.headers, source, length, max_body, body_rules).await?;
             *body = rewritten;
             set_length(&mut head.headers, length);
-            target.cap.note("body-rewrite", PHASE_RESPONSE, "");
+            target
+                .cap
+                .note_each("body-rewrite", PHASE_RESPONSE, &modules);
             tracing::info!("[MITM] rewrite response body of {address}");
         }
         if let Some(script) = script {
@@ -454,6 +473,10 @@ fn adapt(
 
 /// A body over the limit, not UTF-8, or in an encoding it cannot decode is
 /// passed on unchanged.
+fn modules_of(rules: &[Arc<BodyRewrite>]) -> Vec<Option<Arc<str>>> {
+    rules.iter().map(|rule| rule.module.clone()).collect()
+}
+
 pub(crate) async fn rewrite_body(
     headers: &mut HeaderMap,
     body: Body,

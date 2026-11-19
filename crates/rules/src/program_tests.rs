@@ -771,6 +771,7 @@ fn compile_errors_read_like_mihomo() {
         target: "X".into(),
         no_resolve: false,
         src: false,
+        extended: false,
         text: "DOMAIN-REGEX,(,X".into(),
     };
     let err = RouteProgram::compile(&[bad], &Default::default(), &kit.env(8))
@@ -1053,6 +1054,43 @@ fn user_agent_reads_the_proxy_connect_while_no_request_is_read() {
             accepted(&kit, &program, &read),
             pick(2, "PROXY"),
             "a request read speaks for itself"
+        );
+    }
+}
+
+#[test]
+fn extended_matching_also_tries_the_dialed_name_and_the_host_header() {
+    let kit = Kit::new();
+    let lines = [
+        "DOMAIN-SUFFIX,ads.test,REJECT,extended-matching",
+        "DOMAIN,track.test,REJECT,extended-matching",
+        "DOMAIN-SUFFIX,plain.test,REJECT",
+        "MATCH,DIRECT",
+    ];
+    for merge in MERGES {
+        let program = kit.compile(&lines, merge);
+        let sniffed_over = |dialed, sniffed| Flow {
+            sniffed: Some(sniffed),
+            ..Flow::domain(dialed)
+        };
+        let fronted = |url| Flow {
+            http: Some((url, None)),
+            ..Flow::ip("203.0.113.9")
+        };
+        assert_eq!(
+            accepted(&kit, &program, &sniffed_over("x.ads.test", "cdn.test")),
+            pick(0, "REJECT"),
+            "merge {merge}"
+        );
+        assert_eq!(
+            accepted(&kit, &program, &fronted("https://track.test/p")),
+            pick(1, "REJECT"),
+            "merge {merge}"
+        );
+        assert_eq!(
+            accepted(&kit, &program, &sniffed_over("x.plain.test", "cdn.test")),
+            pick(3, "DIRECT"),
+            "merge {merge}: a rule without the flag sees the sniffed name only"
         );
     }
 }

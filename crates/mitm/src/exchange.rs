@@ -177,6 +177,7 @@ fn reject_action(route: &Route) -> UrlAction {
 fn http_facts(out: &OutRequest) -> Arc<HttpFacts> {
     Arc::new(HttpFacts {
         url: out.url.raw.as_str().into(),
+        host: out.url.host.to_ascii_lowercase().into(),
         user_agent: out
             .headers
             .get(USER_AGENT)
@@ -346,7 +347,12 @@ impl Session {
         if let Some((rule, replaced)) = rules.rewrite_url(&target.url.raw, heads) {
             match rule.action {
                 UrlAction::Redirect302 | UrlAction::Redirect307 => {
-                    target.cap.note("url-rewrite", "", rule.action.name());
+                    target.cap.note(
+                        "url-rewrite",
+                        "",
+                        rule.action.name(),
+                        rule.module.as_deref(),
+                    );
                     self.answered(target, ANSWER_REDIRECT, RULE_URL_REWRITE, rule.source());
                     tracing::info!(
                         "[MITM] {} {} --> {replaced}",
@@ -366,7 +372,12 @@ impl Session {
                 }
                 UrlAction::Header => match TargetUrl::parse_http(&replaced) {
                     Some(rewritten) => {
-                        target.cap.note("url-rewrite", "", rule.action.name());
+                        target.cap.note(
+                            "url-rewrite",
+                            "",
+                            rule.action.name(),
+                            rule.module.as_deref(),
+                        );
                         tracing::info!("[MITM] rewrite {} --> {}", target.url.raw, rewritten.raw);
                         target.url = rewritten;
                         target.rewritten = true;
@@ -377,7 +388,9 @@ impl Session {
                     ),
                 },
                 action => {
-                    target.cap.note("url-rewrite", "", action.name());
+                    target
+                        .cap
+                        .note("url-rewrite", "", action.name(), rule.module.as_deref());
                     self.answered(target, ANSWER_REJECT, RULE_URL_REWRITE, rule.source());
                     tracing::info!("[MITM] {} {}", action.name(), target.url.raw);
                     let (status, content_type, data) = reject_response(action);
@@ -390,7 +403,7 @@ impl Session {
             }
         }
         let rule = rules.map_local(&target.url.raw, heads)?;
-        target.cap.note("map-local", "", "");
+        target.cap.note("map-local", "", "", rule.module.as_deref());
         self.answered(target, ANSWER_MAP_LOCAL, RULE_MAP_LOCAL, rule.source());
         tracing::info!("[MITM] map local {}", target.url.raw);
         Some((rule.status, rule.header.clone(), rule.body.clone()))

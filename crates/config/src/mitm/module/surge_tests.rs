@@ -160,3 +160,12 @@ fn text_without_a_section_is_not_a_module() {
     assert!(def.network.is_empty() && def.declared_scripts.is_empty());
     assert_eq!(ignored(&def), [(2, IgnoreReason::Section)]);
 }
+
+#[test]
+fn a_redirect_to_the_gateway_waits_on_a_value_only_the_network_knows() {
+    let def = read(
+        "#!name=Gate\n[URL Rewrite]\n^http://a\\.test/ http://{{{GATEWAY_ADDRESS}}}/ 302\n^http://b\\.test/ http://c.test/ 302\n",
+    );
+    assert_eq!(ignored(&def), [(3, IgnoreReason::RuntimeValue)]);
+    assert_eq!(def.lists.url_rewrite.len(), 1);
+}

@@ -141,6 +141,8 @@ pub struct FlowKey {
 #[derive(Clone, Debug)]
 pub struct HttpFacts {
     pub url: Box<str>,
+    /// The URL's host, lowercased: what the request's Host header or `:authority` names.
+    pub host: Box<str>,
     /// Absent when the request has no User-Agent header.
     pub user_agent: Option<Box<str>>,
 }
@@ -149,6 +151,8 @@ pub struct HttpFacts {
 #[derive(Clone, Debug, Default)]
 pub struct RouteState {
     pub host: Option<Host>,
+    /// The name the flow was dialed by, when `host` is the one sniffed from it instead.
+    pub dialed: Option<Host>,
     pub ip: Option<IpAddr>,
     pub ip_resolved: bool,
     pub process: Option<Arc<ProcessInfo>>,

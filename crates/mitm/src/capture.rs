@@ -85,6 +85,9 @@ pub struct Action {
     pub phase: String,
     #[serde(skip_serializing_if = "is_empty")]
     pub detail: String,
+    /// The module whose line acted; none for the profile's own.
+    #[serde(skip_serializing_if = "is_empty")]
+    pub module: String,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -539,15 +542,27 @@ impl Cap {
         self.0.is_some()
     }
 
-    pub fn note(&self, kind: &str, phase: &str, detail: &str) {
+    pub fn note(&self, kind: &str, phase: &str, detail: &str, module: Option<&str>) {
         if let Some(c) = &self.0 {
             c.update(|e| {
                 e.actions.push(Action {
                     kind: kind.to_string(),
                     phase: phase.to_string(),
                     detail: detail.to_string(),
+                    module: module.unwrap_or_default().to_string(),
                 })
             });
+        }
+    }
+
+    /// One action for each module among those whose lines acted, the profile's own as one.
+    pub fn note_each(&self, kind: &str, phase: &str, modules: &[Option<Arc<str>>]) {
+        let mut seen: Vec<Option<&str>> = Vec::new();
+        for module in modules.iter().map(Option::as_deref) {
+            if !seen.contains(&module) {
+                seen.push(module);
+                self.note(kind, phase, "", module);
+            }
         }
     }
 
@@ -816,7 +831,7 @@ mod tests {
             200,
             HeaderList::from([("Content-Length".to_string(), vec!["3".to_string()])]),
         );
-        cap.note("script", PHASE_RESPONSE, "Ads");
+        cap.note("script", PHASE_RESPONSE, "Ads", Some("Ad block"));
         let json = serde_json::to_value(store.find(cap.id().unwrap()).unwrap()).unwrap();
         for key in [
             "id",

@@ -3,7 +3,7 @@ use smallvec::SmallVec;
 
 use crate::eval::{Ev, Node, Yield};
 use crate::observed::Observed;
-use crate::prog::Op;
+use crate::prog::{Op, host_holds};
 use crate::program::{MatchCtx, RouteProgram, RuleRef, Step};
 
 #[derive(Clone, Copy, Debug, Default)]
@@ -129,11 +129,11 @@ impl<'p> Run<'p> {
                         Err(why) => Outcome::Yield(self.yielded(why)),
                     },
                 },
-                Op::Host { idx, how } => {
+                Op::Host { idx, how, extended } => {
                     if prog
                         .table
                         .payload(idx)
-                        .is_some_and(|payload| how.matches(ev.host, payload))
+                        .is_some_and(|payload| host_holds(&ev, how, extended, payload))
                     {
                         Outcome::Candidate {
                             idx,
@@ -147,7 +147,7 @@ impl<'p> Run<'p> {
                     None => Outcome::Next,
                     Some(run) => {
                         miss_end = Some(run.end);
-                        match run.next_from(ev.host, frame.pos, &prog.table) {
+                        match run.next_in(&ev, frame.pos, &prog.table) {
                             Some(idx) => Outcome::Candidate {
                                 idx,
                                 advance: Advance::Pos(idx + 1),

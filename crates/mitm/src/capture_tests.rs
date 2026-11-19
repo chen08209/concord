@@ -8,6 +8,8 @@ use http_body_util::{BodyExt, StreamBody};
 use serde_json::json;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 
+use concord_config::mitm::MitmDef;
+
 use crate::capture::{Action, ExchangeSummary};
 use crate::limits::PRESSURE_NO_BODIES;
 use crate::script::testkit::{FakeRuntime, sync_program};
@@ -69,6 +71,7 @@ fn action(kind: &str, phase: &str, detail: &str) -> Action {
         kind: kind.into(),
         phase: phase.into(),
         detail: detail.into(),
+        module: String::new(),
     }
 }
 
@@ -625,4 +628,51 @@ async fn bodies_count_against_the_byte_limit() {
     settled(&rig, "conn-1", 1).await;
     client.get("/large").await;
     crate::testing::eventually(|| rig.mitm.exchanges("conn-1").exchanges.is_empty()).await;
+}
+
+#[tokio::test]
+async fn each_action_names_the_module_whose_line_it_was() {
+    let (_server, rig) = tls_rig(echo(), &["http/1.1"]).await;
+    let section = |value| MitmDef::read(&serde_json::from_value(value).unwrap());
+    let mut def = section(json!({
+        "enable": true,
+        "hostname": ["example.test"],
+        "skip-server-cert-verify": true,
+        "header-rewrite": [r"http-request ^https://example\.test header-add X-Added yes"],
+    }));
+    let mut module = section(json!({
+        "url-rewrite": [r"^https://example\.test/old/(.*) https://example.test/new/$1"],
+        "header-rewrite": [
+            r"http-request ^https://example\.test header-add X-Ads 1",
+            r"http-request ^https://example\.test header-add X-Ads-Too 1",
+        ],
+    }));
+    module.mark_origin(&Arc::from("Ads"));
+    def.url_rewrite.append(&mut module.url_rewrite);
+    def.header_rewrite.append(&mut module.header_rewrite);
+    assert!(
+        rig.mitm
+            .apply_section(Some(def), concord_common::Tasks::default())
+            .is_empty()
+    );
+    rig.mitm.set_capture(true);
+    let mut client = Client::tls(&rig, "example.test", 443, &["http/1.1"])
+        .await
+        .unwrap();
+    client.get("/old/x").await;
+
+    let exchanges = settled(&rig, "conn-1", 1).await;
+    let actions = rig.mitm.exchange(exchanges[0].id).unwrap().actions;
+    let from = |kind: &str, phase: &str, detail: &str, module: &str| Action {
+        module: module.into(),
+        ..action(kind, phase, detail)
+    };
+    assert_eq!(
+        actions,
+        [
+            from("url-rewrite", "", "header", "Ads"),
+            from("header-rewrite", "request", "", ""),
+            from("header-rewrite", "request", "", "Ads"),
+        ]
+    );
 }
