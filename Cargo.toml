@@ -108,6 +108,7 @@ rustls-native-certs = "0.8"
 rustls-pki-types = "1"
 webpki = { package = "rustls-webpki", version = "0.103", default-features = false, features = ["std", "aws-lc-rs"] }
 boring = "5.4"
+boring-sys = "5.4"
 tokio-boring = "5.3"
 quinn = { version = "0.11.12", default-features = false, features = ["rustls-aws-lc-rs", "runtime-tokio"] }
 quinn-proto = { version = "0.11.19", default-features = false }

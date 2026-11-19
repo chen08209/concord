@@ -1,3 +1,4 @@
+use std::fmt;
 use std::io;
 use std::pin::Pin;
 use std::task::{Context, Poll, ready};
@@ -22,6 +23,15 @@ pub struct RecordIo<S> {
     header: [u8; RECORD_HEADER_LEN],
     state: State,
     aligned: bool,
+}
+
+impl<S> fmt::Debug for RecordIo<S> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("RecordIo")
+            .field("state", &self.state)
+            .field("aligned", &self.aligned)
+            .finish_non_exhaustive()
+    }
 }
 
 impl<S> RecordIo<S> {

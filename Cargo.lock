@@ -1505,6 +1505,7 @@ dependencies = [
  "aws-lc-rs",
  "base64 0.22.1",
  "boring",
+ "boring-sys",
  "brotli-decompressor",
  "bytes",
  "concord-common",

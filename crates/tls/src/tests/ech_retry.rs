@@ -232,3 +232,56 @@ async fn rustls_retries_each_time_the_server_rotates_its_key() {
 async fn boringssl_retries_each_time_the_server_rotates_its_key() {
     a_second_rotation_is_retried_too(Some(ClientFingerprint::Chrome)).await;
 }
+
+/// Reads the first flight and hangs up, so the handshake fails for a reason other than ECH.
+async fn closing_server() -> Server {
+    let listener = TcpListener::bind(("127.0.0.1", 0)).await.unwrap();
+    let addr = listener.local_addr().unwrap();
+    let accepts = Arc::new(AtomicUsize::new(0));
+    let seen = accepts.clone();
+    tokio::spawn(async move {
+        while let Ok((mut io, _)) = listener.accept().await {
+            seen.fetch_add(1, Ordering::SeqCst);
+            let _ = io.read(&mut [0u8; 4096]).await;
+        }
+    });
+    Server {
+        addr,
+        accepts,
+        ech_accepted: Arc::new(AtomicUsize::new(0)),
+    }
+}
+
+async fn fails_plainly_without_a_retry(ech_config_list: Option<Vec<u8>>) {
+    let ca = Ca::new();
+    let server = closing_server().await;
+    let options = TlsOptions {
+        server_name: Some(INNER_NAME.into()),
+        client_fingerprint: Some(ClientFingerprint::Chrome),
+        ech_config_list,
+        ..TlsOptions::default()
+    };
+    let connector = TlsConnector::new(options, ca.trust()).unwrap();
+
+    let err = connect(&connector, server.addr).await.unwrap_err();
+    assert!(
+        err.get_ref()
+            .is_none_or(|source| !source.is::<crate::ech::BoringRejection>()),
+        "{err}"
+    );
+    assert_eq!(
+        server.accepts.load(Ordering::SeqCst),
+        1,
+        "no ECH retry dial"
+    );
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn boringssl_offering_a_list_fails_plainly_when_the_peer_hangs_up() {
+    fails_plainly_without_a_retry(Some(STALE_LIST.to_vec())).await;
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn boringssl_sending_grease_fails_plainly_when_the_peer_hangs_up() {
+    fails_plainly_without_a_retry(None).await;
+}

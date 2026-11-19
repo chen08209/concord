@@ -1,3 +1,5 @@
+use std::error::Error as _;
+use std::fmt;
 use std::io::{self, Read, Write};
 use std::pin::Pin;
 use std::sync::{Arc, Mutex};
@@ -321,7 +323,7 @@ impl BoringConnector {
         io: S,
     ) -> io::Result<tokio_boring::SslStream<S>>
     where
-        S: AsyncRead + tokio::io::AsyncWrite + Unpin,
+        S: AsyncRead + tokio::io::AsyncWrite + Unpin + fmt::Debug,
     {
         self.handshake(name, io, None).await
     }
@@ -333,7 +335,7 @@ impl BoringConnector {
         log: Option<LogSlot>,
     ) -> io::Result<tokio_boring::SslStream<S>>
     where
-        S: AsyncRead + tokio::io::AsyncWrite + Unpin,
+        S: AsyncRead + tokio::io::AsyncWrite + Unpin + fmt::Debug,
     {
         let mut ssl = Ssl::new(&self.ctx).map_err(io::Error::other)?;
         let cx = Arc::new(VerifyCx {
@@ -357,6 +359,8 @@ impl BoringConnector {
             Err(err) => {
                 let failure = lock(&cx.failure).take();
                 if failure.is_none()
+                    && self.ech_config_list.is_some()
+                    && ech_rejected(&err)
                     && let Some(retry) = err
                         .ssl()
                         .and_then(SslRef::get_ech_retry_configs)
@@ -377,6 +381,20 @@ impl BoringConnector {
             }
         }
     }
+}
+
+/// `SSL_get0_ech_retry_configs` may only follow `SSL_R_ECH_REJECTED` (`ssl.h`); after any other
+/// failure BoringSSL asserts, or without assertions returns a malformed placeholder list.
+fn ech_rejected<S: fmt::Debug>(err: &tokio_boring::HandshakeError<S>) -> bool {
+    err.source()
+        .and_then(|source| source.downcast_ref::<boring::ssl::Error>())
+        .and_then(boring::ssl::Error::ssl_error)
+        .is_some_and(|stack| {
+            stack.errors().iter().any(|error| {
+                error.library_reason(boring_sys::ERR_LIB_SSL)
+                    == Some(boring_sys::SSL_R_ECH_REJECTED)
+            })
+        })
 }
 
 fn record_secret(slot: &LogSlot, line: &str) {
