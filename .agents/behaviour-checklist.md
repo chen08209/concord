@@ -118,6 +118,13 @@ These are host tests. Android was exercised by hand in an embedding app on an em
 |---|---|---|---|
 | 53 | `engine.start` opens the inbound listeners, the desktop TUN and `dns.listen`, and `engine.stop` closes them, in whichever order `engine.start` and the first `config.apply` arrive; an apply alone opens none of them. A stop leaves health checks, provider and geo updates, NTP, established connections and the external controller running | partial | `concord-engine::engine::lifecycle_tests::{engine_stop_ends_everything_engine_start_began, a_start_before_the_first_apply_opens_what_the_apply_brings, engine_stop_leaves_an_established_connection_relaying}`, `concord-controller::routes::the_controller_outlives_an_engine_stop`. The TUN and NTP are not asserted |
 
+## MITM modules
+
+| # | Behaviour | Status | Tests and notes |
+|---|---|---|---|
+| 54 | The modules `mitm.modules` names take effect on apply: their rules ahead of the profile's with `module-policy` mapping their policies, their rule sets, DNS, hosts and MITM lines merged; a module that cannot be read or repeats a name, and a rule whose policy names no outbound, is left out and reported by `mitm.moduleStatus` without refusing the profile | verified | `concord-config::mitm::modules::tests`, `concord-engine::e2e::modules::a_module_rule_goes_ahead_of_the_profiles_through_the_mapped_policy`, `concord-api::behaviour::mitm_module_status_answers_each_module_and_its_files` |
+| 55 | A module's remote file is fetched in the background after an apply, stored under a name its content gives and read once stored; a stored file is not fetched again on the next apply; a failed fetch reports why and keeps any earlier file, and `mitm.fetchModule` fetches again; each module's fetch is one `resourceUpdate` of kind `mitmModule` | verified | `concord-engine::e2e::modules::{a_file_never_fetched_is_fetched_on_apply_and_takes_effect, a_file_that_failed_to_fetch_takes_effect_once_fetched_again}`, `concord-engine::engine::mitm::store::tests` |
+
 ## Go tests ported
 
 Each test file of the Go core's control layer, and where its semantics live in Rust.

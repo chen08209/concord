@@ -12,6 +12,7 @@ use concord_common::{
     PacketSession, SockOpts,
 };
 use concord_config::general::General;
+use concord_config::mitm::modules::{ModuleTexts, Unreadable};
 use concord_config::ntp::NtpConfig;
 use concord_config::sniffer::{SniffProtocol, SnifferConfig};
 use concord_config::tun::TunConfig;
@@ -348,6 +349,7 @@ pub(crate) struct Built {
     pub deferred_geo: Vec<GeoFile>,
     pub warnings: Vec<WarningView>,
     pub mitm: concord_config::MitmDef,
+    pub modules: Vec<concord_config::mitm::modules::AppliedModule>,
     pub trust: Arc<TrustStore>,
 }
 
@@ -479,11 +481,34 @@ pub(crate) async fn load_profile(
             capabilities: capabilities(),
             android,
             age_secret_key: None,
+            modules: module_texts(&home, &raw.mitm),
         };
         Ok(concord_config::load_raw(raw, &options)?)
     })
     .await
     .map_err(ApplyError::Parse)?
+}
+
+/// The text of each module the `mitm` section names by a path in the MITM directory, or why
+/// it cannot be read.
+fn module_texts(home: &HomeDir, section: &concord_config::Map) -> ModuleTexts {
+    let dir = home.join(concord_config::mitm::modules::MITM_DIR);
+    concord_config::mitm::modules::module_paths(section)
+        .into_iter()
+        .map(|(name, path)| {
+            let inside = std::path::Path::new(&path)
+                .components()
+                .all(|part| matches!(part, std::path::Component::Normal(_)));
+            let text = if inside {
+                std::fs::read_to_string(dir.join(&path)).map_err(|err| Unreadable(err.to_string()))
+            } else {
+                Err(Unreadable(format!(
+                    "{path} is not a path inside the MITM directory"
+                )))
+            };
+            (name, text)
+        })
+        .collect()
 }
 
 async fn compile_program(
@@ -626,6 +651,7 @@ pub(crate) async fn build(
         deferred_geo,
         warnings,
         mitm: profile.mitm,
+        modules: profile.modules,
         trust,
     })
 }

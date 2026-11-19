@@ -177,6 +177,7 @@ impl Engine {
             fetcher: fetcher.clone(),
         }));
         let clock = Arc::new(ClockOffset::default());
+        let mitm = MitmService::new(table.clone(), fetcher.clone(), events.clone());
         let shared = Shared {
             platform: config.platform,
             sockets,
@@ -218,7 +219,7 @@ impl Engine {
             warnings: ArcSwap::from_pointee(Vec::new()),
             system_dns: StdMutex::new(None),
             dns_update_seq: AtomicU64::new(0),
-            mitm: MitmService::new(table.clone()),
+            mitm,
             own,
             prober,
             tasks,
@@ -368,6 +369,7 @@ impl Engine {
             deferred_geo,
             mut warnings,
             mitm,
+            modules,
             trust,
         } = built;
         if !self.profile_controller.load(Ordering::Relaxed) {
@@ -395,7 +397,7 @@ impl Engine {
         }
         self.shared.tunnel.set_status(TunnelStatus::Running);
         self.mitm
-            .apply(&mitm, trust, self.shared.proxy_tasks.tasks());
+            .apply(&mitm, modules, trust, self.shared.proxy_tasks.tasks());
         if applied.store_fake_ip {
             fake_ip_store::start(
                 self.shared.fake_ip_store.clone(),

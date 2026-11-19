@@ -269,6 +269,22 @@ reference keeping the argument's type. An `http.mitm` host without a port covers
 rule provider is read when it is a classical list, inline or fetched as text; the domain and CIDR behaviors and the YAML
 and MRS formats are left out as `ruleType`, and a script provider with only `payload` as `noAttachment`.
 
+A profile puts modules in force under `mitm.modules`: each has a `name` and either `text` or a `path` inside the
+MITM directory (`mitm/` under the home directory), with `arguments` and `attachments` as `mitm.readModule` takes
+them. `mitm.module-policy` maps a module's policy names to the profile's outbounds; a name it does not map is taken
+as an outbound of that name, and a rule whose policy names none is left out, not sent to `MATCH`'s. The modules'
+rules go ahead of the profile's in module order, their rule sets become rule providers, their DNS and hosts entries
+edit the profile's, and their MITM lines follow the profile's; their `%INSERT%` hostnames come before the rest. A
+module that cannot be read or repeats a name takes no effect and the profile still loads. Routes and the proxy bypass
+list are the host's to apply. The remote files a module reads are fetched through the core, in the background after
+an apply, and stored in `mitm/resources/` under names their content gives, with `mitm/module-resources.json`
+mapping each URL to its file; a line whose file is not stored yet takes effect once it is, and a failed fetch keeps
+the file an earlier one stored. `adopt-resources` hands over, by URL, files the host stored itself.
+`mitm.moduleStatus` answers how each module and each of its files stand, with why a fetch failed (`http` with its
+status, `dns`, `tls`, `timeout`, `connection` or `other`), and `mitm.fetchModule` fetches one module's files
+again, or every module's; each module's fetch is a `resourceUpdate` of kind `mitmModule`. Nothing fetches them
+again on a timer.
+
 Shadowsocks supports `gost-plugin` in WebSocket mode, including TLS and its default per-connection smux v1 stream.
 Gost relay supports TCP, destination-bound UDP, forward mode, TLS and per-connection smux v1.
 As with mihomo, its relay server needs `nodelay: true` so CONNECT is answered before application data,

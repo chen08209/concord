@@ -78,6 +78,27 @@ impl Control {
         serde_json::from_value(view).map_err(|err| ApiError::internal(err.to_string()))
     }
 
+    pub(super) async fn mitm_module_status(
+        &self,
+        _params: Empty,
+    ) -> Result<MitmModuleStatusList, ApiError> {
+        self.mitm_enabled()?;
+        let status = self.engine.mitm().module_status().map_err(core_error)?;
+        serde_json::from_value(status).map_err(|err| ApiError::internal(err.to_string()))
+    }
+
+    pub(super) async fn mitm_fetch_module(
+        &self,
+        params: MitmFetchModuleParams,
+    ) -> Result<Empty, ApiError> {
+        self.mitm_enabled()?;
+        self.engine
+            .mitm()
+            .fetch_module(params.name)
+            .map_err(core_error)?;
+        Ok(Empty {})
+    }
+
     pub(super) async fn mitm_issue_certificate(
         &self,
         params: MitmIssueParams,

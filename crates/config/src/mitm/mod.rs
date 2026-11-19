@@ -5,6 +5,7 @@ mod heads;
 mod hosts;
 mod issue;
 pub mod module;
+pub mod modules;
 mod pattern;
 mod rules;
 mod script;
@@ -87,6 +88,24 @@ pub struct MitmSection {
     pub h2: bool,
     #[serde(deserialize_with = "null_default")]
     pub limits: MitmLimits,
+    /// Modules in force, in the order their lines follow the section's own.
+    #[serde(
+        deserialize_with = "null_default",
+        skip_serializing_if = "Vec::is_empty"
+    )]
+    pub modules: Vec<modules::ModuleSpec>,
+    /// A module's policy name, by the outbound it stands for.
+    #[serde(
+        deserialize_with = "null_default",
+        skip_serializing_if = "BTreeMap::is_empty"
+    )]
+    pub module_policy: BTreeMap<String, String>,
+    /// The language modules' requirements read, as `zh-Hans`.
+    #[serde(
+        deserialize_with = "null_default",
+        skip_serializing_if = "String::is_empty"
+    )]
+    pub module_language: String,
 }
 
 /// Budgets as written; zero or less keeps the engine's default.

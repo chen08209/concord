@@ -87,7 +87,7 @@ pub async fn check_config(path: String, android: bool) -> Result<Vec<WarningView
         let options = LoadOptions {
             capabilities: apply::capabilities(),
             android,
-            age_secret_key: None,
+            ..LoadOptions::default()
         };
         let profile = load_raw(raw, &options).map_err(config_failure)?;
         Ok(crate::views::warning_views(&profile, android))

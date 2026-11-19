@@ -11,6 +11,7 @@ use crate::general::General;
 use crate::geox::GeoConfig;
 use crate::group::{GroupDef, GroupKind, find_group_cycle, parse_group};
 use crate::hosts::{HostsConfig, parse_hosts};
+use crate::mitm::modules::AppliedModule;
 use crate::ntp::NtpConfig;
 use crate::provider::{
     ProxyProviderDef, ProxySource, RuleProviderDef, parse_proxy_provider, parse_rule_providers,
@@ -31,6 +32,8 @@ pub struct LoadOptions {
     pub capabilities: Capabilities,
     pub android: bool,
     pub age_secret_key: Option<String>,
+    /// By name, each module the `mitm` section names by `path`, or why it could not be read.
+    pub modules: crate::mitm::modules::ModuleTexts,
 }
 
 #[derive(Clone, Debug)]
@@ -57,6 +60,9 @@ pub struct Profile {
     pub dialer_ip4p_convert: bool,
     pub refuse_all: bool,
     pub mitm: crate::mitm::MitmDef,
+    /// The modules the `mitm` section names; their rules, rule sets and network entries are
+    /// already merged in, their section lines are not.
+    pub modules: Vec<AppliedModule>,
     pub tls: TlsConfig,
     pub report: LoadReport,
 }
@@ -103,6 +109,7 @@ impl Profile {
             dialer_ip4p_convert: false,
             refuse_all: true,
             mitm: crate::mitm::MitmDef::default(),
+            modules: Vec::new(),
             tls: TlsConfig::default(),
             report: LoadReport::default(),
         }
@@ -619,6 +626,7 @@ fn warn_ignored_sections(raw: &RawConfig, report: &mut LoadReport) {
 
 pub fn load_raw(mut raw: RawConfig, options: &LoadOptions) -> Result<Profile> {
     let mut report = std::mem::take(&mut raw.report);
+    let mut modules = crate::mitm::modules::read(&mut raw, &options.modules);
     let (general, general_notes) = General::read(&raw.general)?;
     let (dns, dns_notes) =
         DnsConfig::read(&raw.dns, general.ipv6).map_err(|err| err.within("dns"))?;
@@ -758,6 +766,9 @@ pub fn load_raw(mut raw: RawConfig, options: &LoadOptions) -> Result<Profile> {
         &mut report,
         drop,
     )?;
+    let rules = modules.ahead(std::mem::take(&mut raw.rules), |line| {
+        each_checked_rule([line].into_iter(), &[], "rules", &ctx, &mut report, drop)
+    });
     let mut sub_rules = IndexMap::with_capacity(raw.sub_rules.len());
     for (name, lines) in &raw.sub_rules {
         let mut defs = Vec::with_capacity(lines.len());
@@ -812,8 +823,9 @@ pub fn load_raw(mut raw: RawConfig, options: &LoadOptions) -> Result<Profile> {
         store_fake_ip: flag(&raw.profile, "store-fake-ip"),
         dialer_ip4p_convert: flag(&raw.experimental, "dialer-ip4p-convert"),
         refuse_all: false,
-        rules: std::mem::take(&mut raw.rules),
+        rules,
         mitm: crate::mitm::load(&raw.mitm, &raw.lines.mitm, &mut report),
+        modules: modules.list,
         tls: TlsConfig::from_map(&raw.tls),
         report,
     })

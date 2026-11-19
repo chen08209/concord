@@ -48,6 +48,7 @@ use super::{Items, MitmDef, MitmLine, Read};
 pub use arguments::{ArgumentDef, ArgumentKind};
 pub use network::{DomainEntry, ListEdit, NetworkDef};
 pub use requirement::{Environment, evaluate};
+pub(crate) use resource::is_url;
 pub use resource::{ResourceDef, ResourceKind};
 pub use rule::{InlineRule, ModuleRule, Policy, RuleSetDef, RuleSetSource};
 

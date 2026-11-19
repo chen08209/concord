@@ -22,7 +22,7 @@ pub struct ResourceDef {
     pub lines: Vec<u32>,
 }
 
-pub(super) fn is_url(text: &str) -> bool {
+pub(crate) fn is_url(text: &str) -> bool {
     text.get(..8)
         .is_some_and(|head| head.eq_ignore_ascii_case("https://"))
         || text

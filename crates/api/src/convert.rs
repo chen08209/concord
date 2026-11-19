@@ -210,6 +210,7 @@ pub fn resource_event(update: concord_common::ResourceUpdate) -> CoreEvent {
         Kind::ProxyProvider => ResourceKind::ProxyProvider,
         Kind::RuleProvider => ResourceKind::RuleProvider,
         Kind::Geo => ResourceKind::Geo,
+        Kind::MitmModule => ResourceKind::MitmModule,
     };
     let (phase, error) = match update.phase {
         Phase::Updating => (ResourcePhase::Updating, String::new()),

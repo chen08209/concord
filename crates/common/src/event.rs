@@ -60,6 +60,8 @@ pub enum ResourceKind {
     ProxyProvider,
     RuleProvider,
     Geo,
+    /// The remote files of the MITM module of that name.
+    MitmModule,
 }
 
 /// What a finished fetch did to the content in force.

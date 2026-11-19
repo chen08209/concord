@@ -319,6 +319,8 @@ pub enum ResourceKind {
     ProxyProvider,
     RuleProvider,
     Geo,
+    /// The remote files of the MITM module of that name.
+    MitmModule,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]

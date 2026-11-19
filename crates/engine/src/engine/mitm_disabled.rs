@@ -17,7 +17,11 @@ pub struct MitmService {
 impl MitmService {
     pub(crate) const ENABLED: bool = false;
 
-    pub(crate) fn new(_table: Arc<ConnTable>) -> Self {
+    pub(crate) fn new(
+        _table: Arc<ConnTable>,
+        _fetcher: Arc<dyn concord_group::Fetcher>,
+        _events: Arc<dyn concord_common::EventSink>,
+    ) -> Self {
         MitmService {
             pressure: AtomicI32::new(0),
         }
@@ -62,6 +66,14 @@ impl MitmService {
         Err(unavailable())
     }
 
+    pub fn module_status(&self) -> Result<Value, Failure> {
+        Err(unavailable())
+    }
+
+    pub fn fetch_module(&self, _name: Option<String>) -> Result<(), Failure> {
+        Err(unavailable())
+    }
+
     pub async fn run_script(&self, _name: &str) -> Result<Value, Failure> {
         Err(unavailable())
     }
@@ -81,6 +93,7 @@ impl MitmService {
     pub(crate) fn apply(
         &self,
         section: &concord_config::MitmDef,
+        _modules: Vec<concord_config::mitm::modules::AppliedModule>,
         _trust: Arc<TrustStore>,
         _tasks: concord_common::Tasks,
     ) {

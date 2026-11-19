@@ -192,6 +192,8 @@ macro_rules! with_methods {
             { kind: unary, fun: mitm_generate_certificate, name: "mitm.generateCertificate", exec: Concurrent, params: $crate::types::Empty, result: $crate::types::MitmCertificate, event: (), policy: None, cap: Mitm }
             { kind: unary, fun: mitm_validate, name: "mitm.validate", exec: Concurrent, params: $crate::types::MitmValidateParams, result: $crate::types::MitmValidateResult, event: (), policy: None, cap: Mitm }
             { kind: unary, fun: mitm_read_module, name: "mitm.readModule", exec: Concurrent, params: $crate::types::MitmModuleReadParams, result: $crate::types::MitmModuleView, event: (), policy: None, cap: Mitm }
+            { kind: unary, fun: mitm_module_status, name: "mitm.moduleStatus", exec: Concurrent, params: $crate::types::Empty, result: $crate::types::MitmModuleStatusList, event: (), policy: None, cap: Mitm }
+            { kind: unary, fun: mitm_fetch_module, name: "mitm.fetchModule", exec: Concurrent, params: $crate::types::MitmFetchModuleParams, result: $crate::types::Empty, event: (), policy: None, cap: Mitm }
             { kind: unary, fun: mitm_issue_certificate, name: "mitm.issueCertificate", exec: Concurrent, params: $crate::types::MitmIssueParams, result: $crate::types::MitmPem, event: (), policy: None, cap: Mitm }
             { kind: unary, fun: mitm_run_script, name: "mitm.runScript", exec: Concurrent, params: $crate::types::MitmScriptParams, result: $crate::types::MitmResult, event: (), policy: None, cap: Mitm }
             { kind: unary, fun: mitm_exchanges, name: "mitm.exchanges", exec: Concurrent, params: $crate::types::MitmExchangesParams, result: $crate::types::MitmResult, event: (), policy: None, cap: Mitm }

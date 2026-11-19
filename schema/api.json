@@ -771,6 +771,30 @@
       }
     },
     {
+      "name": "mitm.moduleStatus",
+      "kind": "unary",
+      "exec": "concurrent",
+      "capability": "mitm",
+      "params": {
+        "$ref": "#/$defs/Empty"
+      },
+      "result": {
+        "$ref": "#/$defs/MitmModuleStatusList"
+      }
+    },
+    {
+      "name": "mitm.fetchModule",
+      "kind": "unary",
+      "exec": "concurrent",
+      "capability": "mitm",
+      "params": {
+        "$ref": "#/$defs/MitmFetchModuleParams"
+      },
+      "result": {
+        "$ref": "#/$defs/Empty"
+      }
+    },
+    {
       "name": "mitm.issueCertificate",
       "kind": "unary",
       "exec": "concurrent",
@@ -3981,11 +4005,20 @@
       "description": "One entry of `events.watch`."
     },
     "ResourceKind": {
-      "type": "string",
-      "enum": [
-        "proxyProvider",
-        "ruleProvider",
-        "geo"
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": [
+            "proxyProvider",
+            "ruleProvider",
+            "geo"
+          ]
+        },
+        {
+          "type": "string",
+          "const": "mitmModule",
+          "description": "The remote files of the MITM module of that name."
+        }
       ]
     },
     "ResourcePhase": {
@@ -5941,6 +5974,252 @@
         }
       ],
       "description": "Why a line takes no effect; a host shows each in its own words."
+    },
+    "MitmModuleStatusList": {
+      "type": "object",
+      "properties": {
+        "modules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/MitmModuleStatus"
+          }
+        }
+      },
+      "required": [
+        "modules"
+      ],
+      "description": "The modules the `mitm` section of the profile in force names, in its order."
+    },
+    "MitmModuleStatus": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "inForce": {
+          "type": "boolean",
+          "description": "Read, and not turned off by its own requirement: its lines take effect."
+        },
+        "problem": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MitmModuleProblem"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Why it could not be taken at all."
+        },
+        "off": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MitmModuleOff"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/MitmModuleResourceStatus"
+          }
+        },
+        "refusedRules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/MitmRefusedRule"
+          },
+          "description": "Rules left out of the profile, by the module line that wrote them: most often a\npolicy that `module-policy` maps to no outbound."
+        },
+        "hostNetwork": {
+          "$ref": "#/$defs/MitmModuleNetwork",
+          "description": "The routes and proxy bypass entries the module asks for, which the host applies."
+        }
+      },
+      "required": [
+        "name",
+        "inForce",
+        "resources",
+        "refusedRules",
+        "hostNetwork"
+      ]
+    },
+    "MitmModuleProblem": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "reason": {
+              "type": "string",
+              "const": "unreadable"
+            },
+            "detail": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "reason",
+            "detail"
+          ],
+          "description": "Neither its `path` nor its `text` gives a module."
+        },
+        {
+          "type": "object",
+          "properties": {
+            "reason": {
+              "type": "string",
+              "const": "duplicate"
+            }
+          },
+          "required": [
+            "reason"
+          ],
+          "description": "An earlier module has its name."
+        }
+      ]
+    },
+    "MitmModuleResourceStatus": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/MitmResourceKind"
+        },
+        "lines": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0
+          }
+        },
+        "file": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The file in the MITM resources directory the lines read."
+        },
+        "state": {
+          "$ref": "#/$defs/MitmResourceState"
+        },
+        "error": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MitmFetchFailure"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Why the last fetch failed."
+        }
+      },
+      "required": [
+        "url",
+        "kind",
+        "lines",
+        "state"
+      ]
+    },
+    "MitmResourceState": {
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": [
+            "ok",
+            "fetching"
+          ]
+        },
+        {
+          "type": "string",
+          "const": "failed",
+          "description": "The last fetch failed; a file an earlier fetch stored stays in use."
+        },
+        {
+          "type": "string",
+          "const": "missing",
+          "description": "Never stored: the lines that read it take no effect."
+        }
+      ]
+    },
+    "MitmFetchFailure": {
+      "type": "object",
+      "properties": {
+        "reason": {
+          "$ref": "#/$defs/MitmFetchFailureReason"
+        },
+        "status": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint16",
+          "minimum": 0,
+          "maximum": 65535,
+          "description": "The HTTP status of an `http` failure."
+        },
+        "detail": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "reason",
+        "detail"
+      ]
+    },
+    "MitmFetchFailureReason": {
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": [
+            "dns",
+            "tls",
+            "timeout",
+            "connection",
+            "other"
+          ]
+        },
+        {
+          "type": "string",
+          "const": "http",
+          "description": "The server answered with a status other than 2xx."
+        }
+      ]
+    },
+    "MitmRefusedRule": {
+      "type": "object",
+      "properties": {
+        "line": {
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0
+        },
+        "detail": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "line",
+        "detail"
+      ]
+    },
+    "MitmFetchModuleParams": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The module whose remote files are fetched again; absent, every module's."
+        }
+      }
     },
     "MitmIssueParams": {
       "type": "object",

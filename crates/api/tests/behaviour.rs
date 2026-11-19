@@ -1709,3 +1709,73 @@ p = title=x
     assert_eq!(view.ignored[0].text, "FINAL,DIRECT");
     rig.finish().await;
 }
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn mitm_module_status_answers_each_module_and_its_files() {
+    let rig = Rig::new().await;
+    rig.write_config(
+        r#"
+mitm:
+  enable: true
+  module-policy: {PROXY: DIRECT}
+  modules:
+    - name: ads
+      text: |
+        [Rule]
+        DOMAIN,ad.test,PROXY
+        DOMAIN,b.test,Nowhere
+        [Script]
+        s = type=http-response,pattern=^https://a\.test,script-path=http://127.0.0.1:1/s.js
+    - {name: gone, path: modules/gone.sgmodule}
+rules:
+  - MATCH,DIRECT
+"#,
+    );
+    rig.apply().await.unwrap();
+    let failed = |list: &MitmModuleStatusList| {
+        list.modules[0].resources[0].state == MitmResourceState::Failed
+    };
+    let mut status = rig.control.mitm_module_status(Empty {}).await.unwrap();
+    for _ in 0..100 {
+        if failed(&status) {
+            break;
+        }
+        tokio::time::sleep(std::time::Duration::from_millis(50)).await;
+        status = rig.control.mitm_module_status(Empty {}).await.unwrap();
+    }
+    let [ads, gone] = &status.modules[..] else {
+        panic!("{status:?}");
+    };
+    assert!(ads.in_force);
+    assert_eq!(ads.refused_rules.len(), 1);
+    assert_eq!(ads.refused_rules[0].line, 3);
+    let script = &ads.resources[0];
+    assert_eq!(script.url, "http://127.0.0.1:1/s.js");
+    assert_eq!(script.state, MitmResourceState::Failed, "{script:?}");
+    assert_eq!(
+        script.error.as_ref().unwrap().reason,
+        MitmFetchFailureReason::Connection
+    );
+    assert!(!gone.in_force);
+    assert!(matches!(
+        gone.problem,
+        Some(MitmModuleProblem::Unreadable { .. })
+    ));
+
+    rig.control
+        .mitm_fetch_module(MitmFetchModuleParams { name: None })
+        .await
+        .unwrap();
+    let unknown = rig
+        .control
+        .mitm_fetch_module(MitmFetchModuleParams {
+            name: Some("nope".to_string()),
+        })
+        .await
+        .unwrap_err();
+    assert!(
+        unknown.message.contains("no module named nope"),
+        "{unknown:?}"
+    );
+    rig.finish().await;
+}

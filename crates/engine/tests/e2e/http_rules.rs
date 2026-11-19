@@ -1,11 +1,11 @@
 use super::mitm::tls_echo_server;
 use super::*;
 
-trait Io: tokio::io::AsyncRead + tokio::io::AsyncWrite + Unpin + Send {}
+pub(super) trait Io: tokio::io::AsyncRead + tokio::io::AsyncWrite + Unpin + Send {}
 impl<T: tokio::io::AsyncRead + tokio::io::AsyncWrite + Unpin + Send> Io for T {}
 
 /// A plain HTTP/1.1 server that keeps connections open and answers `<path>|<user-agent>`.
-async fn plain_echo_server() -> SocketAddr {
+pub(super) async fn plain_echo_server() -> SocketAddr {
     let listener = TcpListener::bind((Ipv4Addr::LOCALHOST, 0)).await.unwrap();
     let addr = listener.local_addr().unwrap();
     tokio::spawn(async move {
@@ -31,7 +31,7 @@ async fn plain_echo_server() -> SocketAddr {
     addr
 }
 
-async fn read_head(stream: &mut (impl tokio::io::AsyncRead + Unpin)) -> Option<String> {
+pub(super) async fn read_head(stream: &mut (impl tokio::io::AsyncRead + Unpin)) -> Option<String> {
     let mut head = Vec::new();
     let mut byte = [0u8; 1];
     while !head.ends_with(b"\r\n\r\n") {
@@ -130,7 +130,7 @@ impl Setup {
 
 /// One request on a kept connection: its status, content type and body, or `None` when the
 /// connection closed instead.
-async fn ask(
+pub(super) async fn ask(
     stream: &mut Box<dyn Io>,
     port: u16,
     path: &str,
@@ -164,7 +164,7 @@ async fn ask(
     ))
 }
 
-async fn body_of(stream: &mut Box<dyn Io>, port: u16, path: &str) -> (u16, String) {
+pub(super) async fn body_of(stream: &mut Box<dyn Io>, port: u16, path: &str) -> (u16, String) {
     let (status, _, body) = ask(stream, port, path, None)
         .await
         .unwrap_or_else(|| panic!("{path} got no answer"));
