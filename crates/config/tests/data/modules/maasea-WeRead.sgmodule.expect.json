@@ -29,7 +29,7 @@
   "map-local": {},
   "request-body-mock": {},
   "script": {
-    "7": "ScriptDef { name: \"WeRead\", path: \"https://raw.githubusercontent.com/Maasea/sgmodule/master/Script/WeRead/weread.js\", kind: HttpResponse, pattern: Some(\"https:\\\\/\\\\/i\\\\.weread\\\\.qq\\\\.com\\\\/(book\\\\/(reading[sS]tat|chapterReview)|user\\\\/profile|groups\\\\/readerEntrance|review\\\\/list|mobileSync)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }"
+    "7": "ScriptDef { name: \"WeRead\", path: \"https://raw.githubusercontent.com/Maasea/sgmodule/master/Script/WeRead/weread.js\", kind: HttpResponse, pattern: Some(\"https:\\\\/\\\\/i\\\\.weread\\\\.qq\\\\.com\\\\/(book\\\\/(reading[sS]tat|chapterReview)|user\\\\/profile|groups\\\\/readerEntrance|review\\\\/list|mobileSync)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, full_header: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }"
   },
   "rules": {},
   "rule-sets": [],

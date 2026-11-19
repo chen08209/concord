@@ -101,6 +101,7 @@ async fn adding_a_module_and_replacing_it_many_times_keeps_its_memory_bounded() 
         dialer: Arc::new(NoDial),
         clock: Arc::new(UtcClock),
         runtime: None,
+        events: Arc::new(concord_common::NullSink),
         tasks: concord_common::Tasks::default(),
     });
     mitm.generate_certificate().unwrap();

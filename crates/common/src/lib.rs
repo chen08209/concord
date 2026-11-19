@@ -64,7 +64,7 @@ pub use error::{CoreError, io_error, no_retry};
 pub use event::{
     Change, CoreEvent, DelayResult, DnsRecord, EventSink, Fetch, GeneralChange, Initiator,
     LogRecord, NullSink, Origin, Refresh, ResourceKind, ResourcePhase, ResourceUpdate, RouteStamp,
-    RouteView, SUPERSEDED, StateChange, TrafficDelta,
+    RouteView, SUPERSEDED, ScriptNotification, StateChange, TrafficDelta,
 };
 #[cfg(feature = "io")]
 pub use flow::{

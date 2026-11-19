@@ -3,17 +3,23 @@ use std::sync::Arc;
 use http::header::HOST;
 use http::{HeaderMap, StatusCode};
 
-use crate::body::{Body, Buffered, buffer_body, empty, failing, full};
+use crate::body::{Body, Buffered, buffer_body, empty, failing, full_with};
 use crate::capture::{PHASE_REQUEST, PHASE_RESPONSE};
 use crate::exchange::{
     ANSWER_SCRIPT, Answer, OutRequest, RULE_SCRIPT, ReplyError, Sent, Target, has_response_body,
     set_length,
 };
-use crate::headers::{is_grpc, script_header, to_list, with_host};
+use crate::headers::{from_list, is_grpc, script_header, to_list, with_host};
 use crate::limits::PRESSURE_NO_SCRIPTS;
 use crate::script::{Script, ScriptInvocation, ScriptRequest, ScriptResponse, ScriptResult};
 use crate::session::{Session, SessionDial};
 use crate::target::TargetUrl;
+
+/// A body read whole for a script, and the trailers that followed it.
+struct ScriptBody {
+    data: Vec<u8>,
+    trailers: Option<HeaderMap>,
+}
 
 fn non_empty(data: &[u8]) -> Option<Vec<u8>> {
     (!data.is_empty()).then(|| data.to_vec())
@@ -89,17 +95,17 @@ impl Session {
             header: with_host(&out.headers, &out.host_header()),
             body: None,
         };
-        let mut buffered = false;
+        let mut buffered = None;
         if script.requires_body && out.has_body {
             let body = std::mem::replace(&mut out.body, empty());
             let (body, length, data) = self
                 .buffer_for_script(target, script, &address, &mut out.headers, body, out.length)
                 .await;
             out.set_body(body, length);
-            let Some(data) = data else { return };
+            let Some(read) = data else { return };
             request.header = with_host(&out.headers, &out.host_header());
-            request.body = non_empty(&data);
-            buffered = true;
+            request.body = non_empty(&read.data);
+            buffered = Some(read.trailers);
         }
         let mut invocation = self.base_invocation();
         invocation.request = Some(request);
@@ -148,9 +154,11 @@ impl Session {
                 set_length(&mut out.headers, Some(length));
             }
         }
-        if buffered && let Some(data) = result.body {
+        if let Some(trailers) = buffered
+            && let Some(data) = result.body
+        {
             let length = data.len() as u64;
-            out.set_body(full(data), Some(length));
+            out.set_body(full_with(data, trailers), Some(length));
             changed = true;
         }
         if changed {
@@ -197,7 +205,10 @@ impl Session {
         let response = ScriptResponse {
             status: head.status.as_u16(),
             header: to_list(&head.headers),
-            body: data_seen.as_deref().and_then(non_empty),
+            body: data_seen.as_ref().and_then(|read| non_empty(&read.data)),
+            trailers: data_seen
+                .as_ref()
+                .and_then(|read| read.trailers.as_ref().map(to_list)),
         };
         let mut invocation = self.base_invocation();
         invocation.request = Some(request);
@@ -237,11 +248,16 @@ impl Session {
                 set_length(&mut head.headers, Some(length));
             }
         }
-        if data_seen.is_some()
-            && let Some(data) = result.body
+        if let Some(read) = data_seen
+            && (result.body.is_some() || result.trailers.is_some())
         {
+            let data = result.body.unwrap_or(read.data);
+            let trailers = match &result.trailers {
+                Some(list) => Some(from_list(list)).filter(|map| !map.is_empty()),
+                None => read.trailers,
+            };
             let length = data.len() as u64;
-            *body = full(data);
+            *body = full_with(data, trailers);
             set_length(&mut head.headers, Some(length));
             changed = true;
         }
@@ -265,11 +281,11 @@ impl Session {
         headers: &mut HeaderMap,
         body: Body,
         length: Option<u64>,
-    ) -> (Body, Option<u64>, Option<Vec<u8>>) {
+    ) -> (Body, Option<u64>, Option<ScriptBody>) {
         if is_grpc(headers) && !script.binary_body {
             return (body, length, None);
         }
-        let limit = script.body_limit(self.core.config.limits.max_body_size);
+        let limit = script.body_limit(&self.core.config.limits);
         if !self
             .reserve_body(target, address, headers, length, limit)
             .await
@@ -285,12 +301,13 @@ impl Session {
                 );
                 (body, length, None)
             }
-            Ok(Buffered::Whole(data)) => {
+            Ok(Buffered::Whole(data, trailers)) => {
                 let size = data.len() as u64;
+                let body = full_with(data.clone(), trailers.clone());
                 if !script.binary_body && std::str::from_utf8(&data).is_err() {
-                    return (full(data), Some(size), None);
+                    return (body, Some(size), None);
                 }
-                (full(data.clone()), Some(size), Some(data))
+                (body, Some(size), Some(ScriptBody { data, trailers }))
             }
         }
     }

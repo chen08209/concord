@@ -14,7 +14,9 @@ use concord_common::intercept::{
     RuleLabel, Upstream, UpstreamDialer, UpstreamRequest,
 };
 use concord_common::sync::lock;
-use concord_common::{Address, FlowMeta, InboundInfo, InboundKind, Network};
+use concord_common::{
+    Address, CoreEvent, EventSink, FlowMeta, InboundInfo, InboundKind, Network, ScriptNotification,
+};
 use concord_platform::HomeDir;
 use concord_tls::TrustStore;
 use http::{HeaderMap, HeaderName, HeaderValue, Request, StatusCode, Version};
@@ -508,9 +510,32 @@ pub(crate) fn flow_of(kind: InboundKind, dst: Address) -> InterceptFlow {
     }
 }
 
+/// Keeps the scripts' notifications a rig's engine publishes.
+#[derive(Default)]
+pub(crate) struct Notices(Mutex<Vec<ScriptNotification>>);
+
+impl Notices {
+    pub fn taken(&self) -> Vec<ScriptNotification> {
+        std::mem::take(&mut *lock(&self.0))
+    }
+}
+
+impl EventSink for Notices {
+    fn enabled(&self) -> bool {
+        true
+    }
+
+    fn publish(&self, event: CoreEvent) {
+        if let CoreEvent::ScriptNotification(notice) = event {
+            lock(&self.0).push(notice);
+        }
+    }
+}
+
 pub(crate) struct Rig {
     pub mitm: Mitm,
     pub dialer: Arc<TestDialer>,
+    pub notices: Arc<Notices>,
     _home: tempfile::TempDir,
     pub root: CertificateDer<'static>,
 }
@@ -544,17 +569,20 @@ pub(crate) fn rig_for(server: &TestServer, runtime: Option<Arc<dyn ScriptRuntime
 pub(crate) fn rig_without_ca(server: &TestServer, runtime: Option<Arc<dyn ScriptRuntime>>) -> Rig {
     let home = tempfile::tempdir().unwrap();
     let dialer = TestDialer::new(server.addr);
+    let notices = Arc::new(Notices::default());
     let mitm = Mitm::new(MitmEnv {
         home: Arc::new(HomeDir::new(home.path())),
         trust: TrustStore::new(&[], Vec::new()),
         dialer: dialer.clone(),
         clock: Arc::new(UtcClock),
         runtime,
+        events: notices.clone(),
         tasks: concord_common::Tasks::default(),
     });
     Rig {
         mitm,
         dialer,
+        notices,
         _home: home,
         root: CertificateDer::from(Vec::new()),
     }
@@ -629,7 +657,10 @@ impl Client {
         let (near, offer) = offer_on(rig.mitm.interceptor(), flow);
         let name = ServerName::try_from(server_name.to_string()).unwrap();
         let connector = TlsConnector::from(client_config(&rig.root, alpn));
-        let tls = connector.connect(name, near).await?;
+        // A hello the section does not decrypt is left to the caller, which a test never relays.
+        let tls = tokio::time::timeout(Duration::from_secs(10), connector.connect(name, near))
+            .await
+            .map_err(|_| io::Error::other("the TLS handshake got no answer"))??;
         let negotiated = tls.get_ref().1.alpn_protocol().map(<[u8]>::to_vec);
         let wire = if negotiated.as_deref() == Some(b"h2") {
             let (sender, conn) = client2::Builder::new(TokioExecutor::new())

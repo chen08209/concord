@@ -995,7 +995,7 @@
   "request-body-mock": {},
   "script": {
     "count": 220,
-    "sha256": "6ff83d29eb0ee232049b480d1f557e310fad5366b75ba112c060e7102de824fc",
+    "sha256": "921380d1406eae7d81c28133429f4d48e2da218764d8f549ecc72a9811bec348",
     "errors": {}
   },
   "rules": {

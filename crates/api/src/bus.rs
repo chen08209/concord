@@ -443,6 +443,15 @@ impl EventSink for EventBus {
                 name: name.to_string(),
             }),
             EngineEvent::State(change) => self.publish_event(convert::state_event(change)),
+            EngineEvent::ScriptNotification(notice) => {
+                self.publish_event(CoreEvent::ScriptNotification {
+                    script: notice.script,
+                    title: notice.title,
+                    subtitle: notice.subtitle,
+                    body: notice.body,
+                    url: notice.url,
+                });
+            }
         }
     }
 

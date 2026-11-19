@@ -20,6 +20,52 @@ pub(crate) fn full(data: impl Into<Bytes>) -> Body {
         .boxed_unsync()
 }
 
+/// `data` read whole, then the trailers that followed it.
+pub(crate) fn full_with(data: impl Into<Bytes>, trailers: Option<HeaderMap>) -> Body {
+    match trailers {
+        None => full(data),
+        Some(trailers) => WithTrailers {
+            data: Some(data.into()),
+            trailers: Some(trailers),
+        }
+        .boxed_unsync(),
+    }
+}
+
+struct WithTrailers {
+    data: Option<Bytes>,
+    trailers: Option<HeaderMap>,
+}
+
+impl HttpBody for WithTrailers {
+    type Data = Bytes;
+    type Error = io::Error;
+
+    fn poll_frame(
+        mut self: Pin<&mut Self>,
+        _cx: &mut Context<'_>,
+    ) -> Poll<Option<Result<Frame<Bytes>, io::Error>>> {
+        if let Some(data) = self.data.take()
+            && !data.is_empty()
+        {
+            return Poll::Ready(Some(Ok(Frame::data(data))));
+        }
+        Poll::Ready(
+            self.trailers
+                .take()
+                .map(|trailers| Ok(Frame::trailers(trailers))),
+        )
+    }
+
+    fn is_end_stream(&self) -> bool {
+        self.data.as_ref().is_none_or(Bytes::is_empty) && self.trailers.is_none()
+    }
+
+    fn size_hint(&self) -> SizeHint {
+        SizeHint::with_exact(self.data.as_ref().map_or(0, |data| data.len() as u64))
+    }
+}
+
 pub(crate) fn from_incoming(body: Incoming) -> Body {
     body.map_err(io::Error::other).boxed_unsync()
 }
@@ -127,13 +173,11 @@ impl HttpBody for Resumed {
 }
 
 pub(crate) enum Buffered {
-    Whole(Vec<u8>),
+    /// The data, and the trailers that followed it.
+    Whole(Vec<u8>, Option<HeaderMap>),
     /// Larger than the limit or in an encoding with no decoder: to send on as it
     /// came, already decoded if decoding had begun.
-    Rest {
-        body: Body,
-        length: Option<u64>,
-    },
+    Rest { body: Body, length: Option<u64> },
 }
 
 /// Reads a body whole and decoded. A gzip or deflate coding is removed from
@@ -169,9 +213,16 @@ pub(crate) async fn buffer_body(
     }
     let mut body = body;
     let mut out: Vec<u8> = Vec::new();
+    let mut trailers: Option<HeaderMap> = None;
     while let Some(frame) = body.frame().await {
-        let Ok(data) = frame?.into_data() else {
-            continue;
+        let data = match frame?.into_data() {
+            Ok(data) => data,
+            Err(frame) => {
+                if let Ok(more) = frame.into_trailers() {
+                    trailers.get_or_insert_default().extend(more);
+                }
+                continue;
+            }
         };
         match decoder.as_mut() {
             Some(active) => out.extend(active.push(&data)?),
@@ -194,12 +245,12 @@ pub(crate) async fn buffer_body(
         out.extend(active.finish()?);
         if out.len() > cap {
             return Ok(Buffered::Rest {
-                body: full(out),
+                body: full_with(out, trailers),
                 length: None,
             });
         }
     }
-    Ok(Buffered::Whole(out))
+    Ok(Buffered::Whole(out, trailers))
 }
 
 type DataHook = Box<dyn FnMut(&Bytes) + Send>;
@@ -297,7 +348,29 @@ mod tests {
         let got = buffer_body(&mut map, full("hello"), Some(5), 100)
             .await
             .unwrap();
-        assert!(matches!(got, Buffered::Whole(data) if data == b"hello"));
+        assert!(matches!(got, Buffered::Whole(data, None) if data == b"hello"));
+    }
+
+    #[tokio::test]
+    async fn the_trailers_after_a_body_read_whole_are_kept_and_sent_on() {
+        let mut trailers = HeaderMap::new();
+        trailers.insert("grpc-status", http::HeaderValue::from_static("0"));
+        let mut map = header("");
+        let got = buffer_body(
+            &mut map,
+            full_with("hello", Some(trailers.clone())),
+            None,
+            100,
+        )
+        .await
+        .unwrap();
+        let Buffered::Whole(data, Some(kept)) = got else {
+            panic!("no trailers");
+        };
+        assert_eq!((data.as_slice(), &kept), (&b"hello"[..], &trailers));
+        let sent = full_with(data, Some(kept)).collect().await.unwrap();
+        assert_eq!(sent.trailers(), Some(&trailers));
+        assert_eq!(sent.to_bytes(), "hello");
     }
 
     #[tokio::test]
@@ -306,7 +379,7 @@ mod tests {
         let got = buffer_body(&mut map, full(gzip(b"hello ad")), None, 100)
             .await
             .unwrap();
-        assert!(matches!(got, Buffered::Whole(data) if data == b"hello ad"));
+        assert!(matches!(got, Buffered::Whole(data, None) if data == b"hello ad"));
         assert!(map.get(http::header::CONTENT_ENCODING).is_none());
     }
 
@@ -321,7 +394,7 @@ mod tests {
                 assert_eq!(length, Some(10));
                 assert_eq!(drain(body).await, b"0123456789");
             }
-            Buffered::Whole(_) => panic!("buffered"),
+            Buffered::Whole(..) => panic!("buffered"),
         }
         assert!(map.get(http::header::CONTENT_ENCODING).is_some());
     }
@@ -346,7 +419,7 @@ mod tests {
                 assert_eq!(length, None);
                 assert_eq!(drain(body).await, text);
             }
-            Buffered::Whole(_) => panic!("buffered"),
+            Buffered::Whole(..) => panic!("buffered"),
         }
     }
 

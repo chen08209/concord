@@ -106,6 +106,7 @@ fn blank() -> ScriptDef {
         conditions: HeadConditionsDef::default(),
         requires_body: false,
         binary_body: false,
+        full_header: false,
         max_size: 0,
         cronexp: String::new(),
         event: String::new(),

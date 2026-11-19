@@ -61,6 +61,9 @@ pub struct ScriptDef {
     pub conditions: HeadConditionsDef,
     pub requires_body: bool,
     pub binary_body: bool,
+    /// Surge's `full-header-mode`: headers go to the script as `{field, value}` entries.
+    pub full_header: bool,
+    /// Bytes, -1 for as much as the engine allows, 0 when the line does not say.
     pub max_size: i64,
     pub cronexp: String,
     pub event: String,
@@ -108,6 +111,7 @@ pub fn parse_script(line: &str) -> Result<ScriptDef, LineError> {
         conditions: HeadConditionsDef::default(),
         requires_body: false,
         binary_body: false,
+        full_header: false,
         max_size: 0,
         cronexp: String::new(),
         event: String::new(),
@@ -169,18 +173,14 @@ impl ScriptDef {
         }
         self.requires_body = script_bool(params, "requires-body")?;
         self.binary_body = script_bool(params, "binary-body-mode")?;
-        if script_bool(params, "full-header-mode").unwrap_or(true) {
-            return Err(LineError::unsupported("full-header-mode is not supported"));
-        }
+        self.full_header = script_bool(params, "full-header-mode")?;
         if let Some(text) = params.get("max-size") {
             let size = text
                 .parse::<i64>()
                 .ok()
                 .filter(|size| *size >= -1)
                 .ok_or_else(|| LineError::invalid(format!("invalid max-size {}", quote(text))))?;
-            if size > 0 {
-                self.max_size = size;
-            }
+            self.max_size = size;
         }
         check_pattern(&pattern)?;
         self.pattern = Some(pattern);

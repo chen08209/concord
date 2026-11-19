@@ -186,6 +186,7 @@ async fn a_request_answered_in_place_is_listed_as_a_connection() {
                 status: 203,
                 header: Default::default(),
                 body: None,
+                trailers: None,
             }),
             ..ScriptResult::default()
         })

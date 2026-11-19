@@ -3,7 +3,7 @@ use std::sync::{Arc, Mutex, MutexGuard};
 use arc_swap::{ArcSwap, ArcSwapOption};
 use async_trait::async_trait;
 use concord_common::intercept::{ConnInterceptor, InterceptFlow, Offer, UpstreamDialer};
-use concord_common::{BoxStream, Tasks};
+use concord_common::{BoxStream, EventSink, Tasks};
 use concord_platform::HomeDir;
 use concord_tls::TrustStore;
 
@@ -26,6 +26,8 @@ pub struct MitmEnv {
     pub dialer: Arc<dyn UpstreamDialer>,
     pub clock: Arc<dyn LocalClock>,
     pub runtime: Option<Arc<dyn ScriptRuntime>>,
+    /// Where scripts' notifications go.
+    pub events: Arc<dyn EventSink>,
     /// Where the engines of the sections applied before the next `apply_section` run.
     pub tasks: Tasks,
 }
@@ -93,6 +95,7 @@ impl Mitm {
             dialer: env.dialer,
             scripts: Arc::new(ScriptHost::new(runtime)),
             clock: env.clock,
+            events: env.events,
             trusted_ca: ArcSwapOption::empty(),
         });
         Mitm {

@@ -43,8 +43,8 @@
   "map-local": {},
   "request-body-mock": {},
   "script": {
-    "8": "ScriptDef { name: \"0 5 * * * substore\", path: \"https://raw.githubusercontent.com/sub-store-org/Sub-Store/release/cron-sync-artifacts.min.js\", kind: Cron, pattern: None, conditions: HeadConditionsDef { request: None, response: None }, requires_body: false, binary_body: false, max_size: 0, cronexp: \"0 5 * * *\", event: \"\", timeout: Some(120.0), argument: None }",
-    "9": "ScriptDef { name: \"55 2 * * * mgclub\", path: \"https://raw.githubusercontent.com/kokoryh/Script/master/js/ihan.js\", kind: Cron, pattern: None, conditions: HeadConditionsDef { request: None, response: None }, requires_body: false, binary_body: false, max_size: 0, cronexp: \"55 2 * * *\", event: \"\", timeout: None, argument: None }"
+    "8": "ScriptDef { name: \"0 5 * * * substore\", path: \"https://raw.githubusercontent.com/sub-store-org/Sub-Store/release/cron-sync-artifacts.min.js\", kind: Cron, pattern: None, conditions: HeadConditionsDef { request: None, response: None }, requires_body: false, binary_body: false, full_header: false, max_size: 0, cronexp: \"0 5 * * *\", event: \"\", timeout: Some(120.0), argument: None }",
+    "9": "ScriptDef { name: \"55 2 * * * mgclub\", path: \"https://raw.githubusercontent.com/kokoryh/Script/master/js/ihan.js\", kind: Cron, pattern: None, conditions: HeadConditionsDef { request: None, response: None }, requires_body: false, binary_body: false, full_header: false, max_size: 0, cronexp: \"55 2 * * *\", event: \"\", timeout: None, argument: None }"
   },
   "rules": {},
   "rule-sets": [],

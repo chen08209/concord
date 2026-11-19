@@ -49,8 +49,8 @@
   },
   "request-body-mock": {},
   "script": {
-    "68": "ScriptDef { name: \"淘宝\", path: \"https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/myBlockAds.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/guide-acs\\\\.m\\\\.taobao\\\\.com\\\\/gw\\\\/mtop\\\\.taobao\\\\.(cloudvideo\\\\.video\\\\.query|wireless\\\\.home\\\\.splash\\\\.awesome\\\\.get)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(60.0), argument: None }",
-    "70": "ScriptDef { name: \"淘宝\", path: \"https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/myBlockAds.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/poplayer\\\\.template\\\\.alibaba\\\\.com\\\\/\\\\w+\\\\.json\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(60.0), argument: None }"
+    "68": "ScriptDef { name: \"淘宝\", path: \"https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/myBlockAds.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/guide-acs\\\\.m\\\\.taobao\\\\.com\\\\/gw\\\\/mtop\\\\.taobao\\\\.(cloudvideo\\\\.video\\\\.query|wireless\\\\.home\\\\.splash\\\\.awesome\\\\.get)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, full_header: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(60.0), argument: None }",
+    "70": "ScriptDef { name: \"淘宝\", path: \"https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/myBlockAds.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/poplayer\\\\.template\\\\.alibaba\\\\.com\\\\/\\\\w+\\\\.json\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, full_header: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(60.0), argument: None }"
   },
   "rules": {
     "15": "DOMAIN-SUFFIX,apoll.m.taobao.com => REJECT",

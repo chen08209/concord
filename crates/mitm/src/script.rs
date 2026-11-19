@@ -6,7 +6,7 @@ use std::time::Duration;
 
 use async_trait::async_trait;
 use concord_common::sync::lock;
-use concord_common::{BoxStream, Tasks};
+use concord_common::{BoxStream, ScriptNotification, Tasks};
 use concord_config::mitm::{IssueKind, LineError, ScriptDef};
 use sha2::{Digest, Sha256};
 
@@ -16,6 +16,7 @@ pub use concord_config::mitm::{
 
 use crate::cron::CronSchedule;
 use crate::heads::HeadConditions;
+use crate::limits::Limits;
 use crate::pattern::Pattern;
 use crate::rules::read_resource;
 use crate::view::{LineView, ScriptView, ScriptViewKind};
@@ -41,6 +42,8 @@ pub struct ScriptResponse {
     pub status: u16,
     pub header: HeaderList,
     pub body: Option<Vec<u8>>,
+    /// What followed a body read whole, as gRPC's `grpc-status`.
+    pub trailers: Option<HeaderList>,
 }
 
 /// What a script returned; whatever is empty stays as it was.
@@ -50,6 +53,7 @@ pub struct ScriptResult {
     pub status: u16,
     pub header: Option<HeaderList>,
     pub body: Option<Vec<u8>>,
+    pub trailers: Option<HeaderList>,
     pub response: Option<ScriptResponse>,
     pub abort: bool,
     pub value: Vec<u8>,
@@ -69,6 +73,7 @@ pub trait ScriptDial: Send + Sync {
 }
 
 pub type ConsoleSink = Arc<dyn Fn(&str) + Send + Sync>;
+pub type NotifySink = Arc<dyn Fn(ScriptNotification) + Send + Sync>;
 
 pub struct ScriptInvocation {
     pub name: String,
@@ -76,6 +81,7 @@ pub struct ScriptInvocation {
     pub kind: String,
     pub argument: Option<serde_json::Value>,
     pub binary_body: bool,
+    pub full_header: bool,
     pub request: Option<ScriptRequest>,
     pub response: Option<ScriptResponse>,
     /// Opens a connection the rules route like any other and that is never
@@ -87,6 +93,7 @@ pub struct ScriptInvocation {
     pub event: Option<ScriptEvent>,
     pub trigger: String,
     pub console: Option<ConsoleSink>,
+    pub notify: Option<NotifySink>,
 }
 
 impl ScriptInvocation {
@@ -97,6 +104,7 @@ impl ScriptInvocation {
             kind: String::new(),
             argument: None,
             binary_body: false,
+            full_header: false,
             request: None,
             response: None,
             dial,
@@ -106,6 +114,7 @@ impl ScriptInvocation {
             event: None,
             trigger: String::new(),
             console: None,
+            notify: None,
         }
     }
 }
@@ -202,6 +211,7 @@ pub struct Script {
     pub(crate) conditions: HeadConditions,
     pub requires_body: bool,
     pub binary_body: bool,
+    pub full_header: bool,
     pub max_size: i64,
     pub cronexp: String,
     pub(crate) cron: Option<CronSchedule>,
@@ -268,11 +278,13 @@ impl Script {
         })
     }
 
-    pub(crate) fn body_limit(&self, max_body_size: i64) -> i64 {
-        if self.max_size > 0 && self.max_size < max_body_size {
-            self.max_size
-        } else {
-            max_body_size
+    /// The engine's limit for one body unless the line sets `max-size`, which may go up to
+    /// what all bodies share; -1 takes all of it.
+    pub(crate) fn body_limit(&self, limits: &Limits) -> i64 {
+        match self.max_size {
+            0 => limits.max_body_size,
+            -1 => limits.body_buffer,
+            size => size.min(limits.body_buffer),
         }
     }
 }
@@ -307,6 +319,7 @@ pub(crate) fn compile_script(
         conditions,
         requires_body: def.requires_body,
         binary_body: def.binary_body,
+        full_header: def.full_header,
         max_size: def.max_size,
         cronexp: def.cronexp.clone(),
         cron,
@@ -487,6 +500,7 @@ mod tests {
                     name: "Loon",
                     kind: ScriptKind::HttpResponse,
                     requires_body: true,
+                    max_size: -1,
                     argument: Some(serde_json::json!({"on": true})),
                     ..Want::default()
                 },
@@ -604,6 +618,30 @@ mod tests {
     }
 
     #[test]
+    fn max_size_reaches_past_one_body_up_to_what_all_bodies_share() {
+        use crate::limits::{RawLimits, Resolve};
+
+        let (_home, resources, host) = setup();
+        let limits = Limits {
+            max_body_size: 4 << 20,
+            body_buffer: 32 << 20,
+            ..RawLimits::default().resolve()
+        };
+        let limit = |size: &str| {
+            let line =
+                format!("S = type=http-response,pattern=a,requires-body=1,{size}script-path=a.js");
+            parse_script(&line, &resources, &host)
+                .unwrap()
+                .body_limit(&limits)
+        };
+        assert_eq!(limit(""), 4 << 20);
+        assert_eq!(limit("max-size=1024,"), 1024);
+        assert_eq!(limit("max-size=20000000,"), 20_000_000);
+        assert_eq!(limit("max-size=99999999,"), 32 << 20);
+        assert_eq!(limit("max-size=-1,"), 32 << 20);
+    }
+
+    #[test]
     fn script_lines_read_head_conditions() {
         let (_home, resources, host) = setup();
         let script = parse_script(
@@ -654,8 +692,8 @@ mod tests {
                 "pattern is missing",
             ),
             (
-                "X = type=http-request,pattern=a,script-path=a.js,full-header-mode=true",
-                "full-header-mode is not supported",
+                "X = type=http-request,pattern=a,script-path=a.js,full-header-mode=maybe",
+                "invalid full-header-mode",
             ),
             (
                 "X = type=http-request,pattern=a,script-path=a.js,max-size=-2",

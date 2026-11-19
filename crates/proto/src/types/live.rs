@@ -362,6 +362,20 @@ pub enum CoreEvent {
     Fatal {
         message: String,
     },
+    /// What a MITM script posted with `$notification.post`, sent as it posts.
+    /// None is kept for a watch that comes later, and one a watch has no room
+    /// for ends in a resync like any other event.
+    ScriptNotification {
+        script: String,
+        title: String,
+        #[serde(default, skip_serializing_if = "String::is_empty")]
+        subtitle: String,
+        #[serde(default, skip_serializing_if = "String::is_empty")]
+        body: String,
+        /// What opening it opens: the post's `url`, `open-url` or `openUrl`.
+        #[serde(default, skip_serializing_if = "String::is_empty")]
+        url: String,
+    },
     /// Sent only to a watch that asked for `state`.
     StateChanged {
         seq: u64,

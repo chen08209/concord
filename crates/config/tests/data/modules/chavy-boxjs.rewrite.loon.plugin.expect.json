@@ -29,7 +29,7 @@
   "map-local": {},
   "request-body-mock": {},
   "script": {
-    "12": "ScriptDef { name: \"BoxJs\", path: \"https://raw.githubusercontent.com/chavyleung/scripts/master/box/chavy.boxjs.js\", kind: HttpRequest, pattern: Some(\"(?i)^https?:\\\\/\\\\/(.+\\\\.)?boxjs\\\\.(com|net)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(120.0), argument: None }"
+    "12": "ScriptDef { name: \"BoxJs\", path: \"https://raw.githubusercontent.com/chavyleung/scripts/master/box/chavy.boxjs.js\", kind: HttpRequest, pattern: Some(\"(?i)^https?:\\\\/\\\\/(.+\\\\.)?boxjs\\\\.(com|net)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, full_header: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(120.0), argument: None }"
   },
   "rules": {
     "9": "DOMAIN-SUFFIX,jsdelivr.net => <PROXY>"

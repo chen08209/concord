@@ -226,7 +226,15 @@ match sends its data upstream in place of the request's body, a request that had
 set over the request's headers; the header and body rewrites and the script after it see the mocked body.
 An `http-request` or `http-response` script takes the same conditions as parameters, `request-head=<re>` and on
 an `http-response` script `response-head=<re>`. The first script whose URL and conditions match runs, so one whose
-conditions fail leaves the turn to the next.
+conditions fail leaves the turn to the next. A body read whole for a script or a body rewrite keeps the trailers that
+followed it, as gRPC's `grpc-status`; an `http-response` script sees them as `$response.trailers`, absent when there
+were none, and `$done({trailers})` replaces them. With `full-header-mode=true` a script's headers come as `{field, value}` entries, one
+per value, grouped by name in the order each name's values came, and `$done` takes `headers` in either form.
+A script reads a body up to `limits.max-body-size` unless its line sets `max-size`, which may reach up to
+`limits.body-buffer`, the memory all bodies share; `max-size=-1` takes all of it, where Surge sets no limit. A body
+over its script's limit passes on as it came, the script unrun. `$notification.post` goes out on `events.watch` as a
+`scriptNotification` as soon as it is posted, with the URL its fourth argument names as `url`, `open-url`, `openUrl`
+or a bare string; none is kept for an app that is not watching.
 `client-source-address` takes Surge's comma-separated addresses and CIDRs, `-` before one left out, and decrypts
 only for the clients it names, all of them while it is empty. Under a TUN the device's own apps reach Concord from the
 TUN's address, so a list that names only other clients leaves them as they are, as Surge does on a Mac.

@@ -28,5 +28,5 @@
     removeValueForKey: (key) => $persistentStore.write(null, key),
     removeAllValues: () => false,
   };
-  global.$notify = (title, subtitle, message) => $notification.post(title, subtitle, message);
+  global.$notify = (title, subtitle, message, options) => $notification.post(title, subtitle, message, options);
 })(globalThis);

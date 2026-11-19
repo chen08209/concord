@@ -9,6 +9,7 @@ use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
 use base64::Engine as _;
 use base64::engine::general_purpose::STANDARD;
+use concord_common::ScriptNotification;
 use concord_config::mitm::text::canonical_header;
 use concord_tls::TrustStore;
 use rand::RngCore;
@@ -24,7 +25,8 @@ use url::Url;
 use super::fetch::{Client, Fetch, Fetched};
 use super::store::Store;
 use crate::script::{
-    ConsoleSink, HeaderList, ScriptError, ScriptInvocation, ScriptResponse, ScriptResult,
+    ConsoleSink, HeaderList, NotifySink, ScriptError, ScriptInvocation, ScriptResponse,
+    ScriptResult,
 };
 
 const POLYFILL: &str = include_str!("polyfill.js");
@@ -63,6 +65,7 @@ struct Setup {
     store: Arc<Store>,
     name: String,
     console: Option<ConsoleSink>,
+    notify: Option<NotifySink>,
     memory_limit: u64,
     max_body: i64,
     jobs: UnboundedSender<HttpJob>,
@@ -125,6 +128,7 @@ fn build_input(invocation: &ScriptInvocation) -> String {
         "name": invocation.name,
         "kind": invocation.kind,
         "binary": invocation.binary_body,
+        "full": invocation.full_header,
         "system": os_name(),
         "started": started,
         "session": hex::encode(session),
@@ -164,6 +168,9 @@ fn build_input(invocation: &ScriptInvocation) -> String {
         if let Some(body) = &response.body {
             value["body"] = body_json(body, invocation.binary_body);
         }
+        if let Some(trailers) = &response.trailers {
+            value["trailers"] = header_json(trailers);
+        }
         input["response"] = value;
     }
     input.to_string()
@@ -192,6 +199,7 @@ pub(super) async fn execute(
         store,
         name: invocation.name.clone(),
         console: invocation.console.clone(),
+        notify: invocation.notify.clone(),
         memory_limit: invocation.memory_limit,
         max_body: invocation.max_body_size,
         jobs,
@@ -347,7 +355,7 @@ fn install(ctx: &Ctx<'_>, state: &Rc<State>, setup: &Rc<Setup>) -> rquickjs::Res
         "notify",
         Function::new(
             ctx.clone(),
-            move |title: String, subtitle: String, body: String| {
+            move |title: String, subtitle: String, body: String, url: String| {
                 tracing::info!(
                     "[MITM] {} notifies {title:?} {subtitle:?} {body:?}",
                     notify.name
@@ -358,6 +366,15 @@ fn install(ctx: &Ctx<'_>, state: &Rc<State>, setup: &Rc<Setup>) -> rquickjs::Res
                         .filter(|part| !part.is_empty())
                         .collect();
                     console(&parts.join("\n"));
+                }
+                if let Some(sink) = &notify.notify {
+                    sink(ScriptNotification {
+                        script: notify.name.clone(),
+                        title,
+                        subtitle,
+                        body,
+                        url,
+                    });
                 }
             },
         )?,
@@ -533,6 +550,7 @@ struct DoneJson {
     status: Option<i64>,
     header: Option<Vec<(String, Vec<String>)>>,
     body: Option<BodyJson>,
+    trailers: Option<Vec<(String, Vec<String>)>>,
     response: Option<ResponseJson>,
     abort: Option<bool>,
     value: Option<String>,
@@ -564,10 +582,12 @@ fn parse_result(json: &str) -> Result<ScriptResult, String> {
         status: status(done.status),
         header: done.header.map(to_list),
         body: done.body.as_ref().and_then(BodyJson::bytes),
+        trailers: done.trailers.map(to_list),
         response: done.response.map(|answer| ScriptResponse {
             status: status(answer.status),
             header: answer.header.map(to_list).unwrap_or_default(),
             body: answer.body.as_ref().and_then(BodyJson::bytes),
+            trailers: None,
         }),
         abort: done.abort.unwrap_or(false),
         value: done.value.unwrap_or_default().into_bytes(),

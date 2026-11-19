@@ -385,6 +385,7 @@ fn script(
             conditions: HeadConditionsDef::default(),
             requires_body: on("require-body"),
             binary_body: on("binary-mode"),
+            full_header: false,
             max_size: field("max-size")
                 .and_then(|text| text.trim().parse::<i64>().ok())
                 .unwrap_or(0),

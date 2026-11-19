@@ -10,7 +10,7 @@ use http::{HeaderMap, HeaderValue, Method, Request, Response, StatusCode, Uri, V
 use hyper::body::Incoming;
 use hyper::upgrade::OnUpgrade;
 
-use crate::body::{Body, Buffered, Tap, buffer_body, empty, failing, full};
+use crate::body::{Body, Buffered, Tap, buffer_body, empty, failing, full, full_with};
 use crate::capture::{PHASE_REQUEST, PHASE_RESPONSE};
 use crate::exchange::{
     OutRequest, ReplyError, Sent, Target, Unsent, has_response_body, set_length,
@@ -463,10 +463,10 @@ pub(crate) async fn rewrite_body(
 ) -> io::Result<(Body, Option<u64>)> {
     match buffer_body(headers, body, length, limit).await? {
         Buffered::Rest { body, length } => Ok((body, length)),
-        Buffered::Whole(data) => {
+        Buffered::Whole(data, trailers) => {
             let data = apply_off_runtime(Bytes::from(data), rules, DEFAULT_SCRIPT_TIMEOUT).await;
             let length = data.len() as u64;
-            Ok((full(data), Some(length)))
+            Ok((full_with(data, trailers), Some(length)))
         }
     }
 }

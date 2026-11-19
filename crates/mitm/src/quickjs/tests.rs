@@ -1,3 +1,4 @@
+use concord_common::ScriptNotification;
 use std::io;
 use std::net::SocketAddr;
 use std::sync::{Arc, Mutex};
@@ -103,6 +104,7 @@ fn response_invocation() -> ScriptInvocation {
             ),
         ]),
         body: Some(br#"{"ad":true,"items":[1,2]}"#.to_vec()),
+        trailers: None,
     });
     invocation
 }
@@ -119,6 +121,103 @@ async fn run(
     tokio::time::timeout(Duration::from_secs(10), program.run(invocation))
         .await
         .expect("the script did not finish")
+}
+
+#[tokio::test]
+async fn a_response_script_sees_and_replaces_the_trailers_after_the_body() {
+    let rig = rig();
+    let source = r#"$done({trailers: $response.trailers === undefined ? {} : {...$response.trailers, 'grpc-message': 'ok'}})"#;
+    let mut invocation = response_invocation();
+    invocation.response.as_mut().unwrap().trailers = Some(headers(&[("grpc-status", &["0"])]));
+    let result = run(&rig, source, invocation).await.unwrap();
+    assert_eq!(
+        result.trailers,
+        Some(headers(&[
+            ("Grpc-Status", &["0"]),
+            ("Grpc-Message", &["ok"])
+        ]))
+    );
+    let result = run(&rig, source, response_invocation()).await.unwrap();
+    assert_eq!(result.trailers, Some(headers(&[])));
+}
+
+#[tokio::test]
+async fn a_notification_carries_the_url_each_app_names_it_by() {
+    let rig = rig();
+    let posted = Arc::new(std::sync::Mutex::new(Vec::new()));
+    let mut invocation = request_invocation();
+    invocation.name = "notes".into();
+    invocation.notify = Some({
+        let posted = posted.clone();
+        Arc::new(move |notice| lock(&posted).push(notice))
+    });
+    run(
+        &rig,
+        r#"
+        $notification.post('a', 's', 'b', {url: 'https://a.test/1'});
+        $notification.post('a', '', '', {'open-url': 'https://a.test/2'});
+        $notification.post('a', '', '', {openUrl: 'https://a.test/3'});
+        $notification.post('a', '', '', 'https://a.test/4');
+        $notification.post(1, null);
+        $done({});
+        "#,
+        invocation,
+    )
+    .await
+    .unwrap();
+    let posted = lock(&posted);
+    let urls: Vec<&str> = posted.iter().map(|notice| notice.url.as_str()).collect();
+    assert_eq!(
+        urls,
+        [
+            "https://a.test/1",
+            "https://a.test/2",
+            "https://a.test/3",
+            "https://a.test/4",
+            ""
+        ]
+    );
+    assert_eq!(
+        posted[0],
+        ScriptNotification {
+            script: "notes".into(),
+            title: "a".into(),
+            subtitle: "s".into(),
+            body: "b".into(),
+            url: "https://a.test/1".into(),
+        }
+    );
+    assert_eq!(
+        (posted[4].title.as_str(), posted[4].subtitle.as_str()),
+        ("1", "")
+    );
+}
+
+#[tokio::test]
+async fn full_header_mode_hands_each_header_value_and_takes_entries_back() {
+    let rig = rig();
+    let mut invocation = response_invocation();
+    invocation.full_header = true;
+    let result = run(
+        &rig,
+        r#"
+        const cookies = $response.headers.filter((entry) => entry.field === 'Set-Cookie');
+        $done({headers: [...cookies, {field: 'x-count', value: String(cookies.length)}, {field: 'bad name', value: 'x'}]});
+        "#,
+        invocation,
+    )
+    .await
+    .unwrap();
+    assert_eq!(
+        result.header,
+        Some(headers(&[
+            (
+                "Set-Cookie",
+                &["a=1; Path=/", "b=2; Expires=Wed, 21 Oct 2026 07:28:00 GMT"],
+            ),
+            ("X-Count", &["2"]),
+        ]))
+    );
 }
 
 #[tokio::test]

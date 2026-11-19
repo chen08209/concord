@@ -209,6 +209,17 @@ pub struct TrafficDelta {
     pub download: u64,
 }
 
+/// What a MITM script posted with `$notification.post`.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ScriptNotification {
+    pub script: String,
+    pub title: String,
+    pub subtitle: String,
+    pub body: String,
+    /// What opening it opens; empty when the script gave nothing.
+    pub url: String,
+}
+
 #[derive(Clone, Debug)]
 pub enum CoreEvent {
     Log(LogRecord),
@@ -220,6 +231,7 @@ pub enum CoreEvent {
     RouteChanged(RouteView),
     DialerLoop(Arc<str>),
     State(StateChange),
+    ScriptNotification(ScriptNotification),
 }
 
 /// Check `enabled` before building an event: Android runs without a listener for

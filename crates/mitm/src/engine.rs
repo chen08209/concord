@@ -9,7 +9,7 @@ use arc_swap::{ArcSwap, ArcSwapOption};
 use async_trait::async_trait;
 use concord_common::intercept::{ConnInterceptor, InterceptFlow, Offer, UpstreamDialer};
 use concord_common::sync::lock;
-use concord_common::{BoxStream, PeekedStream};
+use concord_common::{BoxStream, CoreEvent, EventSink, PeekedStream};
 use concord_tls::{ClientConfig, TlsError, TrustStore};
 use rustls::AlertDescription;
 use tokio::sync::Semaphore;
@@ -60,6 +60,7 @@ pub(crate) struct Shared {
     pub dialer: Arc<dyn UpstreamDialer>,
     pub scripts: Arc<ScriptHost>,
     pub clock: Arc<dyn LocalClock>,
+    pub events: Arc<dyn EventSink>,
     pub trusted_ca: ArcSwapOption<String>,
 }
 
@@ -303,9 +304,16 @@ impl Core {
         invocation.kind = script.kind.name().to_string();
         invocation.argument.clone_from(&script.argument);
         invocation.binary_body = script.binary_body;
+        invocation.full_header = script.full_header;
         invocation.max_body_size = self.config.limits.max_body_size;
         invocation.memory_limit = self.config.limits.script_memory;
         invocation.dial = dial;
+        let events = self.shared.events.clone();
+        invocation.notify = Some(Arc::new(move |notice| {
+            if events.enabled() {
+                events.publish(CoreEvent::ScriptNotification(notice));
+            }
+        }));
         match timeout_at(deadline, script.program.run(invocation)).await {
             Ok(result) => result,
             Err(_) => Err(ScriptError("the script ran out of time".to_string())),

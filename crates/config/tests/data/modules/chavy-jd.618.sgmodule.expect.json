@@ -24,9 +24,9 @@
   "map-local": {},
   "request-body-mock": {},
   "script": {
-    "6": "ScriptDef { name: \"Tasks: JD618\", path: \"https://raw.githubusercontent.com/chavyleung/scripts/master/jd/jd.618.adapt.js\", kind: Cron, pattern: None, conditions: HeadConditionsDef { request: None, response: None }, requires_body: false, binary_body: false, max_size: 0, cronexp: \"10,30,50 0,1 * * *\", event: \"\", timeout: Some(1200.0), argument: None }",
-    "7": "ScriptDef { name: \"Tasks: JD618.Boom\", path: \"https://raw.githubusercontent.com/chavyleung/scripts/master/jd/jd.618.boom.js\", kind: Cron, pattern: None, conditions: HeadConditionsDef { request: None, response: None }, requires_body: false, binary_body: false, max_size: 0, cronexp: \"0 10,12,18,20,21 * * *\", event: \"\", timeout: None, argument: None }",
-    "8": "ScriptDef { name: \"Tasks: JD618.Boom\", path: \"https://raw.githubusercontent.com/chavyleung/scripts/master/jd/jd.618.boom.js\", kind: Cron, pattern: None, conditions: HeadConditionsDef { request: None, response: None }, requires_body: false, binary_body: false, max_size: 0, cronexp: \"30 21 * * *\", event: \"\", timeout: None, argument: None }"
+    "6": "ScriptDef { name: \"Tasks: JD618\", path: \"https://raw.githubusercontent.com/chavyleung/scripts/master/jd/jd.618.adapt.js\", kind: Cron, pattern: None, conditions: HeadConditionsDef { request: None, response: None }, requires_body: false, binary_body: false, full_header: false, max_size: 0, cronexp: \"10,30,50 0,1 * * *\", event: \"\", timeout: Some(1200.0), argument: None }",
+    "7": "ScriptDef { name: \"Tasks: JD618.Boom\", path: \"https://raw.githubusercontent.com/chavyleung/scripts/master/jd/jd.618.boom.js\", kind: Cron, pattern: None, conditions: HeadConditionsDef { request: None, response: None }, requires_body: false, binary_body: false, full_header: false, max_size: 0, cronexp: \"0 10,12,18,20,21 * * *\", event: \"\", timeout: None, argument: None }",
+    "8": "ScriptDef { name: \"Tasks: JD618.Boom\", path: \"https://raw.githubusercontent.com/chavyleung/scripts/master/jd/jd.618.boom.js\", kind: Cron, pattern: None, conditions: HeadConditionsDef { request: None, response: None }, requires_body: false, binary_body: false, full_header: false, max_size: 0, cronexp: \"30 21 * * *\", event: \"\", timeout: None, argument: None }"
   },
   "rules": {},
   "rule-sets": [],

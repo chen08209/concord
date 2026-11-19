@@ -241,8 +241,29 @@
     return Array.from(header.entries());
   };
 
+  const headerArray = (header) => {
+    const list = [];
+    for (const name of Object.keys(header).sort()) for (const value of header[name]) list.push({ field: name, value });
+    return list;
+  };
+
+  const exportEntries = (list) => {
+    const header = new Map();
+    for (const entry of list) {
+      if (!isObject(entry) || isNil(entry.field) || isNil(entry.value)) continue;
+      const key = toText(entry.field);
+      const value = toText(entry.value);
+      if (!TOKEN.test(key) || !validValue(value)) continue;
+      const name = canon(key);
+      if (!header.has(name)) header.set(name, []);
+      header.get(name).push(value);
+    }
+    return Array.from(header.entries());
+  };
+
   const headerField = (object, shown) => {
     const value = object.headers;
+    if (Array.isArray(value)) return exportEntries(value);
     return isObject(value) ? exportHeader(value, shown) : undefined;
   };
 
@@ -284,7 +305,9 @@
   };
 
   const requestHeaders = hasRequest ? input.request.headers : null;
+  const shownHeaders = (header) => (input.full ? headerArray(header) : headerObject(header));
   const responseHeaders = input.response ? input.response.headers : null;
+  const responseTrailers = input.response ? input.response.trailers : undefined;
 
   let finished = false;
   const finish = (value) => {
@@ -305,6 +328,7 @@
     if (isResponse) {
       result.status = statusOf(value.status);
       result.header = headerField(value, responseHeaders);
+      if (isObject(value.trailers)) result.trailers = exportHeader(value.trailers, responseTrailers);
     } else {
       result.url = toText(value.url);
       const path = toText(value.path);
@@ -368,9 +392,14 @@
     write: (value, key) => (isNil(value) ? native.remove(storeKey(key)) : native.write(storeKey(key), String(value))),
   };
 
+  const openUrl = (options) => {
+    const url = isObject(options) ? (options.url ?? options['open-url'] ?? options.openUrl) : options;
+    return typeof url === 'string' ? url : '';
+  };
+
   global.$notification = {
-    post: (title, subtitle, body) => {
-      native.notify(toText(title), toText(subtitle), toText(body));
+    post: (title, subtitle, body, options) => {
+      native.notify(toText(title), toText(subtitle), toText(body), openUrl(options));
     },
   };
 
@@ -453,7 +482,7 @@
     const request = {
       url: input.request.url,
       method: input.request.method,
-      headers: headerObject(requestHeaders),
+      headers: shownHeaders(requestHeaders),
       id: input.request.id,
     };
     if (input.request.scheme !== undefined) {
@@ -464,8 +493,9 @@
     global.$request = request;
   }
   if (isResponse && input.response) {
-    const response = { status: input.response.status, statusCode: input.response.status, headers: headerObject(responseHeaders) };
+    const response = { status: input.response.status, statusCode: input.response.status, headers: shownHeaders(responseHeaders) };
     if (input.response.body !== undefined) response.body = bodyValue(input.response.body);
+    if (responseTrailers !== undefined) response.trailers = headerObject(responseTrailers);
     global.$response = response;
   }
   if (input.cronexp) global.$cronexp = input.cronexp;

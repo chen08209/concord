@@ -166,6 +166,7 @@ impl MitmService {
             dialer: tunnel.upstream_dialer(),
             clock: Arc::new(DeviceClock),
             runtime: None,
+            events: self.events.clone(),
             tasks,
         }));
         mitm.set_capture(self.capture.load(Ordering::Relaxed));

@@ -1,3 +1,4 @@
+use concord_common::ScriptNotification;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::time::Duration;
@@ -77,6 +78,7 @@ async fn a_request_script_rewrites_answers_and_aborts() {
                 )]
                 .into(),
                 body: Some(b"tea".to_vec()),
+                trailers: None,
             }),
             ..ScriptResult::default()
         })
@@ -842,5 +844,165 @@ async fn the_user_runs_a_task_and_sees_what_it_wrote() {
             Err(ScriptRunError::Ambiguous(name)) if name == "Tool"
         ),
         "one of two scripts of the same name ran"
+    );
+}
+
+#[tokio::test]
+async fn a_grpc_response_a_binary_script_rewrites_keeps_its_trailers() {
+    use http_body_util::{BodyExt, StreamBody};
+
+    use crate::testing::{Service, Wire, start_service};
+
+    let service: Service = Arc::new(|_request| {
+        Box::pin(async {
+            let mut trailers = http::HeaderMap::new();
+            trailers.insert("grpc-status", http::HeaderValue::from_static("0"));
+            let frames = futures_util::stream::iter([
+                Ok(hyper::body::Frame::data(bytes::Bytes::from_static(b"ad"))),
+                Ok(hyper::body::Frame::trailers(trailers)),
+            ]);
+            http::Response::builder()
+                .header("Content-Type", "application/grpc")
+                .body(StreamBody::new(frames).boxed())
+                .unwrap()
+        })
+    });
+    let seen = Arc::new(std::sync::Mutex::new(None));
+    let program = {
+        let seen = seen.clone();
+        sync_program(move |invocation| {
+            let response = invocation.response.as_ref().unwrap();
+            *lock(&seen) = response.trailers.clone();
+            Ok(ScriptResult {
+                body: Some(b"ok".to_vec()),
+                ..ScriptResult::default()
+            })
+        })
+    };
+    let server = start_service(&["h2"], service).await;
+    let mut runtime = FakeRuntime::default();
+    runtime.0.insert("grpc".into(), program);
+    let rig = rig_for(&server, Some(Arc::new(runtime) as Arc<dyn ScriptRuntime>));
+    std::fs::create_dir_all(rig.resources()).unwrap();
+    std::fs::write(rig.resources().join("grpc.js"), "grpc").unwrap();
+    rig.config(json!({
+        "enable": true,
+        "hostname": ["example.test"],
+        "skip-server-cert-verify": true,
+        "h2": true,
+        "script": [
+            r"grpc = type=http-response,pattern=^https://example\.test/,requires-body=1,binary-body-mode=1,script-path=grpc.js",
+        ],
+    }));
+    let client = Client::tls(&rig, "example.test", 443, &["h2"])
+        .await
+        .unwrap();
+    let request = http::Request::builder()
+        .method("POST")
+        .uri("https://example.test/svc/Method")
+        .header("Content-Type", "application/grpc")
+        .header("TE", "trailers")
+        .body(http_body_util::Full::new(bytes::Bytes::new()))
+        .unwrap();
+    let Wire::H2(sender) = &client.wire else {
+        panic!("not h2")
+    };
+    let response = sender.clone().send_request(request).await.unwrap();
+    let collected = response.into_body().collect().await.unwrap();
+    let trailers = collected.trailers().cloned().unwrap_or_default();
+    assert_eq!(&collected.to_bytes()[..], b"ok");
+    assert_eq!(trailers.get("grpc-status").unwrap(), "0");
+    let seen = lock(&seen).clone().unwrap();
+    assert_eq!(seen["Grpc-Status"], ["0"]);
+}
+
+#[tokio::test]
+async fn a_script_line_asks_for_full_header_mode() {
+    let asked = Arc::new(std::sync::Mutex::new(None));
+    let program = {
+        let asked = asked.clone();
+        sync_program(move |invocation| {
+            *lock(&asked) = Some(invocation.full_header);
+            Ok(ScriptResult::default())
+        })
+    };
+    let (_server, rig) = scripted(vec![("full", program)]).await;
+    rig.config(config(json!([
+        r"F = type=http-request,pattern=^https://example\.test/,full-header-mode=true,script-path=full.js",
+    ])));
+    let mut client = Client::tls(&rig, "example.test", 443, &["http/1.1"])
+        .await
+        .unwrap();
+    client.get("/p").await;
+    assert_eq!(*lock(&asked), Some(true));
+}
+
+#[tokio::test]
+async fn max_size_minus_one_reads_a_body_past_the_engine_limit_for_one() {
+    let big = vec![b'a'; 5 << 20];
+    let handler: Handler = {
+        let big = big.clone();
+        Arc::new(move |_| Reply {
+            status: 200,
+            headers: Vec::new(),
+            body: big.clone(),
+        })
+    };
+    let server = start_server(true, &["http/1.1"], handler).await;
+    let replaces = sync_program(|_| {
+        Ok(ScriptResult {
+            body: Some(b"read".to_vec()),
+            ..ScriptResult::default()
+        })
+    });
+    let mut runtime = FakeRuntime::default();
+    runtime.0.insert("all".into(), replaces.clone());
+    runtime.0.insert("default".into(), replaces);
+    let rig = rig_for(&server, Some(Arc::new(runtime) as Arc<dyn ScriptRuntime>));
+    std::fs::create_dir_all(rig.resources()).unwrap();
+    for name in ["all", "default"] {
+        std::fs::write(rig.resources().join(format!("{name}.js")), name).unwrap();
+    }
+    let errors = rig.config(config(json!([
+        "all = type=http-response,pattern=/all,requires-body=1,max-size=-1,script-path=all.js",
+        "default = type=http-response,pattern=/default,requires-body=1,script-path=default.js",
+    ])));
+    assert!(errors.is_empty(), "{errors:?}");
+    let mut client = Client::tls(&rig, "example.test", 443, &["http/1.1"])
+        .await
+        .unwrap();
+    assert_eq!(client.get("/all").await.text(), "read");
+    assert_eq!(client.get("/default").await.body.len(), big.len());
+}
+
+#[tokio::test]
+async fn a_script_notification_goes_out_as_an_event() {
+    let program = sync_program(|invocation| {
+        let notify = invocation
+            .notify
+            .as_ref()
+            .expect("a sink for notifications");
+        notify(ScriptNotification {
+            script: invocation.name.clone(),
+            title: "t".into(),
+            subtitle: String::new(),
+            body: "b".into(),
+            url: "https://a.test/".into(),
+        });
+        Ok(ScriptResult::default())
+    });
+    let (_server, rig) = scripted(vec![("notes", program)]).await;
+    rig.config(config(json!([
+        r"N = type=http-request,pattern=^https://example\.test/,script-path=notes.js",
+    ])));
+    let mut client = Client::tls(&rig, "example.test", 443, &["http/1.1"])
+        .await
+        .unwrap();
+    client.get("/p").await;
+    let notices = rig.notices.taken();
+    assert_eq!(notices.len(), 1);
+    assert_eq!(
+        (notices[0].script.as_str(), notices[0].url.as_str()),
+        ("N", "https://a.test/")
     );
 }
