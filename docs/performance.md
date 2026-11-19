@@ -93,12 +93,44 @@ marks a metric whose run of Concord against itself varied too much between round
 | UDP, round-trip p99 | -19.4% | -25.4% | -21.5% | | -32.8% | 19.4% / 15.7% |
 | Peak memory during download | -72.8% | -70.4% | -69.6% | -55.8% | -66.4% | |
 
+## Android
+
+Concord inside the FlClash Android app, against the same app on its Go core (a mihomo fork), on a Xiaomi Mi 11
+(Snapdragon 888, Android 14), with a later pre-release build of Concord. Each app carries the load through its own VPN
+(`VpnService`) with no proxy (`direct`) and its default TUN settings. The bench attaches to the running app
+(`concord-bench run --attach … --via tun`) and sends as another app's uid; the origin is another machine reached over
+a Wi-Fi hotspot of about 230 Mbit/s.
+
+So every rate is bound by the link: the comparison is CPU per byte, latency and memory, and the throughput ceiling is
+not measured here. Each app ran eight rounds of 5 s, in four sessions that alternate the order, on charge with the
+screen off and no thermal throttling. CPU is the app process's own CPU time. Figures are the ratio of the medians with
+a 95% bootstrap interval, judged as on Linux. "Four flows" is four parallel downloads.
+
+| Metric | Concord against the Go core |
+|---|---|
+| Download, CPU per GB | -37.1% |
+| Upload, CPU per GB | -59.2% |
+| Four flows, CPU per GB | -39.7% (fairness 1.000 in both) |
+| UDP, CPU per GB | -48.6% |
+| UDP, round-trip p99 | -11.6% |
+| Request/response, CPU per transaction | -37.4% |
+| Request/response, p50 latency | -3.7% |
+| Request/response, p99 latency | tie (-6.0%) |
+| UDP request/response, round-trip p50 | -3.9% |
+| UDP request/response, round-trip p99 | tie (-6.8%) |
+| Rates | link-bound: TCP ties, UDP +3.8%, transactions/s +3.6% |
+| Memory 30 s after a cold start (PSS) | 30.0 against 66.4 MiB (-55%) |
+
+For the cold start both apps were force-stopped and started by their start action with no UI, so neither had the
+Flutter engine loaded; PSS is read from `smaps_rollup`, in two passes of opposite order.
+
 ## Not Covered Yet
 
 - Windows.
 - TUN, which is being worked on; these results are through the SOCKS5 port only.
-- The other protocols and workloads (several flows at once, idle connections, large profiles), Android, and links
-  with added delay or loss.
+- The other protocols and workloads (several flows at once, idle connections, large profiles), and links with added
+  delay or loss.
+- On Android: proxy protocols, new connections, and a link fast enough to load the core.
 
 ## Reproducing
 
