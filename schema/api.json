@@ -5640,6 +5640,17 @@
         },
         "source": {
           "$ref": "#/$defs/MitmRuleSetSource"
+        },
+        "provider": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MitmRuleProviderKind"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "A Stash provider's own kind; absent for Surge's and Loon's sets."
         }
       },
       "required": [
@@ -5750,6 +5761,22 @@
         "line",
         "rule"
       ]
+    },
+    "MitmRuleProviderKind": {
+      "type": "object",
+      "properties": {
+        "behavior": {
+          "type": "string"
+        },
+        "format": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "behavior",
+        "format"
+      ],
+      "description": "A Stash rule provider's `behavior` (`domain`, `ipcidr` or `classical`) and `format`\n(`yaml`, `text` or `mrs`) in mihomo's words."
     },
     "MitmModuleNetwork": {
       "type": "object",

@@ -274,3 +274,51 @@ async fn a_module_turned_off_keeps_its_file_until_the_host_no_longer_lists_it() 
         .unwrap();
     assert!(!stored.is_file());
 }
+
+/// A SOCKS request through the core for `host:port`, the answer left unread past its reply.
+async fn ask_for(rig: &Rig, host: &str, port: u16) {
+    let Ok(mut stream) = TcpStream::connect((Ipv4Addr::LOCALHOST, rig.mixed)).await else {
+        return;
+    };
+    let mut request = vec![5, 1, 0, 3, u8::try_from(host.len()).unwrap()];
+    request.extend_from_slice(host.as_bytes());
+    request.extend_from_slice(&port.to_be_bytes());
+    let mut method = [0u8; 2];
+    let mut reply = [0u8; 10];
+    let _ = stream.write_all(&[5, 1, 0]).await;
+    let _ = stream.read_exact(&mut method).await;
+    let _ = stream.write_all(&request).await;
+    let _ = timeout(PATIENCE, stream.read_exact(&mut reply)).await;
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn stash_and_surge_rule_sets_match_by_their_own_behavior_and_format() {
+    let (a_port, a) = upstream_socks().await;
+    let (b_port, _) = upstream_socks().await;
+    let (server, _) = http_server(HashMap::from([("/ads.txt", ".own.test\n".to_string())])).await;
+    let rig = Rig::new();
+    let config = format!(
+        "proxies:\n  - {{name: A, type: socks5, server: 127.0.0.1, port: {a_port}}}\n  \
+         - {{name: B, type: socks5, server: 127.0.0.1, port: {b_port}}}\n\
+         mitm:\n  enable: true\n  modules:\n    - name: stash\n      text: |\n        name: Sets\n        \
+         rules:\n          - RULE-SET,cidrs,A\n        rule-providers:\n          cidrs:\n            \
+         type: inline\n            behavior: ipcidr\n            payload: [192.0.2.1/32]\n    \
+         - name: surge\n      text: |\n        [Rule]\n        DOMAIN-SET,http://{server}/ads.txt,A\n\
+         rules:\n  - MATCH,B\n"
+    );
+    rig.apply(&config).await.unwrap();
+    rig.engine.start_listeners().await;
+    let wanted = ["192.0.2.1:9".to_string(), "own.test:80".to_string()];
+    let deadline = Instant::now() + Duration::from_secs(10);
+    while !wanted.iter().all(|target| lock(&a).contains(target)) && Instant::now() < deadline {
+        ask_for(&rig, "192.0.2.1", 9).await;
+        ask_for(&rig, "own.test", 80).await;
+        sleep(Duration::from_millis(200)).await;
+    }
+    let seen = lock(&a).clone();
+    assert!(
+        wanted.iter().all(|target| seen.contains(target)),
+        "A saw {seen:?}"
+    );
+    rig.engine.shutdown().await;
+}

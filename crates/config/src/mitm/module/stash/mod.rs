@@ -13,7 +13,7 @@ use super::network::{Refused, dns_server};
 use super::rule::RuleReader;
 use super::surge::Reader;
 use super::{IgnoreReason, ModuleDef, ModuleFormat, ModuleInput, ModuleMeta, Unreadable};
-use crate::mitm::module::{DomainEntry, InlineRule, ListEdit, RuleSetSource};
+use crate::mitm::module::{DomainEntry, InlineRule, ListEdit, ProviderKind, RuleSetSource};
 use crate::yaml::{ParsedDocument, SourceLines, parse_override};
 
 /// Keys at the top of an override that no Surge module or Quantumult X snippet read as YAML has.
@@ -256,8 +256,8 @@ fn fill_text(text: &str, arguments: &[ArgumentDef], values: &BTreeMap<String, St
     out
 }
 
-/// `rule-providers`: a classical list fetched as text, or an inline one; Concord's rule sets
-/// hold neither the domain and CIDR behaviors nor the YAML and MRS formats.
+/// `rule-providers`: fetched or inline, with mihomo's behaviors and formats, YAML when none is
+/// given as Stash reads it. A local `file` is the device's own and is left out.
 fn rule_providers(reader: &mut Reader<'_>, providers: &Map<String, Value>, lines: &SourceLines) {
     for (name, provider) in providers {
         let line = lines
@@ -266,36 +266,64 @@ fn rule_providers(reader: &mut Reader<'_>, providers: &Map<String, Value>, lines
             .copied()
             .unwrap_or(1);
         let field = |key: &str| provider.get(key).map(text_of).unwrap_or_default();
-        let kind = field("type");
-        let behavior = field("behavior");
-        let format = field("format");
-        let source = match kind.as_str() {
-            _ if behavior != "classical" => Err(Unreadable(format!("behavior {behavior}"))),
-            "inline" => inline_provider(provider.get("payload"), line),
-            "http" | "" if format == "text" && !field("url").is_empty() => Ok(RuleSetSource::Url {
+        let kind = ProviderKind {
+            behavior: field("behavior"),
+            format: Some(field("format"))
+                .filter(|format| !format.is_empty())
+                .unwrap_or_else(|| "yaml".to_string()),
+        };
+        let classical = kind.behavior == "classical";
+        let source = match field("type").as_str() {
+            _ if !["domain", "ipcidr", "classical"].contains(&kind.behavior.as_str()) => {
+                Err(Unreadable(format!("behavior {}", kind.behavior)))
+            }
+            _ if !["yaml", "text", "mrs"].contains(&kind.format.as_str())
+                || classical && kind.format == "mrs" =>
+            {
+                Err(Unreadable(format!("format {}", kind.format)))
+            }
+            "inline" => inline_provider(provider.get("payload"), line, &kind.behavior),
+            "http" | "" if !field("url").is_empty() => Ok(RuleSetSource::Url {
                 url: field("url"),
                 interval: provider.get("interval").and_then(Value::as_u64),
             }),
-            "http" | "" => Err(Unreadable(format!("format {format}"))),
+            "http" | "" => Err("an http provider needs a url".into()),
             other => Err(Unreadable(format!("type {other}"))),
         };
         match source {
-            Ok(source) => reader.rules.provider(name, source),
+            Ok(source) => reader.rules.provider(name, source, kind),
             Err(Unreadable(detail)) => reader.ignore(line, IgnoreReason::RuleType, Some(detail)),
         }
     }
 }
 
-fn inline_provider(payload: Option<&Value>, line: u32) -> Result<RuleSetSource, Unreadable> {
+/// A classical payload's rules are read as a `[Ruleset]` section's; a domain or CIDR payload's
+/// entries are taken as they are, each CIDR checked.
+fn inline_provider(
+    payload: Option<&Value>,
+    line: u32,
+    behavior: &str,
+) -> Result<RuleSetSource, Unreadable> {
     let Some(Value::Array(items)) = payload else {
         return Err("an inline provider needs a payload".into());
     };
     let rules = items
         .iter()
-        .map(|item| {
-            RuleReader::inline_rule(&text_of(item))
+        .map(|item| match behavior {
+            "domain" => Ok(InlineRule {
+                line,
+                rule: text_of(item),
+            }),
+            "ipcidr" => match text_of(item).parse::<ipnetwork::IpNetwork>() {
+                Ok(_) => Ok(InlineRule {
+                    line,
+                    rule: text_of(item),
+                }),
+                Err(_) => Err(Unreadable(format!("CIDR {}", text_of(item)))),
+            },
+            _ => RuleReader::inline_rule(&text_of(item))
                 .map(|rule| InlineRule { line, rule })
-                .map_err(|(_, detail)| Unreadable(detail.unwrap_or_else(|| text_of(item))))
+                .map_err(|(_, detail)| Unreadable(detail.unwrap_or_else(|| text_of(item)))),
         })
         .collect::<Result<Vec<_>, Unreadable>>()?;
     Ok(RuleSetSource::Inline { rules })

@@ -2,6 +2,7 @@ use std::collections::BTreeMap;
 
 use super::*;
 use crate::hosts::HostValue;
+use crate::provider::{RuleBehavior, RuleFormat};
 use crate::{LoadOptions, Profile, load_str};
 
 const BASE: &str = "\
@@ -448,4 +449,27 @@ pick = type=dns,script-path=https://cdn.test/pick.js
         .collect();
     warned.sort_unstable();
     assert_eq!(warned, ["hosts.gone.test", "hosts.lost.test"]);
+}
+
+#[test]
+fn a_module_s_rule_sets_become_providers_of_their_own_behavior_and_format() {
+    let stash = "name: Sets\nrules:\n  - RULE-SET,cidrs,REJECT\nrule-providers:\n  cidrs:\n    \
+                 behavior: ipcidr\n    format: mrs\n    url: https://cdn.test/c.mrs\n";
+    let surge = "[Rule]\nDOMAIN-SET,https://cdn.test/ads.txt,REJECT\n";
+    let loaded = profile(
+        &format!("{}{}", inline("stash", stash), inline("surge", surge)),
+        BTreeMap::new(),
+    );
+    let kinds: Vec<_> = loaded
+        .rule_providers
+        .iter()
+        .map(|provider| (provider.behavior, provider.format))
+        .collect();
+    assert_eq!(
+        kinds,
+        [
+            (RuleBehavior::IpCidr, RuleFormat::Mrs),
+            (RuleBehavior::Domain, RuleFormat::DomainSet),
+        ]
+    );
 }

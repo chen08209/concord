@@ -66,6 +66,17 @@ pub struct RuleSetDef {
     /// Surge's `DOMAIN-SET`: one domain per line.
     pub domain: bool,
     pub source: RuleSetSource,
+    /// A Stash provider's own kind; none for Surge's and Loon's sets.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub provider: Option<ProviderKind>,
+}
+
+/// A Stash rule provider's `behavior` and `format` in mihomo's words, which the profile's rule
+/// provider takes as they are.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+pub struct ProviderKind {
+    pub behavior: String,
+    pub format: String,
 }
 
 /// Surge's internal rule sets as rules/ruleset.html lists them.
@@ -166,8 +177,8 @@ pub(super) struct RuleReader<'a> {
     pub(super) sets: Vec<RuleSetDef>,
     inline: Vec<String>,
     attachments: &'a BTreeMap<String, String>,
-    /// Stash's `rule-providers` by name: the set's key and where it comes from.
-    providers: BTreeMap<String, (String, RuleSetSource)>,
+    /// Stash's `rule-providers` by name: the set's key, where it comes from and its kind.
+    providers: BTreeMap<String, (String, RuleSetSource, ProviderKind)>,
 }
 
 impl<'a> RuleReader<'a> {
@@ -237,6 +248,7 @@ impl<'a> RuleReader<'a> {
         domain: bool,
     ) -> Result<ModuleRule, Refusal> {
         let policy = policy_of(policy)?;
+        let mut provider = None;
         let (key, source) = if is_url(value) {
             let interval = options.iter().find_map(|option| {
                 let (key, value) = option.split_once('=')?;
@@ -253,7 +265,8 @@ impl<'a> RuleReader<'a> {
                 format!("surge:{}", value.to_ascii_uppercase()),
                 RuleSetSource::Builtin { rules },
             )
-        } else if let Some((key, source)) = self.providers.get(value) {
+        } else if let Some((key, source, kind)) = self.providers.get(value) {
+            provider = Some(kind.clone());
             (key.clone(), source.clone())
         } else if self.inline.iter().any(|name| name == value) {
             (
@@ -271,7 +284,7 @@ impl<'a> RuleReader<'a> {
                 RuleSetSource::File { file: file.clone() },
             )
         };
-        let name = self.add_set(&key, domain, source);
+        let name = self.add_set(&key, domain, source, provider);
         Ok(ModuleRule {
             rule: format!("RULE-SET,{name}"),
             policy,
@@ -307,12 +320,17 @@ impl<'a> RuleReader<'a> {
     }
 
     /// A Stash rule provider `RULE-SET,<name>` names; `rules` are an inline one's.
-    pub(super) fn provider(&mut self, name: &str, source: RuleSetSource) {
+    pub(super) fn provider(&mut self, name: &str, source: RuleSetSource, kind: ProviderKind) {
         let key = match &source {
-            RuleSetSource::Url { url, .. } => url.clone(),
+            RuleSetSource::Url { url, .. }
+                if kind.behavior == "classical" && kind.format == "text" =>
+            {
+                url.clone()
+            }
+            RuleSetSource::Url { url, .. } => format!("{}/{}:{url}", kind.behavior, kind.format),
             _ => format!("stash:{name}"),
         };
-        self.providers.insert(name.to_string(), (key, source));
+        self.providers.insert(name.to_string(), (key, source, kind));
     }
 
     /// A rule of an inline provider's payload, as a `[Ruleset]` line is read.
@@ -337,13 +355,20 @@ impl<'a> RuleReader<'a> {
         Ok(rule)
     }
 
-    fn add_set(&mut self, key: &str, domain: bool, source: RuleSetSource) -> String {
+    fn add_set(
+        &mut self,
+        key: &str,
+        domain: bool,
+        source: RuleSetSource,
+        provider: Option<ProviderKind>,
+    ) -> String {
         let name = set_name(key);
         if !self.sets.iter().any(|set| set.name == name) {
             self.sets.push(RuleSetDef {
                 name: name.clone(),
                 domain,
                 source,
+                provider,
             });
         }
         name
@@ -361,6 +386,7 @@ impl<'a> RuleReader<'a> {
             &inline_key(set),
             false,
             RuleSetSource::Inline { rules: Vec::new() },
+            None,
         );
         if let Some(RuleSetDef {
             source: RuleSetSource::Inline { rules },

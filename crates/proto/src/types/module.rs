@@ -109,6 +109,16 @@ dto! {
         /// One domain per line, as Surge's `DOMAIN-SET`.
         pub domain: bool,
         pub source: MitmRuleSetSource,
+        /// A Stash provider's own kind; absent for Surge's and Loon's sets.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        pub provider: Option<MitmRuleProviderKind>,
+    }
+
+    /// A Stash rule provider's `behavior` (`domain`, `ipcidr` or `classical`) and `format`
+    /// (`yaml`, `text` or `mrs`) in mihomo's words.
+    pub struct MitmRuleProviderKind {
+        pub behavior: String,
+        pub format: String,
     }
 
     pub struct MitmModuleInlineRule {

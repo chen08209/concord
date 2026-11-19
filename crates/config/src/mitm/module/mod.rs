@@ -52,7 +52,7 @@ pub use network::{DomainEntry, ListEdit, NetworkDef};
 pub use requirement::{Environment, evaluate};
 pub(crate) use resource::is_url;
 pub use resource::{InlineFile, ResourceDef, ResourceKind};
-pub use rule::{InlineRule, ModuleRule, Policy, RuleSetDef, RuleSetSource};
+pub use rule::{InlineRule, ModuleRule, Policy, ProviderKind, RuleSetDef, RuleSetSource};
 
 /// What [read_module] reads besides the text.
 #[derive(Clone, Copy, Debug)]

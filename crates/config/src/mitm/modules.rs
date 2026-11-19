@@ -445,15 +445,17 @@ fn provider_map(set: &RuleSetDef) -> Map {
     let mut put = |key: &str, value: Value| {
         provider.insert(key.to_string(), value);
     };
-    put(
-        "behavior",
-        json!(if set.domain { "domain" } else { "classical" }),
-    );
+    let (behavior, format) = match (&set.provider, set.domain) {
+        (Some(kind), _) => (kind.behavior.as_str(), kind.format.as_str()),
+        (None, true) => ("domain", "domain-set"),
+        (None, false) => ("classical", "text"),
+    };
+    put("behavior", json!(behavior));
     match &set.source {
         RuleSetSource::Url { url, interval } => {
             put("type", json!("http"));
             put("url", json!(url));
-            put("format", json!("text"));
+            put("format", json!(format));
             if let Some(interval) = interval {
                 put("interval", json!(interval));
             }
@@ -469,7 +471,7 @@ fn provider_map(set: &RuleSetDef) -> Map {
         }
         RuleSetSource::File { file } => {
             put("type", json!("file"));
-            put("format", json!("text"));
+            put("format", json!(format));
             put("path", json!(format!("{RESOURCES_DIR}/{file}")));
         }
     }

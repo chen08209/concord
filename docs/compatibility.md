@@ -308,8 +308,13 @@ A Stash override (`.stoverride`) reads its `http` lists, `cron` scripts, `rules`
 reference keeping the argument's type. An `http.mitm` host without a port covers 443 only, as Stash's does, and
 `host:*` every port; `force-http-engine` comes back as `force-http-hostname`. Its JSON edits keep Stash's reading:
 `replace` and `del` touch a value that is neither null nor false, and `add` writes one that is missing or null. A
-rule provider is read when it is a classical list, inline or fetched as text; the domain and CIDR behaviors and the YAML
-and MRS formats are left out as `ruleType`, and a script provider with only `payload` as `noAttachment`.
+rule provider becomes a rule provider of the profile with its own `behavior` (`domain`, `ipcidr` or `classical`) and
+`format` (`yaml`, which Stash takes when none is given, `text` or `mrs`), read as mihomo reads them; an inline one's
+classical rules are read as a `[Ruleset]` section's and its CIDRs are checked. A `file` provider, which names a
+file on the device, a format the behavior does not take, such as `mrs` for `classical`, and a CIDR that does not
+read leave the provider out as `ruleType`; a script provider with only `payload` is left out as `noAttachment`. A
+module's `DOMAIN-SET` becomes a `domain` provider of format `domain-set`, so `.example.com` covers
+`example.com` too, as in Surge.
 
 A profile puts modules in force under `mitm.modules`: each has a `name` and either `text` or a `path` inside the
 MITM directory (`mitm/` under the home directory), with `arguments` and `attachments` as `mitm.readModule` takes

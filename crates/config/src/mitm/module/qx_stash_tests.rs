@@ -3,7 +3,8 @@ use std::collections::BTreeMap;
 use serde_json::json;
 
 use crate::mitm::module::{
-    Environment, IgnoreReason, InlineFile, ModuleDef, ModuleFormat, ModuleInput, read_module,
+    Environment, IgnoreReason, InlineFile, ModuleDef, ModuleFormat, ModuleInput, RuleSetSource,
+    read_module,
 };
 use crate::mitm::modules::stored_name;
 use crate::mitm::{BodyActionDef, HeaderEditDef, MapLocalBody, ScriptKind, UrlAction};
@@ -267,11 +268,7 @@ fn a_stash_override_reads_with_its_arguments() {
     assert_eq!(def.meta.desc.as_deref(), Some("A ${args.region} override"));
     assert_eq!(
         ignored(&def),
-        [
-            (48, IgnoreReason::ManagedCa),
-            (69, IgnoreReason::RuleType),
-            (77, IgnoreReason::AppOnly),
-        ]
+        [(48, IgnoreReason::ManagedCa), (77, IgnoreReason::AppOnly),]
     );
     let hosts: Vec<_> = def
         .lists
@@ -362,4 +359,76 @@ fn a_stash_override_reads_with_its_arguments() {
 #[test]
 fn a_profile_like_yaml_without_override_keys_reads_as_surge() {
     assert_eq!(read("name: x\n", &[]).format, ModuleFormat::Surge);
+}
+
+const SETS: &str = "\
+name: Sets
+rules:
+  - RULE-SET,domains,DIRECT
+  - RULE-SET,cidrs,REJECT
+  - RULE-SET,listed,DIRECT
+  - RULE-SET,own,DIRECT
+rule-providers:
+  domains:
+    behavior: domain
+    url: https://cdn.test/d.yaml
+  cidrs:
+    type: http
+    behavior: ipcidr
+    format: mrs
+    url: https://cdn.test/c.mrs
+  listed:
+    behavior: classical
+    format: text
+    url: https://cdn.test/l.txt
+  own:
+    type: inline
+    behavior: ipcidr
+    payload: [10.0.0.0/8]
+  bad-cidr:
+    type: inline
+    behavior: ipcidr
+    payload: [nope]
+  classical-mrs:
+    behavior: classical
+    format: mrs
+    url: https://cdn.test/x.mrs
+  local:
+    type: file
+    behavior: domain
+    path: ./d.txt
+";
+
+#[test]
+fn a_stash_rule_provider_keeps_mihomo_s_behavior_and_format() {
+    let def = read(SETS, &[]);
+    assert_eq!(
+        ignored(&def),
+        [
+            (24, IgnoreReason::RuleType),
+            (28, IgnoreReason::RuleType),
+            (32, IgnoreReason::RuleType),
+        ]
+    );
+    let kind = |url: &str| {
+        def.rule_sets
+            .iter()
+            .find(|set| matches!(&set.source, RuleSetSource::Url { url: own, .. } if own == url))
+            .and_then(|set| set.provider.clone())
+            .map(|kind| (kind.behavior, kind.format))
+    };
+    let pair = |behavior: &str, format: &str| Some((behavior.to_string(), format.to_string()));
+    assert_eq!(kind("https://cdn.test/d.yaml"), pair("domain", "yaml"));
+    assert_eq!(kind("https://cdn.test/c.mrs"), pair("ipcidr", "mrs"));
+    assert_eq!(kind("https://cdn.test/l.txt"), pair("classical", "text"));
+    let own = def
+        .rule_sets
+        .iter()
+        .find_map(|set| match &set.source {
+            RuleSetSource::Inline { rules } => Some(rules),
+            _ => None,
+        })
+        .unwrap();
+    assert_eq!(own[0].rule, "10.0.0.0/8");
+    assert_eq!(def.rules.len(), 4);
 }
