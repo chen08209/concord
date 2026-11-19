@@ -278,24 +278,32 @@ impl Reassembly {
         if overlapping.is_empty() && self.ranges.len() >= MAX_RANGES {
             return false;
         }
-        let start = overlapping.first().map_or(seq, |(s, _)| s.min(seq));
-        let stop = overlapping
-            .last()
-            .map_or(end, |(s, d)| (*s + d.len() as u32).max(end));
-        let mut merged = vec![0u8; stop.since(start) as usize];
-        for (s, d) in overlapping {
-            let at = s.since(start) as usize;
-            if let Some(dst) = merged.get_mut(at..at + d.len()) {
-                dst.copy_from_slice(d);
-            }
-        }
-        let at = seq.since(start) as usize;
-        if let Some(dst) = merged.get_mut(at..at + data.len()) {
-            dst.copy_from_slice(data);
-        }
         let old: usize = overlapping.iter().map(|(_, d)| d.len()).sum();
+        let mut absorbed = self.ranges.drain(first..last);
+        let (start, mut merged) = match absorbed.next() {
+            Some((s, d)) if s.le(seq) => (s, d),
+            Some((s, d)) => {
+                let mut prefix = Vec::with_capacity(d.len() + s.since(seq) as usize);
+                prefix.extend_from_slice(data.get(..s.since(seq) as usize).unwrap_or_default());
+                prefix.extend_from_slice(&d);
+                (seq, prefix)
+            }
+            None => (seq, Vec::new()),
+        };
+        for (s, d) in absorbed {
+            let held = start + merged.len() as u32;
+            merged.extend_from_slice(
+                data.get(held.since(seq) as usize..s.since(seq) as usize)
+                    .unwrap_or_default(),
+            );
+            merged.extend_from_slice(&d);
+        }
+        let held = start + merged.len() as u32;
+        if held.lt(end) {
+            merged.extend_from_slice(data.get(held.since(seq) as usize..).unwrap_or_default());
+        }
         self.bytes = self.bytes - old + merged.len();
-        self.ranges.splice(first..last, [(start, merged)]);
+        self.ranges.insert(first, (start, merged));
         self.latest = Some(start);
         true
     }
@@ -446,5 +454,89 @@ mod tests {
         assert!(ooo.insert(base + 100, &[1; 100]));
         assert!(ooo.insert(base + 10, &[0; 90]));
         assert_eq!(ooo.take_ready(base + 10).unwrap().len(), 190);
+    }
+
+    #[test]
+    fn reassembly_grows_a_range_in_place_when_segments_follow_it() {
+        let mut ooo = Reassembly::default();
+        let segment = [7u8; 1460];
+        let mut capacity = 0;
+        let mut reallocations = 0;
+        for index in 0..1000u32 {
+            assert!(ooo.insert(Seq(1000 + index * 1460), &segment));
+            let held = ooo.ranges[0].1.capacity();
+            if held != capacity {
+                capacity = held;
+                reallocations += 1;
+            }
+        }
+        assert_eq!(ooo.ranges.len(), 1);
+        assert_eq!(ooo.bytes(), 1000 * 1460);
+        assert!(reallocations <= 12, "{reallocations} reallocations");
+    }
+
+    #[test]
+    fn reassembly_matches_a_byte_map() {
+        const SPAN: u32 = 6000;
+        let base = Seq(u32::MAX - 2000);
+        let byte = |offset: u32| (offset.wrapping_mul(2_654_435_761) >> 24) as u8;
+        let mut state = 0x2545_f491_u32;
+        let mut next = |bound: u32| {
+            state ^= state << 13;
+            state ^= state >> 17;
+            state ^= state << 5;
+            state % bound
+        };
+        for _ in 0..50 {
+            let mut ooo = Reassembly::default();
+            let mut held = vec![false; SPAN as usize];
+            for _ in 0..200 {
+                let offset = 1 + next(SPAN - 400);
+                let len = 1 + next(300);
+                let data: Vec<u8> = (offset..offset + len).map(byte).collect();
+                let range = offset as usize..(offset + len) as usize;
+                let runs = runs_of(&held);
+                let touches = held[range.start - 1..=range.end].iter().any(|h| *h);
+                let covered = held[range.clone()].iter().all(|h| *h);
+                let stored = ooo.insert(base + offset, &data);
+                if covered || (!touches && runs.len() >= MAX_RANGES) {
+                    assert!(!stored);
+                    continue;
+                }
+                assert!(stored);
+                held[range].fill(true);
+            }
+            let runs = runs_of(&held);
+            assert_eq!(ooo.bytes(), held.iter().filter(|h| **h).count());
+            let mut blocks = Vec::new();
+            ooo.sack_blocks(&mut blocks, MAX_RANGES);
+            blocks.sort_by_key(|(start, _)| start.since(base));
+            let expected: Vec<_> = runs
+                .iter()
+                .map(|&(start, stop)| (base + start, base + stop))
+                .collect();
+            assert_eq!(blocks, expected);
+            for (start, stop) in runs {
+                let ready = ooo.take_ready(base + start).unwrap();
+                assert_eq!(ready, (start..stop).map(byte).collect::<Vec<_>>());
+            }
+            assert!(ooo.is_empty());
+        }
+    }
+
+    fn runs_of(held: &[bool]) -> Vec<(u32, u32)> {
+        let mut runs = Vec::new();
+        let mut start = None;
+        for (at, h) in held.iter().chain([&false]).enumerate() {
+            match (start, *h) {
+                (None, true) => start = Some(at as u32),
+                (Some(s), false) => {
+                    runs.push((s, at as u32));
+                    start = None;
+                }
+                _ => {}
+            }
+        }
+        runs
     }
 }
