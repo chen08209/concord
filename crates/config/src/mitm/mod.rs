@@ -12,6 +12,7 @@ mod script;
 pub mod text;
 
 use std::collections::BTreeMap;
+use std::sync::Arc;
 
 use serde::{Deserialize, Deserializer, Serialize};
 
@@ -140,6 +141,8 @@ pub struct MitmLine<T> {
     pub index: usize,
     pub text: String,
     pub read: T,
+    /// The module whose line it is; none for the profile's own.
+    pub origin: Option<Arc<str>>,
 }
 
 /// A line of comma-separated items: those that read, and what was wrong with the others.
@@ -170,6 +173,28 @@ pub struct MitmDef {
     pub map_local: Vec<MitmLine<Read<MapLocalDef>>>,
     pub request_body_mock: Vec<MitmLine<Read<MapLocalDef>>>,
     pub script: Vec<MitmLine<Read<ScriptDef>>>,
+    /// The section has a `modules` list, which then names every module the host has.
+    pub modules_listed: bool,
+}
+
+impl MitmDef {
+    /// Marks every line as `origin`'s.
+    pub fn mark_origin(&mut self, origin: &Arc<str>) {
+        fn mark<T>(lines: &mut [MitmLine<T>], origin: &Arc<str>) {
+            for line in lines {
+                line.origin = Some(origin.clone());
+            }
+        }
+        mark(&mut self.hostname, origin);
+        mark(&mut self.skip_server_cert_verify_hostname, origin);
+        mark(&mut self.client_source_address, origin);
+        mark(&mut self.url_rewrite, origin);
+        mark(&mut self.header_rewrite, origin);
+        mark(&mut self.body_rewrite, origin);
+        mark(&mut self.map_local, origin);
+        mark(&mut self.request_body_mock, origin);
+        mark(&mut self.script, origin);
+    }
 }
 
 /// A line that cannot be read, or the items of one that cannot.
@@ -190,6 +215,7 @@ fn each_line<T>(lines: &[String], read: impl Fn(&str) -> T) -> Vec<MitmLine<T>> 
                 index,
                 text: line.to_string(),
                 read: read(line),
+                origin: None,
             })
         })
         .collect()
@@ -260,6 +286,7 @@ impl MitmDef {
                 parse_map_local(line, true)
             }),
             script: each_line(&section.script, parse_script),
+            modules_listed: false,
         }
     }
 
@@ -283,6 +310,7 @@ impl MitmDef {
             map_local,
             request_body_mock,
             script,
+            modules_listed: _,
         } = self;
         *enable == other.enable
             && *skip_server_cert_verify == other.skip_server_cert_verify
@@ -342,6 +370,9 @@ pub(crate) fn load(
     lines: &BTreeMap<String, Vec<u32>>,
     report: &mut LoadReport,
 ) -> MitmDef {
+    let listed = section
+        .get("modules")
+        .is_some_and(|modules| !modules.is_null());
     let section = match serde_json::from_value(serde_json::Value::Object(section.clone())) {
         Ok(section) => section,
         Err(err) => {
@@ -353,7 +384,8 @@ pub(crate) fn load(
             return MitmDef::default();
         }
     };
-    let def = MitmDef::read(&section);
+    let mut def = MitmDef::read(&section);
+    def.modules_listed = listed;
     if def.enable {
         for line in def.bad_lines() {
             let at = lines

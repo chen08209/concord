@@ -56,7 +56,8 @@ struct LineRead {
 }
 
 /// The list's key, the line's index in it and its text.
-type Visit<'a> = dyn FnMut(&'static str, usize, &str, LineRead) + 'a;
+/// The list, then the line's index, text and module.
+type Visit<'a> = dyn FnMut(&'static str, usize, &str, Option<&str>, LineRead) + 'a;
 
 fn items<T>(read: &Items<T>, view: Option<LineView>) -> LineRead {
     LineRead {
@@ -90,7 +91,13 @@ fn each<T>(
     mut read: impl FnMut(&T) -> LineRead,
 ) {
     for line in lines {
-        visit(key, line.index, &line.text, read(&line.read));
+        visit(
+            key,
+            line.index,
+            &line.text,
+            line.origin.as_deref(),
+            read(&line.read),
+        );
     }
 }
 
@@ -201,11 +208,15 @@ impl Config {
     pub(crate) fn compile(def: MitmDef, env: &ParseEnv, unread: bool) -> (Config, Vec<String>) {
         let mut config = Config::empty(&def);
         let mut errors = Vec::new();
-        config.add_lines(&def, env, &mut |key, _, text, read| {
+        config.add_lines(&def, env, &mut |key, _, text, origin, read| {
             if let Some(err) = read.error
                 && (unread || !read.unread)
             {
-                errors.push(format!("{key} {}: {err}", quote(text)));
+                let line = format!("{key} {}: {err}", quote(text));
+                errors.push(match origin {
+                    Some(module) => format!("module {module}: {line}"),
+                    None => line,
+                });
             }
         });
         env.scripts.keep(&config.rules.scripts);
@@ -249,7 +260,7 @@ pub fn check(raw: &RawConfig, env: &ParseEnv) -> Validation {
 pub(crate) fn check_def(def: &MitmDef, env: &ParseEnv) -> Validation {
     let mut validation = Validation::default();
     let mut scratch = Config::empty(&MitmDef::default());
-    scratch.add_lines(def, env, &mut |key, index, _, read| {
+    scratch.add_lines(def, env, &mut |key, index, _, _, read| {
         if let Some(err) = read.error {
             let issue = Issue {
                 index,
@@ -374,6 +385,25 @@ mod tests {
         assert!(errors[0].starts_with("map-local"), "{}", errors[0]);
         let (_, errors) = Config::parse(raw, &env);
         assert_eq!(errors.len(), 2, "{errors:?}");
+    }
+
+    #[test]
+    fn a_line_a_module_wrote_names_the_module() {
+        let (_home, env) = env();
+        let raw = RawConfig {
+            enable: true,
+            map_local: lines(&["^x data=missing.json"]),
+            ..RawConfig::default()
+        };
+        let mut def = MitmDef::read(&raw);
+        def.mark_origin(&"Ads (7)".into());
+        let (_, errors) = Config::compile(def, &env, false);
+        assert_eq!(errors.len(), 1, "{errors:?}");
+        assert!(
+            errors[0].starts_with("module Ads (7): map-local"),
+            "{}",
+            errors[0]
+        );
     }
 
     #[test]

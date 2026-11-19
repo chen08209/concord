@@ -2,8 +2,8 @@ use std::collections::BTreeMap;
 use std::sync::Mutex;
 
 use async_trait::async_trait;
-use concord_config::mitm::module::InlineFile;
-use concord_config::mitm::modules::{AppliedModule, ModuleSpec};
+use concord_config::mitm::module::{InlineFile, ResourceDef, ResourceKind};
+use concord_config::mitm::modules::{AppliedModule, ModuleProblem, ModuleSpec};
 use concord_group::{FetchError, FetchErrorKind, FetchRequest, FetchResponse, Fetcher};
 
 use super::*;
@@ -179,4 +179,85 @@ async fn a_fetch_dropped_halfway_leaves_the_url_free_to_fetch_again() {
     answers.set(URL, 200, b"one");
     assert_eq!(resources.fetch(URL).await, Ok(true));
     assert_eq!(resources.state(URL), (ResourceState::Ok, None));
+}
+
+fn reading(urls: &[&str], scripts: &[&str]) -> AppliedModule {
+    let mut module = AppliedModule::default();
+    module.def.resources = urls
+        .iter()
+        .map(|url| ResourceDef {
+            url: url.to_string(),
+            kind: ResourceKind::Script,
+            lines: vec![1],
+        })
+        .collect();
+    module.def.inline_files = scripts
+        .iter()
+        .map(|content| InlineFile {
+            file: stored_name("inline.js", content.as_bytes()),
+            content: content.to_string(),
+        })
+        .collect();
+    module
+}
+
+#[tokio::test]
+async fn what_no_module_reads_any_longer_goes_and_what_the_host_attached_stays() {
+    let dir = tempfile::tempdir().unwrap();
+    let (answers, resources) = store(dir.path());
+    let gone = "https://cdn.test/gone.js";
+    answers.set(URL, 200, b"kept");
+    answers.set(gone, 200, b"gone");
+    resources.fetch(URL).await.unwrap();
+    resources.fetch(gone).await.unwrap();
+    let all = reading(&[URL, gone], &["$done(1);", "$done(2);"]);
+    resources.write_inline(std::slice::from_ref(&all));
+    let file = |url| resources.stored(url).unwrap();
+    let (kept, dropped) = (file(URL), file(gone));
+    let [script, attached] = [0, 1].map(|at| all.def.inline_files[at].file.clone());
+    let there = |file: &str| dir.path().join(RESOURCES_DIR).join(file).is_file();
+
+    let mut off = reading(&[URL], &["$done(1);"]);
+    off.spec.enabled = false;
+    off.spec.attachments = BTreeMap::from([("a.js".to_string(), attached.clone())]);
+    resources.collect(&[off]);
+    assert_eq!(resources.stored(URL), Some(kept.clone()));
+    assert_eq!(resources.state(gone), (ResourceState::Missing, None));
+    assert!(there(&kept) && there(&script) && there(&attached));
+    assert!(!there(&dropped));
+    let (_, reopened) = store(dir.path());
+    assert_eq!(reopened.stored(gone), None);
+
+    resources.collect(&[]);
+    assert_eq!(resources.stored(URL), None);
+    assert!(!there(&kept) && !there(&script));
+    assert!(there(&attached));
+}
+
+#[tokio::test]
+async fn nothing_goes_while_a_module_cannot_be_read() {
+    let dir = tempfile::tempdir().unwrap();
+    let (answers, resources) = store(dir.path());
+    answers.set(URL, 200, b"one");
+    resources.fetch(URL).await.unwrap();
+    let broken = AppliedModule {
+        problem: Some(ModuleProblem::Duplicate),
+        ..AppliedModule::default()
+    };
+    resources.collect(&[broken]);
+    let file = resources.stored(URL).unwrap();
+    assert_eq!(read(dir.path(), &file), b"one");
+}
+
+#[test]
+fn an_index_of_urls_alone_still_reads() {
+    let dir = tempfile::tempdir().unwrap();
+    std::fs::create_dir_all(dir.path().join(MITM_DIR)).unwrap();
+    std::fs::write(
+        dir.path().join(index_path()),
+        format!(r#"{{"{URL}": {{"file": "a.js"}}}}"#),
+    )
+    .unwrap();
+    let (_, resources) = store(dir.path());
+    assert_eq!(resources.stored(URL).as_deref(), Some("a.js"));
 }

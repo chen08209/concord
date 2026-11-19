@@ -233,3 +233,44 @@ async fn a_stash_script_carried_in_the_text_is_written_out_on_apply() {
         .join(stored_name("inline.js", b"$done({})"));
     assert_eq!(std::fs::read_to_string(file).unwrap(), "$done({})");
 }
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_module_turned_off_keeps_its_file_until_the_host_no_longer_lists_it() {
+    let origin = plain_echo_server().await.port();
+    let files = file_server(200).await;
+    let (a_port, _) = upstream_socks().await;
+    let rig = Rig::new();
+    let on = config(origin, files.port, a_port, a_port);
+    let off = on.replacen(
+        "- name: local\n",
+        "- name: local\n      enabled: false\n",
+        1,
+    );
+    rig.apply(&off).await.unwrap();
+    rig.engine.start_listeners().await;
+    sleep(Duration::from_millis(200)).await;
+    let status = module(&rig).await;
+    assert_eq!(status["enabled"], false, "{status}");
+    assert_eq!(status["inForce"], false, "{status}");
+    assert_eq!(status["resources"][0]["state"], "missing", "{status}");
+    assert_eq!(files.asked.load(Ordering::SeqCst), 0);
+
+    rig.apply(&on).await.unwrap();
+    let file = until(&rig, "ok").await["resources"][0]["file"]
+        .as_str()
+        .unwrap()
+        .to_string();
+    let stored = rig.home.path().join(RESOURCES_DIR).join(file);
+    rig.apply(&off).await.unwrap();
+    assert!(stored.is_file());
+
+    let without = |mitm: &str| format!("mitm:\n{mitm}rules:\n  - MATCH,DIRECT\n");
+    for kept in ["  enable: true\n", "  enable: false\n  modules: []\n"] {
+        rig.apply(&without(kept)).await.unwrap();
+        assert!(stored.is_file(), "{kept}");
+    }
+    rig.apply(&without("  enable: true\n  modules: []\n"))
+        .await
+        .unwrap();
+    assert!(!stored.is_file());
+}

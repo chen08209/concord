@@ -267,7 +267,8 @@ impl MitmService {
     /// `tunnel.UpdateMITM`: the profile's section, followed by its modules' lines, each remote
     /// file a line reads named by the file it is stored in. The files not stored yet are
     /// fetched in the background, and the section is composed again when they arrive. The
-    /// section outlives a rejected config only as "off".
+    /// section outlives a rejected config only as "off". With MITM on and the modules listed,
+    /// the files the core stored that none of them reads any longer are removed.
     pub(crate) fn apply(
         &self,
         section: &MitmDef,
@@ -281,6 +282,9 @@ impl MitmService {
         mitm.set_trust(trust);
         store.resources.adopt(&modules);
         store.resources.write_inline(&modules);
+        if section.enable && section.modules_listed {
+            store.resources.collect(&modules);
+        }
         let applied = Arc::new(Applied {
             section: section.clone(),
             modules,

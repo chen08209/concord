@@ -1,7 +1,7 @@
 //! The remote files modules read, kept in the MITM resources directory under names their
 //! content gives, with an index from each URL to its file and the last fetch's outcome.
 
-use std::collections::{BTreeMap, HashSet};
+use std::collections::{BTreeMap, BTreeSet, HashSet};
 use std::sync::{Arc, Mutex};
 use std::time::{SystemTime, UNIX_EPOCH};
 
@@ -85,6 +85,37 @@ struct Entry {
     fetched_at: Option<u64>,
 }
 
+/// The remote files by URL, and the scripts modules carry in their text that the store wrote
+/// out, by name: the files it may remove.
+#[derive(Debug, Default, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+struct Index {
+    #[serde(default)]
+    urls: BTreeMap<String, Entry>,
+    #[serde(default, skip_serializing_if = "BTreeSet::is_empty")]
+    inline: BTreeSet<String>,
+}
+
+impl Index {
+    /// An index written before the store recorded its inline scripts maps URLs alone.
+    fn read(bytes: &[u8]) -> Option<Index> {
+        serde_json::from_slice(bytes).ok().or_else(|| {
+            serde_json::from_slice(bytes).ok().map(|urls| Index {
+                urls,
+                inline: BTreeSet::new(),
+            })
+        })
+    }
+
+    fn uses(&self, file: &str) -> bool {
+        self.inline.contains(file)
+            || self
+                .urls
+                .values()
+                .any(|entry| entry.file.as_deref() == Some(file))
+    }
+}
+
 /// Where a module's remote file stands.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -99,7 +130,7 @@ pub enum ResourceState {
 pub(crate) struct ModuleResources {
     home: Arc<HomeDir>,
     fetcher: Arc<dyn Fetcher>,
-    index: Mutex<BTreeMap<String, Entry>>,
+    index: Mutex<Index>,
     fetching: Mutex<HashSet<String>>,
 }
 
@@ -133,7 +164,7 @@ impl ModuleResources {
     pub fn open(home: Arc<HomeDir>, fetcher: Arc<dyn Fetcher>) -> ModuleResources {
         let index = std::fs::read(home.join(index_path()))
             .ok()
-            .and_then(|bytes| serde_json::from_slice(&bytes).ok())
+            .and_then(|bytes| Index::read(&bytes))
             .unwrap_or_default();
         ModuleResources {
             home,
@@ -145,13 +176,14 @@ impl ModuleResources {
 
     pub fn stored(&self, url: &str) -> Option<String> {
         lock(&self.index)
+            .urls
             .get(url)
             .and_then(|entry| entry.file.clone())
     }
 
     /// Where the file of `url` stands, and why its last fetch failed.
     pub fn state(&self, url: &str) -> (ResourceState, Option<FetchFailure>) {
-        let entry = lock(&self.index).get(url).cloned().unwrap_or_default();
+        let entry = lock(&self.index).urls.get(url).cloned().unwrap_or_default();
         let state = if lock(&self.fetching).contains(url) {
             ResourceState::Fetching
         } else if entry.error.is_some() {
@@ -173,9 +205,9 @@ impl ModuleResources {
             .iter()
             .flat_map(|module| &module.spec.adopt_resources)
         {
-            let free = index.get(url).is_none_or(|entry| entry.file.is_none());
+            let free = index.urls.get(url).is_none_or(|entry| entry.file.is_none());
             if free && plain_name(file) && self.home.join(resource_path(file)).is_file() {
-                index.insert(
+                index.urls.insert(
                     url.clone(),
                     Entry {
                         file: Some(file.clone()),
@@ -194,19 +226,80 @@ impl ModuleResources {
     /// Writes the scripts the modules in force carry in their text that the resources
     /// directory lacks; their names come from their content, so one already there is the same.
     pub fn write_inline(&self, modules: &[AppliedModule]) {
+        let mut index = lock(&self.index);
+        let mut recorded = false;
         for inline in modules
             .iter()
             .filter(|module| module.in_force())
             .flat_map(|module| &module.def.inline_files)
         {
-            let path = resource_path(&inline.file);
-            if !plain_name(&inline.file) || self.home.join(&path).is_file() {
+            if !plain_name(&inline.file) {
                 continue;
             }
-            if let Err(err) = self.home.write_atomic(&path, inline.content.as_bytes()) {
+            let path = resource_path(&inline.file);
+            if !self.home.join(&path).is_file()
+                && let Err(err) = self.home.write_atomic(&path, inline.content.as_bytes())
+            {
                 tracing::warn!("[MITM] inline script {}: {err}", inline.file);
+                continue;
+            }
+            recorded |= index.inline.insert(inline.file.clone());
+        }
+        if recorded {
+            self.save(&index);
+        }
+    }
+
+    /// Removes what the store keeps that none of `modules`, every module the host has, on or
+    /// off, reads any longer: the URLs with their files, and the scripts it wrote out. A file a
+    /// module attaches is the host's and stays. Nothing goes while a module cannot be read,
+    /// since what it reads is unknown, or while a URL is being fetched.
+    pub fn collect(&self, modules: &[AppliedModule]) {
+        if modules.iter().any(|module| module.problem.is_some()) {
+            return;
+        }
+        let urls: HashSet<&str> = modules
+            .iter()
+            .flat_map(|module| &module.def.resources)
+            .map(|resource| resource.url.as_str())
+            .collect();
+        let inline: HashSet<&str> = modules
+            .iter()
+            .flat_map(|module| &module.def.inline_files)
+            .map(|inline| inline.file.as_str())
+            .collect();
+        let attached: HashSet<&str> = modules
+            .iter()
+            .flat_map(|module| module.spec.attachments.values())
+            .map(String::as_str)
+            .collect();
+        let fetching = lock(&self.fetching).clone();
+        let mut index = lock(&self.index);
+        let mut dropped = Vec::new();
+        let before = (index.urls.len(), index.inline.len());
+        index.urls.retain(|url, entry| {
+            let keep = urls.contains(url.as_str()) || fetching.contains(url);
+            if !keep {
+                dropped.extend(entry.file.take());
+            }
+            keep
+        });
+        index.inline.retain(|file| {
+            let keep = inline.contains(file.as_str());
+            if !keep {
+                dropped.push(file.clone());
+            }
+            keep
+        });
+        if (index.urls.len(), index.inline.len()) == before {
+            return;
+        }
+        for file in dropped {
+            if plain_name(&file) && !attached.contains(file.as_str()) && !index.uses(&file) {
+                let _ = self.home.remove_file(resource_path(&file));
             }
         }
+        self.save(&index);
     }
 
     /// Fetches `url` and stores what it holds; true when the file in force changed. A URL
@@ -221,7 +314,7 @@ impl ModuleResources {
         };
         let outcome = self.fetch_and_store(url).await;
         let mut index = lock(&self.index);
-        let entry = index.entry(url.to_string()).or_default();
+        let entry = index.urls.entry(url.to_string()).or_default();
         let result = match outcome {
             Ok(file) => {
                 let old = entry.file.replace(file.clone());
@@ -232,9 +325,7 @@ impl ModuleResources {
                     .map(|since| since.as_secs());
                 let changed = old.as_deref() != Some(file.as_str());
                 if let Some(old) = old.filter(|_| changed)
-                    && !index
-                        .values()
-                        .any(|entry| entry.file.as_ref() == Some(&old))
+                    && !index.uses(&old)
                 {
                     let _ = self.home.remove_file(resource_path(&old));
                 }
@@ -263,7 +354,7 @@ impl ModuleResources {
         Ok(file)
     }
 
-    fn save(&self, index: &BTreeMap<String, Entry>) {
+    fn save(&self, index: &Index) {
         let written = serde_json::to_vec_pretty(index)
             .map_err(std::io::Error::other)
             .and_then(|bytes| self.home.write_atomic(index_path(), &bytes));

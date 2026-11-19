@@ -4,6 +4,7 @@
 //! follow the profile's, each remote file a line reads named by the file it is stored in.
 
 use std::collections::{BTreeMap, HashSet};
+use std::sync::Arc;
 
 use serde::{Deserialize, Deserializer, Serialize};
 use serde_json::{Value, json};
@@ -49,8 +50,8 @@ pub struct Unreadable(pub String);
 /// By name, the text of each module the section names by `path`, as the engine read it.
 pub type ModuleTexts = BTreeMap<String, Result<String, Unreadable>>;
 
-/// A module the host has put in force, as the section names it.
-#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+/// A module the host has installed, as the section names it.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case", default)]
 pub struct ModuleSpec {
     /// The host's name for it, unique among the modules.
@@ -72,6 +73,22 @@ pub struct ModuleSpec {
     /// directory, which Concord takes over while it is still there.
     #[serde(skip_serializing_if = "BTreeMap::is_empty")]
     pub adopt_resources: BTreeMap<String, String>,
+    /// Off, it is read so that the files it reads are kept, and takes no effect.
+    pub enabled: bool,
+}
+
+impl Default for ModuleSpec {
+    fn default() -> ModuleSpec {
+        ModuleSpec {
+            name: String::new(),
+            path: None,
+            text: None,
+            arguments: BTreeMap::new(),
+            attachments: BTreeMap::new(),
+            adopt_resources: BTreeMap::new(),
+            enabled: true,
+        }
+    }
 }
 
 /// Argument values as text whatever YAML made of them; a module's declaration types them.
@@ -141,9 +158,17 @@ pub struct AppliedModule {
 }
 
 impl AppliedModule {
-    /// Read, and not turned off by its own requirement.
+    /// How logs name it: its own name, with the host's after it when they differ.
+    pub fn origin(&self) -> Arc<str> {
+        match &self.def.meta.name {
+            Some(name) if *name != self.spec.name => format!("{name} ({})", self.spec.name).into(),
+            _ => self.spec.name.as_str().into(),
+        }
+    }
+
+    /// On, read, and not turned off by its own requirement.
     pub fn in_force(&self) -> bool {
-        self.problem.is_none() && self.def.off.is_none()
+        self.spec.enabled && self.problem.is_none() && self.def.off.is_none()
     }
 }
 
@@ -413,7 +438,8 @@ pub fn compose(
     let mut section = own.clone();
     let mut appended = Vec::new();
     for module in modules.iter().filter(|module| module.in_force()) {
-        let lines = module.def.section(&module.text);
+        let mut lines = module.def.section(&module.text);
+        lines.mark_origin(&module.origin());
         let inserts = module.def.lists.hostname.iter().map(|line| line.def.insert);
         for (line, insert) in lines.hostname.into_iter().zip(inserts) {
             if insert {

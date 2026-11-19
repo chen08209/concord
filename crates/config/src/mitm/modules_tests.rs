@@ -161,6 +161,46 @@ fn a_module_its_requirement_turns_off_is_not_merged() {
 }
 
 #[test]
+fn a_module_turned_off_is_read_and_adds_nothing() {
+    let modules = inline("ads", ADS).replacen("\n", "\n      enabled: false\n", 1);
+    let profile = profile(&modules, BTreeMap::new());
+    let module = &profile.modules[0];
+    assert!(!module.spec.enabled && !module.in_force());
+    assert_eq!(module.def.resources[0].url, "https://cdn.test/s.js");
+    assert!(!profile.rules.iter().any(|rule| rule.contains("ad.test")));
+    assert!(profile.hosts.lookup("a.test").is_none());
+    assert_eq!(profile.dns.nameserver.len(), 1);
+    let section = compose(&profile.mitm, &profile.modules, |_| None);
+    assert!(section.script.is_empty());
+    assert!(profile.mitm.modules_listed);
+}
+
+#[test]
+fn a_composed_line_names_its_module_by_its_name_and_the_hosts() {
+    let modules = format!("{}{}", inline("ads", ADS), inline("Ads", ADS));
+    let profile = profile(&modules, BTreeMap::new());
+    let section = compose(&profile.mitm, &profile.modules, |_| None);
+    let origins: Vec<_> = section
+        .hostname
+        .iter()
+        .map(|line| line.origin.as_deref())
+        .collect();
+    assert_eq!(origins, [None, Some("Ads (ads)"), Some("Ads")]);
+}
+
+#[test]
+fn a_section_without_a_module_list_is_not_listed() {
+    let options = LoadOptions::default();
+    let empty = load_str(
+        &format!("{BASE}mitm:\n  enable: true\n  modules: []\n"),
+        &options,
+    );
+    assert!(empty.unwrap().mitm.modules_listed);
+    let absent = load_str(&format!("{BASE}mitm:\n  enable: true\n"), &options);
+    assert!(!absent.unwrap().mitm.modules_listed);
+}
+
+#[test]
 fn a_module_read_from_its_path_takes_the_text_the_engine_read() {
     let texts = BTreeMap::from([("ads".to_string(), Ok(ADS.to_string()))]);
     let profile = profile("    - {name: ads, path: modules/ads.txt}\n", texts);
@@ -294,4 +334,30 @@ fn later_modules_go_over_earlier_ones() {
             after: Vec::new(),
         })
     );
+}
+
+#[test]
+fn the_system_resolver_a_host_appends_comes_after_the_modules() {
+    let servers = |text: &str| -> Vec<String> {
+        let loaded = load_str(text, &LoadOptions::default()).unwrap();
+        loaded
+            .dns
+            .nameserver
+            .iter()
+            .map(|server| server.text.clone())
+            .collect()
+    };
+    let base = BASE.replace(
+        "  nameserver: [1.1.1.1]\n",
+        "  nameserver: [1.1.1.1]\n  append-system: true\n",
+    );
+    let replacing = format!(
+        "{base}mitm:\n  enable: true\n  modules:\n{}",
+        inline("dns", "[General]\ndns-server = 8.8.8.8\n")
+    );
+    assert_eq!(servers(&replacing), ["8.8.8.8", "system://"]);
+    assert_eq!(servers(&base), ["1.1.1.1", "system://"]);
+    let named = base.replace("[1.1.1.1]", "[system, 1.1.1.1]");
+    assert_eq!(servers(&named), ["system", "1.1.1.1"]);
+    assert_eq!(servers(BASE), ["1.1.1.1"]);
 }

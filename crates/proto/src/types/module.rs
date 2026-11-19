@@ -94,6 +94,8 @@ dto! {
         pub rule: String,
         pub policy: MitmModulePolicy,
         pub no_resolve: bool,
+        /// Surge's `extended-matching`, read but not applied: the rule matches the domain
+        /// only, not the SNI or the Host header.
         pub extended_matching: bool,
     }
 

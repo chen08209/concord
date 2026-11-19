@@ -518,14 +518,15 @@ impl DnsConfig {
     }
 
     /// With `ipv6` off mihomo drops `fake-ip-range6` before reading it (`parseIPV6`). A number
-    /// out of range takes its default, returned as a note.
+    /// out of range takes its default, returned as a note. `append-system`, a key a host sets
+    /// for its user, puts `system://` last in `nameserver`, as the modules left it.
     pub fn read(map: &Map, ipv6: bool) -> Result<(DnsConfig, Vec<Ignored>)> {
         let defaults = dns_defaults();
         let mut notes = Vec::new();
         let mut f = Fields::new(map, "dns", false);
         let enable = f.boolean("enable")?;
         let respect_rules = f.boolean("respect-rules")?;
-        let nameserver_text = f.strings("nameserver")?;
+        let nameserver_text = with_system(f.strings("nameserver")?, f.boolean("append-system")?);
         let proxy_server_text = f.strings("proxy-server-nameserver")?;
         if enable && nameserver_text.is_empty() {
             return Err(ConfigError::new(
@@ -653,6 +654,15 @@ impl DnsConfig {
             .flat_map(|entry| entry.servers.iter());
         lists.chain(policies).filter_map(|up| up.proxy.as_deref())
     }
+}
+
+/// `servers` with `system://` last when `append` and it names no system resolver yet.
+fn with_system(mut servers: Vec<String>, append: bool) -> Vec<String> {
+    let system = |server: &String| matches!(server.trim(), "system" | "system://");
+    if append && !servers.iter().any(system) {
+        servers.push("system://".to_string());
+    }
+    servers
 }
 
 #[cfg(test)]

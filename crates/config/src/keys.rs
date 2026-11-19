@@ -185,6 +185,7 @@ pub const DNS_T0: &[&str] = &[
     "direct-nameserver-follow-policy",
     "use-hosts",
     "use-system-hosts",
+    "append-system",
     "respect-rules",
     "fake-ip-range",
     "fake-ip-filter",

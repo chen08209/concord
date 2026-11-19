@@ -5549,7 +5549,8 @@
           "type": "boolean"
         },
         "extendedMatching": {
-          "type": "boolean"
+          "type": "boolean",
+          "description": "Surge's `extended-matching`, read but not applied: the rule matches the domain\nonly, not the SNI or the Host header."
         }
       },
       "required": [
@@ -5996,9 +5997,13 @@
         "name": {
           "type": "string"
         },
+        "enabled": {
+          "type": "boolean",
+          "description": "Off, the host keeps it installed: it is read, and its files are kept but not fetched."
+        },
         "inForce": {
           "type": "boolean",
-          "description": "Read, and not turned off by its own requirement: its lines take effect."
+          "description": "On, read, and not turned off by its own requirement: its lines take effect."
         },
         "problem": {
           "anyOf": [
@@ -6041,6 +6046,7 @@
       },
       "required": [
         "name",
+        "enabled",
         "inForce",
         "resources",
         "refusedRules",

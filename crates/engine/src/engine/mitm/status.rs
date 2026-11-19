@@ -10,6 +10,7 @@ use super::store::{FetchFailure, ModuleResources, ResourceState};
 #[serde(rename_all = "camelCase")]
 pub(super) struct ModuleStatus<'a> {
     name: &'a str,
+    enabled: bool,
     in_force: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
     problem: Option<&'a ModuleProblem>,
@@ -41,6 +42,7 @@ pub(super) fn module_status<'a>(
 ) -> ModuleStatus<'a> {
     ModuleStatus {
         name: &module.spec.name,
+        enabled: module.spec.enabled,
         in_force: module.in_force(),
         problem: module.problem.as_ref(),
         off: module.def.off.as_ref(),

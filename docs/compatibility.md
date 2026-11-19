@@ -45,6 +45,7 @@ widen exposure are never ignored silently, and keys that name a server's identit
 | The replacement text of `override.proxy-name` | .NET rules: `$1x` is group 1 followed by `x` | Rust `regex` rules: `$1x` names a group called `1x`, so write `${1}x` |
 | The TUN keys that choose what is captured: `route-address-set`, `route-exclude-address-set`, `include-uid-range`, `exclude-uid-range`, `exclude-src-port-range`, `exclude-dst-port-range`, `include-android-user`, `include-package`, `exclude-package`, `include-mac-address` and `exclude-mac-address` | Applied | Ignored with a warning that the TUN captures other traffic than the profile says; an app that embeds Concord picks the apps itself |
 | `iptables` | Installs redirect rules on Linux | Ignored with a warning; Concord does not run as a Linux router |
+| `dns.append-system` | Not a key | A Concord key: `true` puts `system://` last in `nameserver` unless the list already has it, after the MITM modules have edited the list, so a module that replaces the list keeps it. An app sets it for its user |
 | Picking a dead `fallback` member | Stores the pick, then tests the member; a connection during the test drops the pick (`adapter/outboundgroup/fallback.go:105-145`) | Stores the pick, then tests the member; a connection during the test uses another member, and the pick stays until the test decides |
 
 TCP JLS does not resume sessions. Its native Hello matches the AES-capable Go jls-tls default
@@ -241,7 +242,8 @@ A host reads a module (a Surge `.sgmodule`, a Loon plugin, a Quantumult X snippe
 `mitm.readModule`, which answers with each line by its line number: what goes into the MITM lists, the rules and rule sets with their policies for the host to map, the
 DNS, hosts and route changes in mihomo's keys, the remote files it reads, and every line Concord does not take with the
 reason. A module's `force-http-engine-hosts` comes back as a list of its own, `force-http-hostname`, for the host to
-decide on. A `map-local` line's `data-type=json`, which Loon writes and Surge's manual does not list, reads as text
+decide on. A rule's `extended-matching` is read and reported as `extendedMatching`, but not applied: the rule
+matches the domain only, not the SNI or the Host header. A `map-local` line's `data-type=json`, which Loon writes and Surge's manual does not list, reads as text
 sent as `application/json`.
 A Loon plugin's `[Rewrite]` and `[Script]` lines read in both of Loon's syntaxes. In the `if … then` form the
 `[Argument]` values come in with their types: a test on arguments alone is decided as the module is read, a line
@@ -279,8 +281,12 @@ module that cannot be read or repeats a name takes no effect and the profile sti
 list are the host's to apply. The remote files a module reads are fetched through the core, in the background after
 an apply, and stored in `mitm/resources/` under names their content gives, with `mitm/module-resources.json`
 mapping each URL to its file; a line whose file is not stored yet takes effect once it is, and a failed fetch keeps
-the file an earlier one stored. `adopt-resources` hands over, by URL, files the host stored itself.
-`mitm.moduleStatus` answers how each module and each of its files stand, with why a fetch failed (`http` with its
+the file an earlier one stored. `adopt-resources` hands over, by URL, files the host stored itself. A module with
+`enabled: false` is read but takes no effect and its files are not fetched; a host lists it so that they are kept.
+With MITM on and a `modules` list, which then names every module the host has, each apply removes the files Concord
+stored, fetched, adopted or written from a module's text, that no listed module reads any longer. Attached files are
+the host's and stay, and nothing is removed while a listed module cannot be read.
+`mitm.moduleStatus` answers whether each module is on, how it and each of its files stand, with why a fetch failed (`http` with its
 status, `dns`, `tls`, `timeout`, `connection` or `other`), and `mitm.fetchModule` fetches one module's files
 again, or every module's; each module's fetch is a `resourceUpdate` of kind `mitmModule`. Nothing fetches them
 again on a timer.

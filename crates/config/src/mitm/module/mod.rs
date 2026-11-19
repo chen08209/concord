@@ -248,6 +248,7 @@ impl ModuleDef {
                         index,
                         text,
                         read: map(&line.def),
+                        origin: None,
                     }
                 })
                 .collect()
@@ -262,6 +263,7 @@ impl ModuleDef {
                     items: line.def.clone(),
                     error: None,
                 },
+                origin: None,
             }
         });
         MitmDef {

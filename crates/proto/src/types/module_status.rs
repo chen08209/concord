@@ -17,7 +17,9 @@ dto! {
 
     pub struct MitmModuleStatus {
         pub name: String,
-        /// Read, and not turned off by its own requirement: its lines take effect.
+        /// Off, the host keeps it installed: it is read, and its files are kept but not fetched.
+        pub enabled: bool,
+        /// On, read, and not turned off by its own requirement: its lines take effect.
         pub in_force: bool,
         /// Why it could not be taken at all.
         #[serde(default, skip_serializing_if = "Option::is_none")]

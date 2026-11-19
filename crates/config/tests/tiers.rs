@@ -89,6 +89,7 @@ const SAMPLES: &[(&str, &str)] = &[
     ),
     ("dns.use-hosts", "dns: {use-hosts: false}"),
     ("dns.use-system-hosts", "dns: {use-system-hosts: false}"),
+    ("dns.append-system", "dns: {append-system: true}"),
     (
         "dns.respect-rules",
         "dns: {respect-rules: true, proxy-server-nameserver: [\"8.8.8.8\"]}",
