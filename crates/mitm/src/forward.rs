@@ -57,19 +57,15 @@ impl Session {
         cap.sent(&out.url.raw, with_host(&out.headers, &out.host_header()));
     }
 
-    async fn apply_request_rules(self: &Arc<Self>, out: &mut OutRequest, target: &mut Target) {
-        let rules = &self.core.config.rules;
-        let max_body = self.core.config.limits.max_body_size;
-        let address = out.url.raw.clone();
-        let (header_rules, mock, body_rules, script) = {
+    /// Header Rewrite comes first, as in Surge, so a URL rewrite and Map Local see its result.
+    pub(crate) fn rewrite_request_headers(&self, out: &mut OutRequest, target: &Target) {
+        let header_rules = {
             let request = || request_text(out, target.version);
             let heads = Heads::new(Some(&request), None);
-            (
-                rules.header_rewrites_for(&address, false, &heads),
-                rules.request_mock(&address, &heads),
-                rules.body_rewrites_for(&address, false, &heads),
-                rules.script_for(&address, false, &heads),
-            )
+            self.core
+                .config
+                .rules
+                .header_rewrites_for(&out.url.raw, false, &heads)
         };
         let mut rewritten = Vec::new();
         for rule in header_rules {
@@ -84,8 +80,23 @@ impl Session {
             target
                 .cap
                 .note_each("header-rewrite", PHASE_REQUEST, &rewritten);
-            tracing::info!("[MITM] rewrite request headers of {address}");
+            tracing::info!("[MITM] rewrite request headers of {}", out.url.raw);
         }
+    }
+
+    async fn apply_request_rules(self: &Arc<Self>, out: &mut OutRequest, target: &mut Target) {
+        let rules = &self.core.config.rules;
+        let max_body = self.core.config.limits.max_body_size;
+        let address = out.url.raw.clone();
+        let (mock, body_rules, script) = {
+            let request = || request_text(out, target.version);
+            let heads = Heads::new(Some(&request), None);
+            (
+                rules.request_mock(&address, &heads),
+                rules.body_rewrites_for(&address, false, &heads),
+                rules.script_for(&address, false, &heads),
+            )
+        };
         if let Some(mock) = mock {
             mock_body(out, &mock.header, &mock.body);
             target.cap.note(
@@ -338,7 +349,9 @@ fn mock_body(out: &mut OutRequest, header: &HeaderMap, body: &[u8]) {
     out.has_body = true;
 }
 
-fn request_text(out: &OutRequest, version: &str) -> String {
+/// The head of a request as Quantumult X's `url-and-header` reads it: the request line, the
+/// host, then every header as `Name: value`, each line ending in CRLF, and the blank line.
+pub(crate) fn request_text(out: &OutRequest, version: &str) -> String {
     let line = format!("{} {} {version}", out.method, out.url.path_and_query);
     head_text(&line, &out.host_header(), &out.headers)
 }

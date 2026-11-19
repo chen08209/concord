@@ -670,9 +670,9 @@ async fn each_action_names_the_module_whose_line_it_was() {
     assert_eq!(
         actions,
         [
-            from("url-rewrite", "", "header", "Ads"),
             from("header-rewrite", "request", "", ""),
             from("header-rewrite", "request", "", "Ads"),
+            from("url-rewrite", "", "header", "Ads"),
         ]
     );
 }

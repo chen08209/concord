@@ -14,7 +14,7 @@ fn-lines crates/config/src/share_link/decode.rs::decode_line 294
 fn-lines crates/config/src/share_link/decode.rs::decode_vmess 172
 fn-lines crates/config/src/share_link/decode.rs::v_share_link 148
 fn-lines crates/dns/src/build.rs::Resolver::new 160 raised from 157: the resolver and each of its groups take the engine's Tasks, read before the shared state moves into the builder; back down when group assembly leaves Resolver::new
-fn-lines crates/mitm/src/exchange.rs::Session::handle 142
+fn-lines crates/mitm/src/exchange.rs::Session::handle 138
 fn-lines crates/net/src/relay.rs::Half::poll 175
 fn-lines crates/netstack/src/engine.rs::TcpStack::poll 129 raised from 123: a connection whose turn found no transmit room keeps its queue place, which needs whether its output sent anything
 fn-lines crates/netstack/src/tcp/recovery.rs::Tcb::process_ack 126

@@ -13,7 +13,8 @@ use tokio::sync::OwnedSemaphorePermit;
 
 use crate::body::{Body, Tap, empty, from_incoming, full};
 use crate::capture::Cap;
-use crate::headers::{remove_hop_by_hop, request_head, text, to_list, version_text, with_host};
+use crate::forward::request_text;
+use crate::headers::{remove_hop_by_hop, text, to_list, version_text, with_host};
 use crate::heads::Heads;
 use crate::rules::{UrlAction, tiny_gif};
 use crate::session::{ActivityGuard, Routed, Session};
@@ -336,6 +337,27 @@ impl Session {
         }
     }
 
+    /// Header rewrites, then a URL rewrite and Map Local, in Surge's order: the answer the
+    /// last two give in place of the server's, or `None` when the request goes on.
+    fn rewrite_head(
+        &self,
+        out: &mut OutRequest,
+        target: &mut Target,
+    ) -> Option<(StatusCode, HeaderMap, Vec<u8>)> {
+        self.rewrite_request_headers(out, target);
+        target.url = out.url.clone();
+        let answer = {
+            let version = target.version;
+            let head = || request_text(out, version);
+            self.answer_locally(&Heads::new(Some(&head), None), target)
+        };
+        if answer.is_none() && target.rewritten {
+            out.url = target.url.clone();
+            out.host = None;
+        }
+        answer
+    }
+
     /// The answer a URL rewrite or Map Local gives in place of the server's, or `None` when
     /// the request goes on, perhaps to the URL a rewrite moved it to.
     fn answer_locally(
@@ -458,26 +480,22 @@ impl Session {
             reserved: Vec::new(),
             cap: cap.clone(),
         };
-        let head = || request_head(&parts, &in_host, version_text(parts.version));
-        if let Some((status, headers, data)) =
-            self.answer_locally(&Heads::new(Some(&head), None), &mut target)
-        {
-            return Ok(local(&cap, status, headers, data, guard));
-        }
-        let rules = &self.core.config.rules;
-        if !rules.scripts.is_empty() {
-            target.id = new_request_id();
-        }
-        tracing::debug!("[MITM] {} {}", parts.method, target.url.raw);
         let mut out = OutRequest {
             method: parts.method.clone(),
             headers: std::mem::take(&mut parts.headers),
-            host: (!target.rewritten).then_some(in_host),
+            host: Some(in_host),
             url: target.url.clone(),
             body,
             has_body,
             length,
         };
+        if let Some((status, headers, data)) = self.rewrite_head(&mut out, &mut target) {
+            return Ok(local(&cap, status, headers, data, guard));
+        }
+        if !self.core.config.rules.scripts.is_empty() {
+            target.id = new_request_id();
+        }
+        tracing::debug!("[MITM] {} {}", out.method, target.url.raw);
         self.rewrite_request(&mut out, &mut target).await;
         if target.abort {
             cap.fail("aborted by a script");

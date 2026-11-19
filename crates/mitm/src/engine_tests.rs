@@ -1856,3 +1856,24 @@ async fn a_disabled_hostname_is_taken_out_of_the_list_as_written() {
         "only an entry written the same is taken out"
     );
 }
+
+#[tokio::test]
+async fn header_rewrite_comes_before_the_url_rewrite_as_in_surge() {
+    let (_server, rig) = rig(echo(), true, &["http/1.1"]).await;
+    let errors = rig.config(json!({
+        "enable": true,
+        "hostname": ["example.test"],
+        "skip-server-cert-verify": true,
+        "url-rewrite": [r"^https://example\.test/old https://example.test/new"],
+        "header-rewrite": [r"http-request ^https://example\.test/old header-add X-Added yes"],
+    }));
+    assert!(errors.is_empty(), "{errors:?}");
+    let mut client = Client::tls(&rig, "example.test", 443, &["http/1.1"])
+        .await
+        .unwrap();
+    assert_eq!(
+        client.get("/old").await.text(),
+        "example.test|/new|yes|",
+        "the header rewrite matched the URL the client asked for"
+    );
+}

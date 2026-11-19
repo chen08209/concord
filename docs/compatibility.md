@@ -220,10 +220,13 @@ the request script left it, and its User-Agent; it reuses only a connection that
 host the rules reject only until its requests are read is still decrypted, and a request a REJECT variant decides
 gets the variant's reply (`REJECT-TINYGIF` a GIF, `REJECT-DICT` `{}`, `REJECT-DROP` no answer). While the rules
 read requests, plain HTTP on port 80 is read for any host.
+A request goes through header rewrites, then a URL rewrite and Map Local, then `request-body-mock`, body rewrites and
+the request script, in Surge's order, each matching the URL and head the step before left; a response goes through
+header rewrites, body rewrites and the response script.
 A `map-local` line takes `request-head <re>` after its URL as well. `request-body-mock`, a list of Concord's own for
 Loon's `mock-request-body`, takes `map-local`'s parameters but `status-code`: the first line whose URL and condition
 match sends its data upstream in place of the request's body, a request that had none included, with `header=`
-set over the request's headers; the header and body rewrites and the script after it see the mocked body.
+set over the request's headers; the body rewrites and the script after it see the mocked body.
 An `http-request` or `http-response` script takes the same conditions as parameters, `request-head=<re>` and on
 an `http-response` script `response-head=<re>`. The first script whose URL and conditions match runs, so one whose
 conditions fail leaves the turn to the next. A body read whole for a script or a body rewrite keeps the trailers that
