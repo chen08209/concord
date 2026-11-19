@@ -3,26 +3,24 @@ use std::pin::Pin;
 use std::sync::Arc;
 use std::task::{Context, Poll, ready};
 
-use bytes::{Buf, Bytes};
+use bytes::Bytes;
 use futures_util::future::BoxFuture;
 use tokio::io::{AsyncRead, AsyncWrite, ReadBuf};
 
 use super::{Session, error};
+use crate::h3io::{H3Reader, RecvStream};
 
-pub(super) type Receive = ::h3::client::RequestStream<h3_quinn::RecvStream, Bytes>;
 type Send = ::h3::client::RequestStream<h3_quinn::SendStream<Bytes>, Bytes>;
 
 pub(super) struct Reader {
-    recv: Receive,
-    pending: Bytes,
+    recv: H3Reader,
     _session: Arc<Session>,
 }
 
 impl Reader {
-    pub(super) fn new(recv: Receive, session: Arc<Session>) -> Self {
+    pub(super) fn new(recv: RecvStream, session: Arc<Session>) -> Self {
         Self {
-            recv,
-            pending: Bytes::new(),
+            recv: H3Reader::new(recv),
             _session: session,
         }
     }
@@ -34,19 +32,7 @@ impl AsyncRead for Reader {
         cx: &mut Context<'_>,
         buf: &mut ReadBuf<'_>,
     ) -> Poll<io::Result<()>> {
-        let this = self.get_mut();
-        if buf.remaining() == 0 {
-            return Poll::Ready(Ok(()));
-        }
-        while this.pending.is_empty() {
-            let Some(mut data) = ready!(this.recv.poll_recv_data(cx)).map_err(error)? else {
-                return Poll::Ready(Ok(()));
-            };
-            this.pending = data.copy_to_bytes(data.remaining());
-        }
-        let len = buf.remaining().min(this.pending.len());
-        buf.put_slice(&this.pending.split_to(len));
-        Poll::Ready(Ok(()))
+        self.get_mut().recv.poll_read(cx, buf).map_err(error)
     }
 }
 

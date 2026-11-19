@@ -6,6 +6,7 @@ use std::task::{Context, Poll, ready};
 use bytes::{Buf, Bytes};
 use concord_common::{BoxRead, BoxWrite, Stream};
 use concord_quic::io_error;
+use concord_transport::h3io::H3Reader;
 use tokio::io::{AsyncRead, AsyncWrite, ReadBuf};
 use tokio_util::sync::ReusableBoxFuture;
 
@@ -14,8 +15,7 @@ use super::h3;
 pub(super) type Sent = (h3::Send, io::Result<()>);
 
 pub(super) struct Read {
-    stream: h3::Recv,
-    data: Bytes,
+    stream: H3Reader,
     _client: Arc<h3::Client>,
 }
 
@@ -25,16 +25,7 @@ impl AsyncRead for Read {
         cx: &mut Context<'_>,
         out: &mut ReadBuf<'_>,
     ) -> Poll<io::Result<()>> {
-        let this = self.get_mut();
-        while this.data.is_empty() && out.remaining() != 0 {
-            match ready!(this.stream.poll_recv_data(cx)).map_err(io_error)? {
-                Some(mut data) => this.data = data.copy_to_bytes(data.remaining()),
-                None => return Poll::Ready(Ok(())),
-            }
-        }
-        let len = out.remaining().min(this.data.len());
-        out.put_slice(&this.data.split_to(len));
-        Poll::Ready(Ok(()))
+        self.get_mut().stream.poll_read(cx, out).map_err(io_error)
     }
 }
 
@@ -155,8 +146,7 @@ impl Body {
         let (send, recv) = stream.split();
         Self {
             read: Read {
-                stream: recv,
-                data: Bytes::new(),
+                stream: H3Reader::new(recv),
                 _client: client.clone(),
             },
             write: Write {

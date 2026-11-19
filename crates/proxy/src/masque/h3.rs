@@ -13,7 +13,6 @@ pub(super) type Requests = h3::client::SendRequest<h3_quinn::OpenStreams, Bytes>
 pub(super) type Driver = h3::client::Connection<h3_quinn::Connection, Bytes>;
 pub(super) type RequestStream = h3::client::RequestStream<h3_quinn::BidiStream<Bytes>, Bytes>;
 pub(super) type Send = h3::client::RequestStream<h3_quinn::SendStream<Bytes>, Bytes>;
-pub(super) type Recv = h3::client::RequestStream<h3_quinn::RecvStream, Bytes>;
 
 pub(super) struct Client {
     pub(super) quic: QuicConn,

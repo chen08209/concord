@@ -162,6 +162,11 @@ Concord already takes these from the references; keep them unless the reference 
   negotiated-timeout getter or keepalive setter, so shorter peer timeouts remain a compatibility limit. TLS is mandatory; additional security modes are
   rejected (`adapter/outbound/vless.go:676-708`). `download-settings` selects its own HTTP version
   and connection settings (`adapter/outbound/vless.go:867-903`).
+- [language-neutral] **HTTP/3 body reads** copy every DATA chunk already received until the caller's buffer is
+  full and return what they have once the stream is pending, for MASQUE's CONNECT body and XHTTP's HTTP/3
+  responses (`crates/transport/src/h3io.rs`, `H3Reader`). quic-go `v0.61.1-0.20260727080200` (mihomo `v1.19.33`'s
+  pin) copies every queued STREAM frame into the buffer under one stream lock (`receive_stream.go:113-123`,
+  `:173-226`), up to the end of the current DATA frame (`http3/stream.go:73-112`).
 
 - [language-neutral] **MASQUE transport and identity defaults** follow mihomo's MTU 1280, QUIC
   initial packet 1242, keepalive 30 s and 20-byte CID (`adapter/outbound/masque.go:208-219`, `:267-275`).

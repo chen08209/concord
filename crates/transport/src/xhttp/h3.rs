@@ -122,7 +122,7 @@ impl H3Transport {
         unreachable!()
     }
 
-    fn response(mut recv: io::Receive, session: Arc<Session>) -> Pending {
+    fn response(mut recv: crate::h3io::RecvStream, session: Arc<Session>) -> Pending {
         Box::pin(async move {
             let response = recv.recv_response().await.map_err(error)?;
             let status = response.status().as_u16();
