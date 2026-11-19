@@ -130,8 +130,10 @@ What the engine runs has one of three lifetimes, and a new service picks one:
   `dns.listen`, and MITM's scheduled scripts. An apply opens them only while the core runs. Android's TUN comes and
   goes with `tun.start` and `tun.stop` instead, and its stop ends the run.
 
-A stop leaves established connections relaying. `engine::lifecycle_tests` walks apply, start, stop and start again
-and fails when a port or a task begun by a start outlives the stop.
+A stop leaves established connections relaying. A new service starts and stops where the Go core's counterpart does;
+a departure needs a reason the Go behaviour is wrong for the host and an entry in `reference-choices.md`, as
+`dns.listen` has. `engine::lifecycle_tests` walks apply, start, stop and start again and fails when a port or a
+task begun by a start outlives the stop.
 
 The control plane is layered: `proto` (types, errors, the method registry with execution class `inline`, `serial` or
 `concurrent`, stream policies `latest`, `drop_oldest` or `resync`) → `api` (one async function per method) → `rpc`
