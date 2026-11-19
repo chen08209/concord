@@ -1,0 +1,108 @@
+{
+  "format": "surge",
+  "meta": {
+    "name": "YouTube增强",
+    "desc": "https://github.com/Maasea/sgmodule/blob/master/YouTube.Enhance.sgmodule",
+    "author": null,
+    "icon": null,
+    "homepage": null,
+    "category": "Enhancement",
+    "system": null,
+    "requirement": null,
+    "argumentsDesc": "- 屏蔽参数：[true, false] \n- 翻译参数：[语言代码, off] \n\n1. 语言代码遵循 Google Translate Languages Codes, 当填入 off 时关闭翻译\n2. 开启调试模式用于输出更多日志"
+  },
+  "off": null,
+  "arguments": [
+    {
+      "name": "屏蔽上传按钮",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "line": 4
+    },
+    {
+      "name": "屏蔽选段按钮",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "line": 4
+    },
+    {
+      "name": "屏蔽Shorts按钮",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "line": 4
+    },
+    {
+      "name": "字幕翻译语言",
+      "kind": {
+        "type": "text"
+      },
+      "number": false,
+      "default": "off",
+      "line": 4
+    },
+    {
+      "name": "启用调试模式",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "false",
+      "line": 4
+    }
+  ],
+  "hostname": [
+    {
+      "line": 13,
+      "items": "*.googlevideo.com, youtubei.googleapis.com"
+    }
+  ],
+  "force-http-hostname": [],
+  "skip-server-cert-verify": null,
+  "client-source-address": [],
+  "h2": null,
+  "url-rewrite": {},
+  "header-rewrite": {},
+  "body-rewrite": {},
+  "map-local": {},
+  "request-body-mock": {},
+  "script": {
+    "8": "ScriptDef { name: \"youtube.response\", path: \"https://raw.githubusercontent.com/Maasea/sgmodule/master/Script/Youtube/youtube.response.js\", kind: HttpResponse, pattern: Some(\"^https:\\\\/\\\\/youtubei\\\\.googleapis\\\\.com\\\\/(youtubei\\\\/v1\\\\/(browse|next|player|search|reel\\\\/reel_watch_sequence|guide|account\\\\/get_setting|get_watch|log_event|config))(\\\\?(.*))?$\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: true, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: Some(String(\"{\\\"captionLang\\\":\\\"off\\\",\\\"blockUpload\\\":true,\\\"blockImmersive\\\":true,\\\"blockShorts\\\":true,\\\"debug\\\":false}\")) }",
+    "9": "ScriptDef { name: \"youtube.request.init\", path: \"https://raw.githubusercontent.com/Maasea/sgmodule/master/Script/Youtube/youtube.request.js\", kind: HttpRequest, pattern: Some(\"^https?:\\\\/\\\\/[\\\\w-]+\\\\.googlevideo\\\\.com\\\\/initplayback.+&ack.*\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: true, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: Some(String(\"{\\\"captionLang\\\":\\\"off\\\"}\")) }",
+    "10": "ScriptDef { name: \"youtube.request.log_event\", path: \"https://raw.githubusercontent.com/Maasea/sgmodule/master/Script/Youtube/youtube.request.js\", kind: HttpRequest, pattern: Some(\"^https:\\\\/\\\\/youtubei\\\\.googleapis\\\\.com\\\\/youtubei\\\\/v1\\\\/log_event\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: true, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }"
+  },
+  "rules": {},
+  "rule-sets": [],
+  "resources": [
+    {
+      "url": "https://raw.githubusercontent.com/Maasea/sgmodule/master/Script/Youtube/youtube.response.js",
+      "kind": "script",
+      "lines": [
+        8
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Maasea/sgmodule/master/Script/Youtube/youtube.request.js",
+      "kind": "script",
+      "lines": [
+        9,
+        10
+      ]
+    }
+  ],
+  "network": {},
+  "declared-scripts": [
+    8,
+    9,
+    10
+  ],
+  "ignored": []
+}

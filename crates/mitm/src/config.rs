@@ -242,9 +242,13 @@ pub struct LineEntry {
 }
 
 pub fn check(raw: &RawConfig, env: &ParseEnv) -> Validation {
+    check_def(&MitmDef::read(raw), env)
+}
+
+pub(crate) fn check_def(def: &MitmDef, env: &ParseEnv) -> Validation {
     let mut validation = Validation::default();
     let mut scratch = Config::empty(&MitmDef::default());
-    scratch.add_lines(&MitmDef::read(raw), env, &mut |key, index, _, read| {
+    scratch.add_lines(def, env, &mut |key, index, _, read| {
         if let Some(err) = read.error {
             let issue = Issue {
                 index,

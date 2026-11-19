@@ -1,0 +1,59 @@
+{
+  "format": "surge",
+  "meta": {
+    "name": "bilibili去广告8.13(>=iOS15)",
+    "desc": "开屏页广告,推荐页广告,动态(最常访问/推荐话题/列表广告),视频播放页面(up主推荐广告)",
+    "author": null,
+    "icon": null,
+    "homepage": null,
+    "category": null,
+    "system": null,
+    "requirement": null,
+    "argumentsDesc": null
+  },
+  "off": null,
+  "arguments": [],
+  "hostname": [
+    {
+      "line": 7,
+      "items": "app.bilibili.com, grpc.biliapi.net"
+    }
+  ],
+  "force-http-hostname": [],
+  "skip-server-cert-verify": null,
+  "client-source-address": [],
+  "h2": null,
+  "url-rewrite": {},
+  "header-rewrite": {},
+  "body-rewrite": {},
+  "map-local": {},
+  "request-body-mock": {},
+  "script": {
+    "10": "ScriptDef { name: \"bili-json\", path: \"https://raw.githubusercontent.com/app2smile/rules/master/js/bilibili-json.js\", kind: HttpResponse, pattern: Some(\"^https:\\\\/\\\\/app\\\\.bilibili\\\\.com\\\\/x\\\\/(v2\\\\/(splash\\\\/(list|show)|feed\\\\/index\\\\?)|resource\\\\/show\\\\/tab\\\\/v2)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "11": "ScriptDef { name: \"bili-proto\", path: \"https://raw.githubusercontent.com/app2smile/rules/master/js/bilibili-proto.js\", kind: HttpResponse, pattern: Some(\"^https:\\\\/\\\\/(grpc\\\\.biliapi\\\\.net|app\\\\.bilibili\\\\.com)\\\\/bilibili\\\\.app\\\\.(viewunite\\\\.v1\\\\.View\\\\/View|dynamic\\\\.v2\\\\.Dynamic\\\\/DynAll)$\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: true, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }"
+  },
+  "rules": {},
+  "rule-sets": [],
+  "resources": [
+    {
+      "url": "https://raw.githubusercontent.com/app2smile/rules/master/js/bilibili-json.js",
+      "kind": "script",
+      "lines": [
+        10
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/app2smile/rules/master/js/bilibili-proto.js",
+      "kind": "script",
+      "lines": [
+        11
+      ]
+    }
+  ],
+  "network": {},
+  "declared-scripts": [
+    10,
+    11
+  ],
+  "ignored": []
+}

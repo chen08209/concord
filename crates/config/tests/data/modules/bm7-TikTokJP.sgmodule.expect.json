@@ -1,0 +1,43 @@
+{
+  "format": "surge",
+  "meta": {
+    "name": "TikTokJP",
+    "desc": "最后更新时间 2025-06-06 09:20:55",
+    "author": "Semporia",
+    "icon": null,
+    "homepage": null,
+    "category": null,
+    "system": null,
+    "requirement": null,
+    "argumentsDesc": null
+  },
+  "off": null,
+  "arguments": [],
+  "hostname": [
+    {
+      "line": 17,
+      "items": "*.byteoversea.com, *.tik-tokapi.com, *.tiktokv.com"
+    }
+  ],
+  "force-http-hostname": [],
+  "skip-server-cert-verify": null,
+  "client-source-address": [],
+  "h2": null,
+  "url-rewrite": {
+    "10": "UrlRewriteDef { pattern: \"(?<=&mcc_mnc=)4\", head: None, replacement: \"2\", action: Redirect307 }",
+    "11": "UrlRewriteDef { pattern: \"(?<=_region=)CN(?=&)\", head: None, replacement: \"JP\", action: Redirect307 }",
+    "12": "UrlRewriteDef { pattern: \"(^https?:\\\\/\\\\/*\\\\.\\\\w{4}okv.com\\\\/.+&.+)(\\\\d{2}\\\\.3\\\\.\\\\d)(.+)\", head: None, replacement: \"$118.0$3\", action: Redirect302 }",
+    "13": "UrlRewriteDef { pattern: \"^(https?:\\\\/\\\\/(tnc|dm)[\\\\w-]+\\\\.\\\\w+\\\\.com\\\\/.+)(\\\\?)(.+)\", head: None, replacement: \"$1$3\", action: Redirect302 }"
+  },
+  "header-rewrite": {},
+  "body-rewrite": {},
+  "map-local": {},
+  "request-body-mock": {},
+  "script": {},
+  "rules": {},
+  "rule-sets": [],
+  "resources": [],
+  "network": {},
+  "declared-scripts": [],
+  "ignored": []
+}

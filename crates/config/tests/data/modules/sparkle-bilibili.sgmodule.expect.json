@@ -1,0 +1,191 @@
+{
+  "format": "surge",
+  "meta": {
+    "name": "哔哩哔哩增强",
+    "desc": "拜托，没有广告的哔哩哔哩真的超酷的",
+    "author": null,
+    "icon": null,
+    "homepage": null,
+    "category": "Enhancement",
+    "system": null,
+    "requirement": null,
+    "argumentsDesc": "动态最常访问\n- auto: 仅当列表中存在直播状态时显示\n- show: 始终显示\n- hide: 始终隐藏\n\n创作中心\n- 0: 隐藏\n- 1: 显示\n\n过滤置顶评论广告\n- 0: 关闭\n- 1: 开启\n\n优化评论区加载: 默认开启，配置为\"#\"时关闭\n\n空降助手: 默认开启，配置为\"#\"时关闭\n\n空降助手策略: 默认直连，建议配置为代理策略\n\n屏蔽P2P: 默认开启，配置为\"#\"时关闭\n\n日志等级\n- 1: DEBUG\n- 2: INFO\n- 3: WARN\n- 4: ERROR\n- 5: OFF"
+  },
+  "off": null,
+  "arguments": [
+    {
+      "name": "动态最常访问",
+      "kind": {
+        "type": "text"
+      },
+      "number": false,
+      "default": "auto",
+      "line": 4
+    },
+    {
+      "name": "创作中心",
+      "kind": {
+        "type": "text"
+      },
+      "number": false,
+      "default": "0",
+      "line": 4
+    },
+    {
+      "name": "过滤置顶评论广告",
+      "kind": {
+        "type": "text"
+      },
+      "number": false,
+      "default": "1",
+      "line": 4
+    },
+    {
+      "name": "优化评论区加载",
+      "kind": {
+        "type": "text"
+      },
+      "number": false,
+      "default": "bilibili.request",
+      "line": 4
+    },
+    {
+      "name": "空降助手",
+      "kind": {
+        "type": "text"
+      },
+      "number": false,
+      "default": "bilibili.airborne",
+      "line": 4
+    },
+    {
+      "name": "空降助手策略",
+      "kind": {
+        "type": "text"
+      },
+      "number": false,
+      "default": "DIRECT",
+      "line": 4
+    },
+    {
+      "name": "屏蔽P2P",
+      "kind": {
+        "type": "text"
+      },
+      "number": false,
+      "default": "DEST-PORT",
+      "line": 4
+    },
+    {
+      "name": "日志等级",
+      "kind": {
+        "type": "text"
+      },
+      "number": false,
+      "default": "4",
+      "line": 4
+    }
+  ],
+  "hostname": [
+    {
+      "line": 46,
+      "items": "grpc.biliapi.net, app.bilibili.com, api.bilibili.com, api.live.bilibili.com, www.bilibili.com, line3-h5-mobile-api.biligame.com"
+    }
+  ],
+  "force-http-hostname": [],
+  "skip-server-cert-verify": null,
+  "client-source-address": [],
+  "h2": null,
+  "url-rewrite": {},
+  "header-rewrite": {},
+  "body-rewrite": {
+    "30": "BodyRewriteDef { response: true, pattern: \"^http:\\\\/\\\\/[^?]+\\\\/resolve\\\\?host=(?:ap[ip]\\\\.bilibili\\\\.com|grpc\\\\.biliapi\\\\.net|api\\\\.live\\\\.bilibili\\\\.com)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".dns[]? |= (.ips = [] | .ttl = 86400)\") }",
+    "31": "BodyRewriteDef { response: true, pattern: \"^https:\\\\/\\\\/api\\\\.live\\\\.bilibili\\\\.com\\\\/xlive\\\\/open-interface\\\\/v2\\\\/tracker\\\\/conf\\\\?\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data.domains = [\\\"wss://tracker.chat.bilibili.com\\\"]\") }",
+    "32": "BodyRewriteDef { response: true, pattern: \"^https:\\\\/\\\\/api\\\\.bilibili\\\\.com\\\\/x\\\\/pd-proxy\\\\/tracker\\\\?\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data[][]? = \\\"stun.chat.bilibili.com:3478\\\"\") }",
+    "33": "BodyRewriteDef { response: true, pattern: \"^https:\\\\/\\\\/api\\\\.bilibili\\\\.com\\\\/pgc\\\\/view\\\\/v2\\\\/app\\\\/season\\\\?\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"del(.data.payment)\") }",
+    "34": "BodyRewriteDef { response: true, pattern: \"^https:\\\\/\\\\/api\\\\.bilibili\\\\.com\\\\/pgc\\\\/page\\\\/channel\\\\?\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data.modules |= map(select(.type != \\\"TIP\\\") | if .type == \\\"BANNER\\\" then .module_data.items |= map(select(.url | startswith(\\\"https://www.bilibili.com/blackboard/era/\\\") | not)) else . end)\") }"
+  },
+  "map-local": {
+    "20": "MapLocalDef { pattern: \"^https:\\\\/\\\\/app\\\\.bilibili\\\\.com\\\\/x\\\\/v2\\\\/splash\\\\/list\\\\?\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{\\\"code\\\":0,\\\"message\\\":\\\"OK\\\",\\\"ttl\\\":1,\\\"data\\\":{\\\"max_time\\\":0,\\\"min_interval\\\":31536000,\\\"pull_interval\\\":31536000,\\\"keep_ids\\\":[],\\\"show\\\":[],\\\"list\\\":[{}],\\\"splash_request_id\\\":\\\"\\\"}}\", status: 200, header: {\"content-type\": \"application/json\"}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "21": "MapLocalDef { pattern: \"^https:\\\\/\\\\/ap[ip]\\\\.bilibili\\\\.com\\\\/x\\\\/(?:resource\\\\/(?:top\\\\/activity|patch\\\\/tab(?:\\\\/v2)?)|v2\\\\/search\\\\/square|vip\\\\/ads\\\\/materials)\\\\?\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{\\\"code\\\":-404,\\\"message\\\":\\\"-404\\\",\\\"ttl\\\":1,\\\"data\\\":null}\", status: 200, header: {\"content-type\": \"application/json\"}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "22": "MapLocalDef { pattern: \"^https:\\\\/\\\\/api\\\\.bilibili\\\\.com\\\\/pgc\\\\/activity\\\\/deliver\\\\/material\\\\/receive\\\\?\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{\\\"code\\\":0,\\\"data\\\":{\\\"closeType\\\":\\\"close_win\\\",\\\"container\\\":[],\\\"showTime\\\":\\\"\\\"},\\\"message\\\":\\\"success\\\"}\", status: 200, header: {\"content-type\": \"application/json\"}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "23": "MapLocalDef { pattern: \"^https:\\\\/\\\\/api\\\\.live\\\\.bilibili\\\\.com\\\\/xlive\\\\/e-commerce-interface\\\\/v1\\\\/ecommerce-user\\\\/get_shopping_info\\\\?\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{}\", status: 200, header: {\"content-type\": \"application/json\"}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "24": "MapLocalDef { pattern: \"^https:\\\\/\\\\/line3-h5-mobile-api\\\\.biligame\\\\.com\\\\/game\\\\/live\\\\/large_card_material\\\\?\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{\\\"code\\\":0,\\\"message\\\":\\\"success\\\"}\", status: 200, header: {\"content-type\": \"application/json\"}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "25": "MapLocalDef { pattern: \"^https:\\\\/\\\\/grpc\\\\.biliapi\\\\.net\\\\/bilibili\\\\.app\\\\.interface\\\\.v1\\\\.Teenagers\\\\/ModeStatus$\", conditions: HeadConditionsDef { request: None, response: None }, body: Base64([0, 0, 0, 0, 19, 10, 17, 8, 2, 18, 9, 116, 101, 101, 110, 97, 103, 101, 114, 115, 32, 2, 42, 0]), data: \"AAAAABMKEQgCEgl0ZWVuYWdlcnMgAioA\", status: 200, header: {\"content-type\": \"application/grpc\", \"grpc-status\": \"0\"}, content_type: \"application/octet-stream\", request: false }",
+    "26": "MapLocalDef { pattern: \"^https:\\\\/\\\\/grpc\\\\.biliapi\\\\.net\\\\/bilibili\\\\.app\\\\.interface\\\\.v1\\\\.Search\\\\/DefaultWords$\", conditions: HeadConditionsDef { request: None, response: None }, body: Base64([0, 0, 0, 0, 33, 26, 29, 230, 144, 156, 231, 180, 162, 232, 167, 134, 233, 162, 145, 227, 128, 129, 231, 149, 170, 229, 137, 167, 230, 136, 150, 117, 112, 228, 184, 187, 40, 1]), data: \"AAAAACEaHeaQnOe0ouinhumikeOAgeeVquWJp+aIlnVw5Li7KAE=\", status: 200, header: {\"content-type\": \"application/grpc\", \"grpc-status\": \"0\"}, content_type: \"application/octet-stream\", request: false }",
+    "27": "MapLocalDef { pattern: \"^https:\\\\/\\\\/grpc\\\\.biliapi\\\\.net\\\\/bilibili\\\\.app\\\\.(?:view\\\\.v1\\\\.View\\\\/TFInfo|viewunite\\\\.v1\\\\.View\\\\/(?:PlayPause|ViewEndPage))$\", conditions: HeadConditionsDef { request: None, response: None }, body: Base64([0, 0, 0, 0, 0]), data: \"AAAAAAA=\", status: 200, header: {\"content-type\": \"application/grpc\", \"grpc-status\": \"0\"}, content_type: \"application/octet-stream\", request: false }"
+  },
+  "request-body-mock": {},
+  "script": {
+    "37": "ScriptDef { name: \"bilibili.request\", path: \"https://raw.githubusercontent.com/kokoryh/Sparkle/refs/heads/master/dist/bilibili.protobuf.request.js\", kind: HttpRequest, pattern: Some(\"^https:\\\\/\\\\/(?:grpc\\\\.biliapi\\\\.net|app\\\\.bilibili\\\\.com)\\\\/bilibili\\\\.(?:app\\\\.viewunite\\\\.v1\\\\.View\\\\/View|main\\\\.community\\\\.reply\\\\.v1\\\\.Reply\\\\/MainList)$\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: true, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(10.0), argument: Some(String(\"{\\\"purifyComment\\\":1,\\\"logLevel\\\":\\\"4\\\"}\")) }",
+    "38": "ScriptDef { name: \"bilibili.airborne\", path: \"https://raw.githubusercontent.com/kokoryh/Sparkle/refs/heads/master/dist/bilibili.protobuf.request.js\", kind: HttpRequest, pattern: Some(\"^https:\\\\/\\\\/(?:grpc\\\\.biliapi\\\\.net|app\\\\.bilibili\\\\.com)\\\\/bilibili\\\\.(?:community\\\\.service\\\\.dm\\\\.v1\\\\.DM\\\\/DmSegMobile|app\\\\.view(?:unite)?\\\\.v1\\\\.View\\\\/ViewProgress)$\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: true, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(10.0), argument: Some(String(\"{\\\"logLevel\\\":\\\"4\\\"}\")) }",
+    "39": "ScriptDef { name: \"bilibili.skin\", path: \"https://raw.githubusercontent.com/kokoryh/Script/master/js/bili-suit-diy.js\", kind: HttpResponse, pattern: Some(\"^https:\\\\/\\\\/app\\\\.bilibili\\\\.com\\\\/x\\\\/resource\\\\/show\\\\/skin\\\\?\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "40": "ScriptDef { name: \"bilibili.json\", path: \"https://raw.githubusercontent.com/kokoryh/Sparkle/refs/heads/master/dist/bilibili.json.js\", kind: HttpResponse, pattern: Some(\"^https:\\\\/\\\\/app\\\\.bilibili\\\\.com\\\\/x\\\\/(?:resource\\\\/show\\\\/tab\\\\/v2|v2\\\\/(?:splash\\\\/(?:show|event\\\\/list2)|feed\\\\/index(?:\\\\/story)?|account\\\\/(?:mine(?:\\\\/ipad)?|myinfo)))\\\\?\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: Some(String(\"{\\\"showCreatorHub\\\":0}\")) }",
+    "41": "ScriptDef { name: \"bilibili.live\", path: \"https://raw.githubusercontent.com/kokoryh/Sparkle/refs/heads/master/dist/bilibili.json.js\", kind: HttpResponse, pattern: Some(\"^https:\\\\/\\\\/api\\\\.live\\\\.bilibili\\\\.com\\\\/xlive\\\\/(?:app-interface\\\\/v2\\\\/index\\\\/feed|app-room\\\\/v1\\\\/index\\\\/getInfoBy(?:Room|User))\\\\?\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "42": "ScriptDef { name: \"bilibili.webpage\", path: \"https://raw.githubusercontent.com/kokoryh/Sparkle/refs/heads/master/dist/webpage.bilibili.js\", kind: HttpResponse, pattern: Some(\"^https:\\\\/\\\\/www\\\\.bilibili\\\\.com\\\\/blackboard\\\\/era\\\\/[^?]+\\\\.html\\\\?\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "43": "ScriptDef { name: \"bilibili.protobuf\", path: \"https://raw.githubusercontent.com/kokoryh/Sparkle/refs/heads/master/dist/bilibili.protobuf.response.js\", kind: HttpResponse, pattern: Some(\"^https:\\\\/\\\\/(?:grpc\\\\.biliapi\\\\.net|app\\\\.bilibili\\\\.com)\\\\/bilibili\\\\.(?:app\\\\.(?:show\\\\.v1\\\\.Popular\\\\/Index|dynamic\\\\.v2\\\\.Dynamic\\\\/DynAll|view(?:unite)?\\\\.v1\\\\.View\\\\/(?:View|ViewProgress|RelatesFeed|AIRelateAsync)|playurl\\\\.v1\\\\.PlayURL\\\\/PlayView|playerunite\\\\.v1\\\\.Player\\\\/PlayViewUnite)|polymer\\\\.app\\\\.search\\\\.v1\\\\.Search\\\\/SearchAll|community\\\\.service\\\\.dm\\\\.v1\\\\.DM\\\\/DmView|main\\\\.community\\\\.reply\\\\.v1\\\\.Reply\\\\/MainList|pgc\\\\.gateway\\\\.player\\\\.v2\\\\.PlayURL\\\\/PlayView)$\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: true, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: Some(String(\"{\\\"displayUpList\\\":\\\"auto\\\",\\\"purifyComment\\\":1,\\\"sponsorBlock\\\":\\\"bilibili.airborne\\\",\\\"logLevel\\\":\\\"4\\\"}\")) }"
+  },
+  "rules": {
+    "8": "DOMAIN,bsbsb.top => DIRECT",
+    "9": "DOMAIN,dns.google => REJECT",
+    "10": "DOMAIN,api.biliapi.com => REJECT extended-matching",
+    "11": "DOMAIN,app.biliapi.com => REJECT extended-matching",
+    "12": "DOMAIN,api.biliapi.net => REJECT extended-matching",
+    "13": "DOMAIN,app.biliapi.net => REJECT extended-matching",
+    "14": "AND,((DOMAIN-SUFFIX,chat.bilibili.com),(OR,((DOMAIN-KEYWORD,stun),(DOMAIN-KEYWORD,tracker),(DOMAIN-KEYWORD,p2p)))) => REJECT",
+    "15": "DST-PORT,4480 => REJECT-NO-DROP",
+    "16": "DST-PORT,4483 => REJECT-NO-DROP",
+    "17": "DST-PORT,9102 => REJECT-NO-DROP"
+  },
+  "rule-sets": [],
+  "resources": [
+    {
+      "url": "https://raw.githubusercontent.com/kokoryh/Sparkle/refs/heads/master/dist/bilibili.protobuf.request.js",
+      "kind": "script",
+      "lines": [
+        37,
+        38
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/kokoryh/Script/master/js/bili-suit-diy.js",
+      "kind": "script",
+      "lines": [
+        39
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/kokoryh/Sparkle/refs/heads/master/dist/bilibili.json.js",
+      "kind": "script",
+      "lines": [
+        40,
+        41
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/kokoryh/Sparkle/refs/heads/master/dist/webpage.bilibili.js",
+      "kind": "script",
+      "lines": [
+        42
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/kokoryh/Sparkle/refs/heads/master/dist/bilibili.protobuf.response.js",
+      "kind": "script",
+      "lines": [
+        43
+      ]
+    }
+  ],
+  "network": {},
+  "declared-scripts": [
+    37,
+    38,
+    39,
+    40,
+    41,
+    42,
+    43
+  ],
+  "ignored": []
+}

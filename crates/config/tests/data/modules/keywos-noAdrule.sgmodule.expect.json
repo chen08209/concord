@@ -1,0 +1,144 @@
+{
+  "format": "surge",
+  "meta": {
+    "name": "去广告合集",
+    "desc": "目前只有:爱思,中国移动,网易邮箱大师,qq邮箱,大师兄,腾讯手机管家,招商银行,it之家",
+    "author": null,
+    "icon": null,
+    "homepage": null,
+    "category": null,
+    "system": null,
+    "requirement": null,
+    "argumentsDesc": null
+  },
+  "off": null,
+  "arguments": [],
+  "hostname": [
+    {
+      "line": 79,
+      "items": "client.app.coc.10086.cn, list-app-m.i4.cn, search-app-m.i4.cn, mp.weixin.qq.com, webappcfg.paas.cmbchina.com, rescdn.qqmail.com, us.l.qq.com, napi.ithome.com, api.zuihuimai.com, mobads.baidu.com, dsp-x.jd.comdat.ruanmei.com, appconf.mail.163.com, home.mi.com, wrapper.cyapi.cn, api.caiyunapp.com, api-access.pangolin-sdk-toutiao*.com"
+    }
+  ],
+  "force-http-hostname": [
+    {
+      "line": 5,
+      "items": "sdk.alibaba.com.ailbaba.me"
+    }
+  ],
+  "skip-server-cert-verify": null,
+  "client-source-address": [],
+  "h2": 78,
+  "url-rewrite": {
+    "10": "UrlRewriteDef { pattern: \"^https?:\\\\/\\\\/list-app-m\\\\.i4\\\\.cn\\\\/getopfstadinfo\\\\.xhtml\", head: None, replacement: \"\", action: Reject }",
+    "13": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/rescdn\\\\.qqmail\\\\.com\\\\/qqmail\\\\/images\\\\/.+\\\\.(png|jpg)$\", head: None, replacement: \"\", action: Reject }",
+    "16": "UrlRewriteDef { pattern: \"^https:\\\\/\\\\/us\\\\.l\\\\.qq\\\\.com\\\\/exapp\", head: None, replacement: \"\", action: Reject }",
+    "19": "UrlRewriteDef { pattern: \"^https?:\\\\/\\\\/api\\\\.zuihuimai\\\\.com\\\\/static\\\\/.*\\\\/hongbao\", head: None, replacement: \"\", action: Reject }",
+    "20": "UrlRewriteDef { pattern: \"^https?:\\\\/\\\\/dat\\\\.ruanmei\\\\.com\\\\/ithome\\\\/money\\\\/acd\\\\.json$\", head: None, replacement: \"\", action: Reject }"
+  },
+  "header-rewrite": {},
+  "body-rewrite": {},
+  "map-local": {
+    "41": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/client\\\\.app\\\\.coc\\\\.10086\\\\.cn\\\\/biz-orange\\\\/DN\\\\/(explorePage\\\\/getAdverList|init\\\\/startInit)\", conditions: HeadConditionsDef { request: None, response: None }, body: File, data: \"https://raw.githubusercontent.com/Keywos/rule/main/mocks//reject-200.txt\", status: 200, header: {}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "44": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/mp\\\\.weixin\\\\.qq\\\\.com\\\\/mp\\\\/getappmsgad\", conditions: HeadConditionsDef { request: None, response: None }, body: File, data: \"https://raw.githubusercontent.com/Keywos/rule/main/mocks//WeChat.json\", status: 200, header: {}, content_type: \"application/json\", request: false }",
+    "47": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/appconf\\\\.mail\\\\.163\\\\.com\\\\/mmad\\\\/\", conditions: HeadConditionsDef { request: None, response: None }, body: File, data: \"https://raw.githubusercontent.com/Keywos/rule/main/mocks/reject-200.txt\", status: 200, header: {}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "48": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/mail\\\\.163\\\\.com\\\\/smflow\\\\/(config|get)\\\\.do\", conditions: HeadConditionsDef { request: None, response: None }, body: File, data: \"https://raw.githubusercontent.com/Keywos/rule/main/mocks/reject-dict.json\", status: 200, header: {}, content_type: \"application/json\", request: false }",
+    "49": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/iad\\\\.g\\\\.163\\\\.com\\\\/ma\\\\/ad\", conditions: HeadConditionsDef { request: None, response: None }, body: File, data: \"https://raw.githubusercontent.com/Keywos/rule/main/mocks/reject-dict.json\", status: 200, header: {}, content_type: \"application/json\", request: false }",
+    "50": "MapLocalDef { pattern: \"^https:\\\\/\\\\/api-access\\\\.pangolin-sdk-toutiao(\\\\d|-\\\\w)?\\\\.com\\\\/api\\\\/ad\\\\/union\\\\/sdk\\\\/get_ads\", conditions: HeadConditionsDef { request: None, response: None }, body: File, data: \"https://raw.githubusercontent.com/Keywos/rule/main/mocks/reject-dict.json\", status: 200, header: {}, content_type: \"application/json\", request: false }",
+    "52": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/mobads\\\\.baidu\\\\.com\\\\/cpro\\\\/ui\\\\/mads\\\\.php\\\\?\", conditions: HeadConditionsDef { request: None, response: None }, body: File, data: \"https://raw.githubusercontent.com/Keywos/rule/main/mocks/reject-dict.json\", status: 200, header: {}, content_type: \"application/json\", request: false }",
+    "54": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/dsp-x\\\\.jd\\\\.com\\\\/adx\\\\/sdk\", conditions: HeadConditionsDef { request: None, response: None }, body: File, data: \"https://raw.githubusercontent.com/Keywos/rule/main/mocks/reject-dict.json\", status: 200, header: {}, content_type: \"application/json\", request: false }",
+    "57": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/webappcfg\\\\.paas\\\\.cmbchina\\\\.com\\\\/v\\\\d\\\\/func\\\\/getmarketconfig\", conditions: HeadConditionsDef { request: None, response: None }, body: File, data: \"https://raw.githubusercontent.com/Keywos/rule/main/mocks/reject-dict.json\", status: 200, header: {}, content_type: \"application/json\", request: false }",
+    "60": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/sdk\\\\.alibaba\\\\.com\\\\.ailbaba\\\\.me\\\\/(dsx|xgapp)\\\\.php\\\\/v\\\\d\\\\/(top_notice\\\\?|app_config|search_hot|version|advert\\\\?position=[^2]+)\", conditions: HeadConditionsDef { request: None, response: None }, body: File, data: \"https://raw.githubusercontent.com/Keywos/rule/main/mocks/reject-dict.json\", status: 200, header: {}, content_type: \"application/json\", request: false }",
+    "63": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/home\\\\.mi\\\\.com\\\\/cgi-op\\\\/api\\\\/v1\\\\/recommendation\\\\/(banner|carousel\\\\/banners|myTab|openingBanner)\", conditions: HeadConditionsDef { request: None, response: None }, body: File, data: \"https://raw.githubusercontent.com/Keywos/rule/main/mocks/reject-dict.json\", status: 200, header: {}, content_type: \"application/json\", request: false }",
+    "66": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/wrapper\\\\.cyapi\\\\.cn\\\\/v1\\\\/activity\\\\?\", conditions: HeadConditionsDef { request: None, response: None }, body: File, data: \"https://raw.githubusercontent.com/Keywos/rule/main/mocks/caiyun.json\", status: 200, header: {}, content_type: \"application/json\", request: false }",
+    "67": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/api\\\\.caiyunapp\\\\.com\\\\/v1\\\\/activity\", conditions: HeadConditionsDef { request: None, response: None }, body: File, data: \"https://raw.githubusercontent.com/Keywos/rule/main/mocks/reject-dict.json\", status: 200, header: {}, content_type: \"application/json\", request: false }"
+  },
+  "request-body-mock": {},
+  "script": {
+    "71": "ScriptDef { name: \"AD_SDKEY\", path: \"https://raw.githubusercontent.com/Keywos/rule/main/JS/adsdk_chj.js\", kind: HttpResponse, pattern: Some(\"^https:\\\\/\\\\/api-access\\\\.pangolin-sdk-toutiao(\\\\d|-\\\\w)??\\\\.com\\\\/api\\\\/ad\\\\/union\\\\/sdk\\\\/settings\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "74": "ScriptDef { name: \"爱思\", path: \"https://raw.githubusercontent.com/Keywos/rule/main/JS/aisi.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/(search|list)-app-m\\\\.i4\\\\.cn\\\\/(getHotSearchList|getAppList)\\\\.xhtml\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }"
+  },
+  "rules": {
+    "24": "DOMAIN-SUFFIX,sdk.e.qq.com => REJECT-NO-DROP",
+    "25": "DOMAIN-SUFFIX,gorgon.youdao.com => REJECT-NO-DROP",
+    "26": "DOMAIN-SUFFIX,nex.163.com => REJECT-NO-DROP",
+    "27": "DOMAIN-SUFFIX,mi.gdt.qq.com => REJECT-NO-DROP",
+    "29": "DOMAIN-SUFFIX,ulogs.umengcloud.com => REJECT-DROP",
+    "30": "DOMAIN-SUFFIX,toblog.ctobsnssdk.com => REJECT-NO-DROP",
+    "31": "DOMAIN-SUFFIX,adashbc.ut.taobao.com => REJECT-NO-DROP",
+    "34": "DOMAIN-SUFFIX,api-access.pangolin-sdk-toutiao.com => DIRECT",
+    "35": "DOMAIN-SUFFIX,api-access.pangolin-sdk-toutiao1.com => DIRECT",
+    "36": "DOMAIN-KEYWORD,pangolin-sdk-toutiao => DIRECT"
+  },
+  "rule-sets": [],
+  "resources": [
+    {
+      "url": "https://raw.githubusercontent.com/Keywos/rule/main/mocks//reject-200.txt",
+      "kind": "map-local",
+      "lines": [
+        41
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Keywos/rule/main/mocks//WeChat.json",
+      "kind": "map-local",
+      "lines": [
+        44
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Keywos/rule/main/mocks/reject-200.txt",
+      "kind": "map-local",
+      "lines": [
+        47
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Keywos/rule/main/mocks/reject-dict.json",
+      "kind": "map-local",
+      "lines": [
+        48,
+        49,
+        50,
+        52,
+        54,
+        57,
+        60,
+        63,
+        67
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Keywos/rule/main/mocks/caiyun.json",
+      "kind": "map-local",
+      "lines": [
+        66
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Keywos/rule/main/JS/adsdk_chj.js",
+      "kind": "script",
+      "lines": [
+        71
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Keywos/rule/main/JS/aisi.js",
+      "kind": "script",
+      "lines": [
+        74
+      ]
+    }
+  ],
+  "network": {},
+  "declared-scripts": [
+    71,
+    74
+  ],
+  "ignored": [
+    {
+      "line": 6,
+      "reason": "setting",
+      "detail": "tcp-connection"
+    }
+  ]
+}

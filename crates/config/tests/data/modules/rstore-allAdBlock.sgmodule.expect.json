@@ -1,0 +1,2160 @@
+{
+  "format": "surge",
+  "meta": {
+    "name": "全部-广告拦截合集",
+    "desc": "某些规则要清除缓存或者重新安装APP，拦截广告才会生效！",
+    "author": "zirawell[https://github.com/zirawell]",
+    "icon": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Icon/Filter/AdBlock.png",
+    "homepage": "https://github.com/zirawell/R-Store/tree/main/Rule/Surge/README.md",
+    "category": null,
+    "system": null,
+    "requirement": null,
+    "argumentsDesc": null
+  },
+  "off": null,
+  "arguments": [],
+  "hostname": [
+    {
+      "line": 3565,
+      "items": "api.psy-1.com, wxapp.bestwehotel.com, mobile.12306.cn, fm.fenqile.com, gab.122.gov.cn, gql.reddit.com, gql-fed.reddit.com, res.hongyibo.com.cn, us.l.qq.com, www.xiaoxiongmeishu.com, api.xueqiu.com, xqimg.imedao.com, open.xueqiu.com, stock.xueqiu.com, promo.xueqiu.com, api.zhihu.com, www.zhihu.com, appcloud2.zhihu.com, m-cloud.zhihu.com, zhuanlan.zhihu.com, zhstatic.zhihu.com, shealthyapi.senssun.com, supplier-api.imdada.cn, wx.maoyan.com, vod-movie.maoyan.com, api.maoyan.com, x.seeyouyima.com, axxd.xmseeyouyima.com, m5-zb.amap.com, api-hyper.walmartmobile.cn, bgw.xinyue.qq.com, res.pizzahut.com.cn, games.mobileapi.hupu.com, goblin.hupu.com, du.hupucdn.com, i*.hoopchina.com.cn, business.msstatic.com, api.haohaozhu.cn, api.21jingji.com, peppermall.meituan.com, gw.etczs.net, api.intsig.net, wallet.95516.com, api.xibei.com.cn, m.mallcoo.cn, 182.92.244.70, ad.myfriday.cn, api.pinduoduo.com, api.yangkeduo.com, mobile.yangkeduo.com, wxs-weixin.sd.zhumanggroup.com, api.yonghuivip.com, www.msccruises.com.cn, info.mina.xiaoaisound.com, marketing-aibox.v.mitvos.com, 3pp.starbucks.com.cn, m.airchina.com.cn, haojia.m.smzdm.com, user-api.smzdm.com, app-api.smzdm.com, haojia-api.smzdm.com, homepage-api.smzdm.com, article-api.smzdm.com, qianbao.smzdm.com, s-api.smzdm.com, post.m.smzdm.com, *mangaapi.manhuaren.*, www.oschina.net, api3.cls.cn, pmbservice.bosc.cn, pic*.chelaile.net.cn, api.chelaile.net.cn, atrace.chelaile.net.cn, web.chelaile.net.cn, cdn.*.chelaileapp.cn, api.jiahui.com, ecssmobile.e-chinalife.com, m.prod.app.hsbcfts.com.cn, mobileapi.xiamenair.com, proservice.powerlong.com, booking.bestwehotel.com, hdgateway.zto.com, fscdn.zto.com, foodie-api.yiruikecorp.com, mobile.laichon.com, shop.laichon.com, raw.githubusercontent.com, gist.githubusercontent.com, github.com, doh.pub, api.ulife.group, api-fouth-mem.huazhu.com, api.wfdata.club, api.feng.com, new.wwldz.com, god.gameyw.netease.com, ok.166.net, se-api.djiits.com, app.zhuanzhuan.com, m2.cmbwinglungbank.com, blog.nilbt.com, spamblocker-api.zeekstudio.com, api.xiaoyuzhoufm.com, saas-ad.cloudpnr.com, mcsp.cloudpnr.com, passengerapi.saicmobility.com, client.app.coc.10086.cn, app.10086.cn, gateway.benewtech.cn, ntt-app.benewtech.cn, capi.lkcoffee.com, 180.76.76.112, aiqicha.baidu.com, b2baifanfan.baidu.com, *.bankcomm.com, *.bankcomm.cn, tagit.hyhuo.com, j1.pupuapi.com, *.pangolin-sdk-toutiao.*, *.pstatp.com, *.pstatp.com.*, *.pglstatp-toutiao.com.*, *.pglstatp-toutiao.com, gurd.snssdk.com, gurd.snssdk.com.*, *default.ixigua.com, lf-cdn-tos.bytescm.com, tnc3-alisc1.zijieapi.com, ad.xiaotucc.com, mapi.xiaotucc.com, wxapp.api.ke.com, wx.api.ke.com, app-izz.zhengzhou.gov.cn, lamb.lakala.com, wallet.lakala.com, *.weibo.cn, *.weibo.com, api-mifit*.zepp.com, a.line.me, ad.line-scdn.net, gw.line.naver.jp, legy.line-apps.com, w.line.me, buy.line.me, crs-event.line.me, obs.line-scdn.net, d.line-scdn.net, cix.line-apps.com, scdn.line-apps.com, sch.line.me, uts-front.line-apps.com, static.line-scdn.net, nelo2-col.linecorp.com, jiguang.sptcc.com, online.sptcc.com, cdb.meituan.com, tg.feidee.com, yunmk.feidee.net, api.feidee.net, yun.feidee.net, mime.baidu.com, api.yikaobang.com.cn, awg.enmonster.com, api.gameplus.qq.com, minipro.95504.net, www.banyuetanapp.com, img.jiemian.com, *.rsscc.com, cdn.133.cn, wx.bthhotels.com, app.homeinns.com, z.onewo.com, ec.ems.com.cn, ump.ems.com.cn, t1.market.xiaomi.com, api.jr.mi.com, www-yxapp.feiniu.com, search-yxapp.feiniu.com, membase-yxapp.feiniu.com, sq.iyunmai.com, restapi.iyunmai.com, apisvr.iyunmai.com, issuecdn.baidupcs.com, air-matters.com, p0.pipi.cn, api.touker.com, daoyu.sdo.com, douyucdn.cn, rtbapi.douyucdn.cn, staticlive.douyucdn.cn, capi.douyucdn.cn, apiv2.douyucdn.cn, venus.douyucdn.cn, appapi.51job*.com, cupid.51job*.com, api*.futunn.com, l*.51fanli.net, ccsp-egmas.sf-express.com, ucmp.sf-express.com, fintechappdr.cgws.com, edata.bank.ecitic.com, autoload.bank.ecitic.com, appwk.baidu.com, acs.m.taobao.com, edu.51cto.com, www.deppon.com, wanciwangdata.oss-cn-*.aliyuncs.com, recite.perfectlingo.com, go.babytree.com, api.babytree.com, plough.babytree.com, mapiweb.babytree.com, 103.37.155.60, *.dianping.com, img.meituan.net, p.meituan.com, rms.meituan.com, www.dpfile.com, awp-assets.meituan.net, s3plus.meituan.net, p*.meituan.net, ddplus.meituan.net, api.u51.com, base.mkzcdn.com, y.gtimg.cn, web.meituan.com, news.ssp.qq.com, sports3.gtimg.com, capi.mwee.cn, api.taptapdada.com, csc-service.sgcc.com.cn, osg-service.sgcc.com.cn, open.fitdays.cn, passenger.t3go.cn, apis.lifeweek.com.cn, mapi.sichuanair.com, appdmkj.5idream.net, *.boohee.com, *.boohee.cn, bohe.sfo-tx-shanghai-01.saas.sensorsdata.cn, gugongmini.dpm.org.cn, pages.trip.com, download.trip.com, m.trip.com, p*.pstatp.com, xyst.yuanfudao.com, peisongapi.meituan.com, portal.zjzwfw.gov.cn, *.mgtv.com, amap-aos-info-nogw.amap.com, m*.amap.com, oss.amap.com, sns.amap.com, wmapi.meituan.com, p*.meituan.net, s3plus.meituan.net, mobile.1qianbao.com, maicai.api.ddxq.mobi, gw.api.ddxq.mobi, user.api.ddxq.mobi, bd-api.kuwo.cn, app.peopleapp.com, stat.peopleapp.com, adstatic.peopleapp.com, i.ys7.com, api.ys7.com, api*.bybutter.com, ya-sdn.ysepay.com, acs.m.shyhhema.com, pan.baidu.com, us.l.qq.com, ossweb-img.qq.com, mlol.qt.qq.com, www.upwork.com, sfo.mddcloud.com.cn, mob.mddcloud.com.cn, mobads-pre-config.cdn.bcebos.com, tower.ubixioe.com, api.m.mi.com, shop-api.retail.mi.com, 500px.com.cn, gw-passenger.01zhuanche.com, img.yun.01zhuanche, sso.ifanr.com, fuwu.nhsa.gov.cn, dss0.bdstatic.com, tb1.bdstatic.com, tb2.bdstatic.com, ss0.bdstatic.com, gss0.bdstatic.com, newclient.map.baidu.com, smsp.epicc.com.cn, file.cibfintech.com, webcast-open.douyin.com, lf-cdn-tos.bytescm.com, api.hengdianfilm.com, dsxcx.tencent-prod.pagoda.com.cn, eshop-api-wx-mini.eshop.tencent-prod.pagoda.com.cn, mres.aibank.com, operationapi.fosunhanig.com, ad.shunchangzhixing.com, api.bwton.com, lofter.lf127.net, capis*.didapinche.com, www.didapinche.com, consumer-api.quncrm.com, waimai-guide.ele.me, mall.meituan.com, mobileapi.chebada.com, minifm.maxxipoint.com, a.ajmide.com, s.ajmide.com, apis.alenable.com, gha.ghac.cn, open.qyer.com, media.qyer.com, zone.guiderank-app.com, api.m.jd.com, *.jddebug.com, bdsp-x.jd.com, dsp-x.jd.com, storage.360buyimg.com, img*.360buyimg.com, storage.jd.com, api.charmdeer.com, iobs.pingan.com.cn, hcz-member.pingan.com.cn, maam.pingan.com.cn, app.badmintoncn.com, www.onstar.com.cn, api.shanghaionstar.com, gateway.36kr.com, api.mgzf.com, app.homeinns.com, oxadmin.cp.com.cn, mp.weixin.qq.com, webapi.qmai.cn, miniapp.qmai.cn, rms.meituan.com, meal.2dfire.com, *.pipix.com, learn.chaoxing.com, api.51credit.com, api.hellobike.com, image.wjx.cn, kaoshi.wjx.top, apimobile.meituan.com, img.meituan.net, p*.meituan.net, www.meituan.com, s3plus.meituan.net, w.meituan.net, flowplus.meituan.net, portal-portm.meituan.com, sqt.meituan.com, apps.teamair.cn, mobile-consumer-sapp.chery.cn, a.sinopecsales.com, ocrifs.ejoy.sinopec.com, egw.ejoy.sinopec.com, applets.jtexpress.com.cn, 118.178.214.118, dapis.mting.info, display.wting.info, htwkop.xiaojukeji.com, static.xyzq.cn, b.appsimg.com, mapi.appvipshop.com, gateway.shouqiev.com, m.sh.189.cn, mapi.txcmapp.com, h5.m.goofish.com, dinamicx.alibabausercontent.com, g.alicdn.com, acs.m.goofish.com, g-acs.m.goofish.com, cdn.moji.com, api.ncarzone.com, gfp.veta.naver.com, api.hanju.koudaibaobao.com, ossgw.alicdn.com, zconfig.alibabausercontent.com, api.winbull8.com, qimg.cdnmama.com, cdn.jlbank.com.cn, syh.zybang.com, www.zybang.com, gw.aihuishou.com, app.missevan.com, e-static.aia.com.cn, c.zhangle.com, live.inst-service.htsc.com, geetest.htsc.com, ios.wps.cn, *.kingsoft-office-service.com, tiance.wps.cn, ovs-shopwindow-server*.wps.com, yunbusiness.ccb.com, waimai-guide.ele.me, xc.ccblife.ccb.com, api.sfacg.com, tk.lanjiyin.com.cn, app.yinxiang.com, cds.wifi188.com, pan-api.bitqiu.com, chl.tf.cn, wechat.tf.cn, ext-svc.xiaopeng.com, nnapp.cloudbae.cn, sg.teld.cn, ecloud.tppension.cntaiping.com, api.huachenjie.com, open.e.kuaishou.cn, ad.shunchangzhixing.com, zlsdk.1rtb.net, dl-cu-hz.lechange.cn, api.petkit.cn, static.95508.com, 8.95508.com, wap.cgbchina.com.cn, cdn.sdb.com.cn, rsb.pingan.com.cn, b.pingan.com.cn, dl.wechat.com, payapp.weixin.qq.com, mp.weixin.qq.com, weixin110.qq.com, security.wechat.com, mkt-gateway.tuhu.cn, cl-gateway.tuhu.cn, gateway.tuhu.cn, jad-api.jin10.com, api.kkmh.com, cdn-api.kkmh.com, h5.kuaikanmanhua.com, cdn-h5.kuaikanmanhua.com, topic.kkmh.com, cdn-topic.kkmh.com, pay.kkmh.com, cdn-pay.kkmh.com, shop.kkmh.com, cdn-shop.kkmh.com, social.kkmh.com, cdn-social.kkmh.com, cdns.chinastock.com.cn, www.i3zh.com, interface.mcake.com, mars.ccc.cmbchina.com, marscc.bcs.cmbchina.com, contentcc.bcs.cmbchina.com, intellicc.b*s.cmbchina.com, *mbasecc.b*s.cmbchina.com, interactivecc.b*s.cmbchina.com, yummy2web01-edge-dmz.bcs.cmbchina.com, mapi.chaogejiaoyu.com, mada-travel.17u.cn, ebk.17u.cn, app.10099.com.cn, tf*.istrongcloud.com, delivery-api.imdada.cn, wxapi.csair.com, extra.csair.com, mapi.mafengwo.cn, ih2.ireader.com, book.img.ireader.com, client.tujia.com, api.songguo7.com, www.inoreader.com, stlib.qbb6.com, api.qbb6.com, apipt.qbb6.com, apicommunity.qbb6.com, webapi.qbb6.com, api-marketing.zhinengxiyifang.cn, snailsleep.net, order-app-api.lbdj.com, api-miprint.hannto.com, api.indeedpower.com, ssp.soulapp.cn, api-account.soulapp.cn, api-a.soulapp.cn, api-chat.soulapp.cn, api-user.soulapp.cn, api-pay.soulapp.cn, post.soulapp.cn, gateway-mobile-gray.soulapp.cn, api-global.soulapp.me, zua.zhidiantianxia.cn, direct.z-bank.com, capis*.didapinche.com, conf.diditaxi.com.cn, iphone.ac.qq.com, djcapp.game.qq.com, mall.abchina.com.cn, midc.cdn-static.abchina.com.cn, mb-mbc.cdn-static.abchina.com.cn, flow.dmall.com, 7n.bczcdn.com, npay.meituan.com, web.meituan.com, tv.qiaohuapp.com, lcen.xiaote.net, wcprd.hilton.com.cn, ztoread.ziroom.com, misc-api-prd-mx.wandafilm.com, adpai.thepaper.cn, mbank.grcbank.com, client-api-v*.oray.com, slapi.oray.net, hd.xiaojukeji.com, ct.xiaojukeji.com, omgup*.xiaojukeji.com, res.xiaojukeji.com, as.xiaojukeji.com, freight.xiaojukeji.com, ut.xiaojukeji.com, api.udache.com, pt-starimg.didistatic.com, conf.diditaxi.com.cn, common.diditaxi.com.cn, static.frdic.com, static-main.frdic.com, api.eudic.net, tfsmy.chengdu.gov.cn, tft-app.cdtft.cn, api5.youonbike.com, mxsa.mxbc.net, static.creditcard.hxb.com.cn, explorer.tratao.com, tqt.weibo.cn, api2.helper.qq.com, imgcache.qq.com, mtteve.beacon.qq.com, vv.video.qq.com, qt.qq.com, y.gtimg.cn, splashqqlive.gtimg.com, qzonestyle.gtimg.cn, discuz.gtimg.cn, bla.gtimg.com, mmgr.gtimg.com, bk.bingo.qq.com, mi.gdt.qq.com, www.baidu.com, api.map.baidu.com, fcvbjbcebos.baidu.com, cover.baidu.com, afd.baidu.com, issuecdn.baidupcs.com, update.pan.baidu.com, video-dsp.pddpic.com, t-dsp.pinduoduo.com, images.pinduoduo.com, amdc.m.taobao.com, gw.alicdn.com, heic.alicdn.com, g.alicdn.com, yixiu-abtest.alicdn.com, img1.126.net, nex.163.com, g1.163.com, c.m.163.com, www.google.com, api*.musical.ly, api-access.pangolin-sdk-toutiao.com, is.snssdk.com, cdn.api.fotoable.com, cloud.bluecardsoft.com, static.95508.com, mps.95508.com, tiku.fenbi.com, market-api.fenbi.com, apiproxy.zuche.com, www.caixin.com, cxdata.caixin.com, entities.caixin.com, gateway.caixin.com, mediacloud.xiaohongshu.com, edith.xiaohongshu.com, www.xiaohongshu.com, rec.xiaohongshu.com, ci.xiaohongshu.com, manager.aiqiangua.com, api.xbxxhz.com, api.wmpvp.com, triangle.wearemanner.com, res.kfc.com.cn, cn-app.narwaltech.com, oneapp-api.faw-vw.com, www.1314zhilv.com, api.xiangji.qq.com, pss.txffp.com, api.tipsoon.com, a.sinopecsales.com, acs.m.taobao.com, dorangesource.alicdn.com, amdc.m.taobao.com, syt.leshuazf.com, m.fqfin.cn, d.psbc.com, emisdatacenterhk.hafoo.com.hk, pocketuni.net, cdnmobibank.bankofbeijing.com.cn, router-app-api.jdcloud.com, static1.keepcdn.com, api.gotokeep.com, kad.gotokeep.com, cstore-en-public-tx.seewo.com, adapi.izuiyou.com, wx.17u.cn, tcmobileapi.17usoft.com, m.ly.com, mobileapi.ly.com, mobile-api2011.elong.com, mobilehotelapi.elong.com, app.home.360.cn, vv.video.qq.com, apd-vlive.apdcdn.tc.qq.com, apd-*.v.smtcdns.com, ossgw.alicdn.com, rs.creditcard.cmbc.com.cn, miniprogram.ishansong.com, cdn-xyk-app.bankofbeijing.com.cn, -i.vip.iqiyi.com, *.iqiyi.com, wapi.kuwo.cn, appi.kuwo.cn, audiobookpay.kuwo.cn, mgxhtj.kuwo.cn, nmobi.kuwo.cn, searchrecterm.kuwo.cn, musicpay.kuwo.cn, vip*.kuwo.cn, *tieba*.baidu.com, dict.youdao.com, api-overmind.youdao.com, cdke.youdao.com, dictvip-business.youdao.com, dsp-impr2.youdao.com, impservice.dictapp.youdao.com, oral.youdao.com, oimage*.ydstatic.com, c.kuaiduizuoye.com, www.kuaiduizuoye.com, apivip.kuaiduizuoye.com, cdn-evone-ceph.echargenet.com, tianqi.2345.com, newton.gumingnc.com, wrapper.cyapi.cn, starplucker.cyapi.cn, r2.gzyct.com, m.ctrip.com, tm-api.pin-dao.cn, mea.meitudata.com, h5.xiuxiu.meitu.com, api.xiuxiu.meitu.com, api-sub.meitu.com, api.posters.meitu.com, r6.mo.baidu.com, res.mi.baidu.com, mime.baidu.com, mbd.baidu.com, apicloud.zol.com.cn, api.mcd.cn, ccmsupport-sz.tenpay.com, ios.jjwxc.com, appapi.huazhu.com, hweb-hotel.huazhu.com, hweb-manager.huazhu.com, fbchina.flipchina.cn, app.hbooker.com, easyreadfs.nosdn.127.net, p.du.163.com, *.58cdn.com, app.58.com, pic?.ajkimg.com, acs-m.alijk.com, apis.folidaymall.com, img0*.benlailife.com, gae2-spclient.spotify.com, guc3-spclient.spotify.com, spclient.wg.spotify.com, plt.yorentown.com, lawsonapi.yorentown.com, www.thaiairways.com, lban.spdb.com.cn, wap.spdb.com.cn, api.club.lenovo.cn, as.xiaojukeji.com, daijia.kuaidadi.com, www.icourse163.org, acs.m.taobao.com, guide-acs.m.taobao.com, poplayer.template.alibaba.com, app.bilibili.com, grpc.biliapi.net, api.bilibili.com, api.live.bilibili.com, upos-sz-static.bilivideo.com, mec.yto.net.cn, www.haixue.com, shopapi.io.mi.com, helper.2bulu.com, backservice.offerxiansheng.com, upload-bbs.mihoyo.com, api.izuiyou.com, mercury-gateway.ixiaochuan.cn, dict-mobile.iciba.com, mobile-pic.cache.iciba.com, service.iciba.com, swdlcdn.eastmoney.com, cache.bydauto.com.cn, hfapp-service.qweather.net, zgrb.epicc.com.cn, coco-com.e.verystar.net, venus.yhd.com, api*.sparke.cn, www.linkedin.com, ams-cdn.cdtft.cn, support.you.163.com, m.you.163.com, yanxuan.nosdn.127.net, qadx.qinlinad.com, member.alipan.com, api.alipan.com, api.flydigi.com, dsp.fcbox.com, external.fcbox.com, ife.etcp.cn, static.etcp.cn, userpms-api.suh.cn, patient-api.suh.cn, oneapph5.dongfeng-nissan.com.cn, gw.xiaocantech.com, web2.realtech-inc.com, ssp.dzh.com.cn, pv.elife.icbc.com.cn, mgs.wallet.pbcdci.cn, fmapp.chinafamilymart.com.cn, api-marketing.zhinengxiyifang.cn, adsoss.zhinengxiyifang.cn, gateway.cotticoffee.com, yyfapi.huatu.com, ocfapi.huatu.com, api.xiachufang.com, m.client.10010.com, res.mall.10010.cn, app.95598pay.com, lchttpapi.xczim.com, ecard.shenzhentong.com, ptmpcap.caocaokeji.cn, cap.caocaokeji.cn, cbd-gateway-service-applets.hualala.com, api.taou.com, open.taou.com, h3.open.taou.com, mgesq.api.mgtv.com, beta-api.crunchyroll.com, service.busi.inke.cn, api.sodalife.xyz, thor.weidian.com, apigateway.gaodun.com, hmbaby.simshine.cn, rr*.googlevideo.com, youtubei.googleapis.com, ap*-ios.zhipin.com, lop-proxy.jd.com, app.chinahxzq.com.cn, miniapp.sexytea2013.com, napi.ithome.com, open.e.kuaishou.com, v*.wufazhuce.com, app.api.d3yuiw4.com, api.21ec74.com, api-sams.walmartmobile.cn, mpcs.suning.com, image.suning.com, luckman.suning.com, suyun-user.daojia.com, api.17gwx.com, xyk.cmbchina.com, weclub.ccc.cmbchina.com, e.dangdang.com, api.dangdang.com, mapi.dangdang.com, e.weather.com.cn, api.yonghuivip.com, activity.yonghuivip.com, sauron-report.yonghuivip.com, *.xima*.*.com, *.xmcdn.com, apiwz.midukanshu.com, ma-adx.ctrip.com, mbd.baidu.com, aimai-guide.ele.me, alsc-buy2.ele.me, mcmm.caiyun.feixin.10086.cn, mrp.mcloud.139.com, middle.yun.139.com, jzts.cmpassport.com, dq.dxy.cn, saas.hpplay.cn, myusmile.online, wemallh5.usmile.com, www.myusmile.online, jiucaigongshe.oss-cn-beijing.aliyuncs.com, xxyx-client-api.xiaoxiaoyouxuan.com, m.tuniu.com, api.gongkaoleida.com, www.iyingdi.cn, jdread-api.jd.com, japi.233.com, promote-trx.helipay.com, access.mypikpak.com, wx.ymiot.net, gaia.ch.com, appmedia.springairlines.com, cdn.kuaidi100.com, p.kuaidi100.com, api-wanda.liepin.com, mapi.dianping.com, m.dianping.com, kano.guahao.cn, app.wy.guahao.com, gw-passenger-wap.01zhuanche.com, api.laifeng.com, creditcardapp.bankcomm.com, pan.baidu.com, ndstatic.cdn.bcebos.com, staticsns.cdn.bcebos.com, issuecdn.baidupcs.com, update.pan.baidu.com, fc-video.cdn.bcebos.com, rp.hpplay.cn, cili.xfuse.fun, compus.xiaofubao.com, cdn.wup.huya.com, business.msstatic.com, cdnfile1.msstatic.com, ut2.shuqistat.com, dsp.toutiao.com, sf3-be-pack.pglstatp-toutiao.com, api-access.pangolin-sdk-toutiao.com, sq.sljkj.com, ocean.shuqireader.com, img-tailor.11222.cn, message.shuqireader.com, feedback.uc.cn, *.shuqireader.com, 101.91.69.26, admin.hydlight.com, cdn.cmgadx.com, images.client.vip.xunlei.com, api-shoulei-ssl.xunlei.com, conf-m-ssl.xunlei.com, nam.veta.naver.com, www.okx.com, *.kakamobi.cn, cheyouquan.kakamobi.com, mcbd.maiche.com, smart.789.image.mucang.cn, api.duitang.com, www.duitang.com, social.blued.cn, pacdn.m.stock.pingan.com, service.haiersmarthomes.com, mbs.boc.cn, cdn1.mbs.boc.cn, list-app-m.i4.cn, choicegw.eastmoney.com, choicegw2.eastmoney.com, innovactivity.eastmoney.com, crm.scpgroup.com.cn, hoapp.juneyaoair.com, m.juneyaoair.com, shopping.juneyaoair.com, api.yisouti.com, y.gtimg.cn, music.y.qq.com, quanguo.mygolbs.com, fastbuyer.zbj.com, minicap.caocaokeji.cn, jia.360.cn, mpaas1.bosc.cn, dfg.bosc.cn, gdlf.bosc.cn, mgs1.bosc.cn, cappapi.alittle-tea.com, alittle-tea.oss-cn-shanghai.aliyuncs.com, www.ahzs10000.com, api-cfg.wtzw.com, ydmbpic.yundasys.com, mbpxapi.yundasys.com, m.ibuscloud.com, umerp.umetrip.com, umerp.umetrip.com.cn, home.umetrip.com, bkclient.umetrip.com.cn, sns.umetrip.com, activity.umetrip.com, api.kuaidihelp.com, top-widgets-api.xiaozujian.com, g*.dushu365.com, wxproj.seeyouyima.com, cloud.189.cn, zt-app.go189.cn, appkefu.189.cn, api.zcool.com.cn, api.internetofcity.cn, api.cloud.189.cn, new-app-api.ylyk.com, prom.mobile.gome.com.cn, push.it.10086.cn, oss.jegotrip.com.cn, cn-acs.m.cainiao.com, aag.enmonster.com, www.gaoding.com, mrobot.pconline.com.cn, mrobot.pcauto.com.cn, agent-count.pconline.com.cn, agent-count.pcauto.com.cn, edit.sinaapp.com, mobile.cmbchina.com, webappcfg.paas.cmbchina.com, entry-gateway.paas.cmbchina.com, api.xiaoheihe.cn, app.dewu.com, cdn.poizon.com, 3g.csair.com, szdmobile.suzhou.gov.cn, app.xinpianchang.com, www.skyscanner.com, dsa-mfp.fengshows.cn, api.fengshows.com, api-c.liepin.com, api-ac.liepin.com, api-wanda.liepin.com, app.api.versa-ai.com, static01.versa-ai.com, dock.tenchii.com, c.m.163.com, gw.m.163.com, nex.163.com, alt-r.my.com, imgx.jampp.com, 4gimg.map.qq.com, 3gimg.qq.com, dxy.com, interface*.music.163.com, m.pvp.xoyo.com, acs.youku.com, push.m.youku.com, un-acs.youku.com, www.gcores.com, dualstack*.amap.com, oss-zjrs.haier.net, zj.haier.net, img*.10101111cdn.com, api.blibee.com, image.spdbccc.com.cn, app.flymodem.com.cn, www.flyert.com, www.flyert.com.cn, www.flyertrip.com, www.flyertrip.com.cn, s.jiediankeji.com, *.i18n-pglstatp.com, qde.qunar.com, homefront.qunar.com, client.qunar.com, qimgs.qunarzz.com, slugger.qunar.com, api.jxedt.com, gouche.ksedt.com, op.ksedt.com, wx.17u.cn, *.sh.wxgateway.com, guanyu.longfor.com, ios.sspai.com, httpdns.bilivideo.com, i*.hdslb.com, manga.bilibili.com, dispatcher.camera360.com, *.youzan.com, download1.bankcomm.com, facade-api.black-unique.com, r.inews.qq.com, interface.aomiapp.com, api-ad-product.huxiu.com, www.cmbc.com.cn, ios.sogou.com, android.sogou.com, h5api.sginput.qq.com, sec.sginput.qq.com, dili.bdatu.com, wap.ngchina.cn, fx.service.kugou.com, gateway.kugou.com, gatewayretry.kugou.com, gzacshow.kugou.com, m1fxgroup.kugou.com, hwstore.kugou.com, ep.kugou.com, webchatapp.fcbox.com, guide-acs.m.taobao.com, mdn.alicdn.com, wx.mygolbs.com, mobile-api2011.elong.com, webboot.zhangyue.com, saad.ms.zhangyue.net, portal-xunyou.qingcdn.com, ucmp.sf-express.com, shopic.sf-express.com, app-api.niu.com, api.m.jd.com, capi.lkcoffee.com, ecapi.lkcoffee.com, m.lkcoffee.com, img*.lkcoffee.com, api.catchtable.net, jz.wacaijizhang.com, api.vistopia.com.cn, app-gw.csdn.net, gw.csdn.net, image1.ccb.com, imageadv.ccb.com, cy.cloud.ccb.com, open3.vistastory.com, api.btyjscl.com, apidd.btyjscl.com, api.github.com, vapp.tmuyun.com, customer-app.sto.cn, sto-customer-app.oss-cn-shanghai.aliyuncs.com, api-one-wscn.awtmt.com, api.wallstreetcn.com, api.wallstcn.com, app-cdn.2q10.com, iqushangwang.8quan.com, iosapi.peiyinxiu.com, api.sogaha.cn, www.shihuo.cn, sh-gateway.shihuo.cn, static.shihuocdn.cn, m.hnair.com, app.hnair.com, wx.youhaosoft.com, pic.edaijia.cn, api.wandacm.com.cn, member.lxjchina.com.cn, shopping.ele.me, waimai-guide.ele.me, api-cslp-emt.amazon.cn, api.globalstore.amazon.cn, api.nj.nbtv.cn, gsp.gacmotor.com, api.ycapp.yiche.com, cheyouapi.ycapp.yiche.com, api.gamer.com.tw, ggc.miguvideo.com, public-deliver*.miguvideo.com, recommend-dy.miguvideo.com, app-sc.miguvideo.com, common-sc.miguvideo.com, ggic*.miguvideo.com, api.swiftgram.app, hwimg.beingfine.cn, learnywhere.cn, lens.leoao.com, home.mi.com, cn-acs.m.cainiao.com, guide-acs.m.taobao.com, netflow-mtop.cainiao.com, api.caijingmobile.com, m.caijing.com.cn, api.17kjs.com, cgbank.oss-cn-shenzhen.aliyuncs.com, app*.ddpai.com, online.aicarmap.com, st7niu.aicarmap.com, d.socdm.com, app-api.pixiv.net, api-release.wuta-cam.com, res-release.wuta-cam.com, huichuan.sm.cn, stars.shuqireader.com, open-cms-api.quark.cn, api.coolapk.com, e.jparking.cn, sytgate.jslife.com.cn, *.souhu.com, appconf.mail.163.com, client.mail.163.com, support.you.163.com, gw.chuangkit.com, mapi.ghsmpwalmart.com, pcmx.autohome.com.cn, app2.autoimg.cn, wcmp.189.cn, j5.dfcfw.com, appactive.1234567.com.cn, www.tailgdd.com, clubmed.bd.clubmedmnp.com, shcss.suning.com, www.bodivis.com.cn, lanfanapp.com, service.4gtv.tv, api.douban.com, api.zhuishushenqi.com, b.zhuishushenqi.com, www.bahecloud.com, guide-acs.m.taobao.com, aes.acfun.cn, api-new.app.acfun.cn, tiku.zhan.com, app.meruki.cn, api.cdmcaac.com, app.variflight.com, app.mixcapp.com, mlife.jf365.boc.cn, amdc.m.ele.me, g.alicdn.com, nr-op.elemecdn.com, cube.elemecdn.com, web-stable-cdn.ykccn.com, gw3.ykccn.com, mage.if.qidian.com, magev*.if.qidian.com, webcdn.m.qq.com, wechat-api-dj.mstand.cn, api.00bang.cn, apapia-sqk.manmanbuy.com, app.ceair.com, opss.qiye.ccbhome.cn, preprod.cdzghome.com, ump.sz.creditcard.ecitic.com, m.creditcard.ecitic.com, dynamicad.kfc.com.cn, res.kfc.com.cn, smkmp.96225.com, ap.dongqiudi.com, ap.dongdianqiu.com, apps.api.ke.com, xhtz.oss-cn-guangzhou.aliyuncs.com, m.360buyimg.com, ms.jr.jd.com, b-api.ins.miaopai.com, mobile-api.imlaidian.com, qapi.huolala.cn, appuser-static.huolala.cn, amdc.m.taobao.com, acs.m.taobao.com, acs-m.freshippo.com, bp-api.bestv.com.cn, api.rr.tv"
+    }
+  ],
+  "force-http-hostname": [],
+  "skip-server-cert-verify": null,
+  "client-source-address": [],
+  "h2": null,
+  "url-rewrite": {
+    "count": 655,
+    "sha256": "30ea5a11a4ba0e5f52a4a2c27b0adf5fdb6601d09c6fecfa185c37fa44c46354",
+    "errors": {}
+  },
+  "header-rewrite": {
+    "3250": "error Unknown: unknown action \"url\"",
+    "3251": "HeaderRewriteDef { response: false, pattern: \"^https?:\\\\/\\\\/gw\\\\.xiaocantech\\\\.com\\\\/rpc\", conditions: HeadConditionsDef { request: None, response: None }, edit: ReplaceRegex(\"'methodname'\", \"'(?>Popup|Banner|BatchMatchPlacement|WaitClaimedPoints)'\", \"'null'\") }",
+    "3252": "error Unknown: unknown action \"url\""
+  },
+  "body-rewrite": {
+    "3184": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/tft-app\\\\.cdtft\\\\.cn\\\\/gateway-customer\\\\/tftapp\\\\/tft-ams\\\\/api\\\\/appAd\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"officialAdvertResultVo\", \"random-response\")]) }",
+    "3185": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/wx(app)?\\\\.api\\\\.ke\\\\.com\\\\/pt\\\\/pt-xcx-php\\\\/index\\\\/v\\\\d\\\\/home\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data.modules |= map(select(.type != \\\"popup\\\" and .type != \\\"icon\\\"))\") }",
+    "3186": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/chl\\\\.tf\\\\.cn\\\\/channelmg\\\\/sys\\\\/socso\\\\/order\\\\/queryOrderInfo\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"imgUrl\", \"imgUrl0\")]) }",
+    "3187": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/www\\\\.flyert(rip)?\\\\.com(\\\\.cn)?\\\\/.*\\\\.php\\\\?.*module=threadpost\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"relatedrecommend\", \"relatedrecommend0\")]) }",
+    "3188": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/api-wanda\\\\.liepin\\\\.com\\\\/api\\\\/com\\\\.liepin\\\\.cbp\\\\.baizhong\\\\.op\\\\.v\\\\d-show-4pc\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"adList\", \"random_body\")]) }",
+    "3189": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/acs-m\\\\.alijk\\\\.com\\\\/gw\\\\/mtop\\\\.alihealth\\\\.doctor\\\\.llm\\\\.remind\\\\.get\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"\\\"shouldRemind\\\":\\\"true\\\"\", \"\\\"shouldRemind\\\":\\\"false\\\"\")]) }",
+    "3190": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/www\\\\.tailgdd\\\\.com\\\\/v\\\\d\\\\/smart\\\\/app\\\\/config\\\\/get$\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"footResource\", \"footResource0\")]) }",
+    "3191": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/res\\\\.cc\\\\.cmbimg\\\\.com\\\\/fsp\\\\/File\\\\/ClientFacePublic\\\\/\\\\w+\\\\.DAT$\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"widget\", \"widget0\")]) }",
+    "3192": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/client\\\\.tujia\\\\.com\\\\/bnbapp-node\\\\/app\\\\/portal\\\\/getportalconfig\\\\/bnb\\\\/v\\\\d\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"\\\"banners\\\":\\\\[.+\\\\],\", \"\\\"banners\\\":[],\")]) }",
+    "3193": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/outfliggys\\\\.m\\\\.taobao\\\\.com\\\\/app\\\\/trip\\\\/rx-travel-detail\\\\/pages\\\\/index\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"\\\"showAiAssistant\\\":true,\", \"\\\"showAiAssistant\\\":false,\")]) }",
+    "3194": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/api\\\\.zhihu\\\\.com\\\\/search\\\\/recommend_query\\\\/v2\\\\?\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"\\\"recommend_queries\\\":\\\\{.+\\\\}\", \"\\\"recommend_queries\\\":{}\")]) }",
+    "3195": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/oneapp-api\\\\.faw-vw\\\\.com\\\\/content\\\\/booth\\\\/getBoothList\\\\/v\\\\d\\\\?.*showPositionCode=VWAPP_(?>ICE|MEB)_(?>OPEN_SCREEN_ADS|CAR_ZHIHU_COLLEGE)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\". = { returnStatus: \\\"SUCCEED\\\", hasMore: false, data: [] }\") }",
+    "3196": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/xxyx-client-api\\\\.xiaoxiaoyouxuan\\\\.com\\\\/place_ad\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"resource_slug\", \"random_body\")]) }",
+    "3197": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/rms\\\\.meituan\\\\.com\\\\/api\\\\/v\\\\d\\\\/rmsmina\\\\/c\\\\/queryPortalInfo\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data.modules |= map(select(.data.advType != true and .name != \\\"float-window\\\"))\") }",
+    "3198": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/app-izz\\\\.zhengzhou\\\\.gov\\\\.cn:10019\\\\/bizgw\\\\/gateway\\\\.do\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"\\\"imgUrl19_5x9\\\":\\\".+?\\\"\", \"\\\"imgUrl19_5x9\\\":\\\"\\\"\")]) }",
+    "3199": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/wrapper\\\\.cyapi\\\\.cn\\\\/v\\\\d\\\\/activity\\\\?.*type_id=A03\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".activities[]? |= (if .feature != null then .feature = false else . end)\") }",
+    "3200": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/api\\\\.charmdeer\\\\.com\\\\/services\\\\/render\\\\/app\\\\/lux\\\\/util\\\\/entries\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".results[] |= map(select(.extendedProp.skippable != true))\") }",
+    "3201": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/manga\\\\.bilibili\\\\.com\\\\/twirp\\\\/comic\\\\.v\\\\d\\\\.Comic\\\\/Recommend\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"data\", \"data0\")]) }",
+    "3202": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/manga\\\\.bilibili\\\\.com\\\\/twirp\\\\/comic\\\\.v\\\\d\\\\.Comic\\\\/GetBubbles\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"bubbles\", \"bubbles0\")]) }",
+    "3203": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/ut\\\\.xiaojukeji\\\\.com\\\\/ut\\\\/kappa\\\\/api\\\\/owner\\\\/index\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"banner_items\", \"random_body\")]) }",
+    "3204": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/api\\\\.yisouti\\\\.com\\\\/popupAd\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"data\", \"zirawell\")]) }",
+    "3205": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/dorangesource\\\\.alicdn\\\\.com\\\\/\\\\w+\\\\.json$\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"(.mergedNamespaces[] | select(.name == \\\"app_initialize\\\") | .candidates) |= map(select(.match != \\\"app_ver<9.0.13\\\"))\") }",
+    "3206": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/oneapp-api\\\\.faw-vw\\\\.com\\\\/content\\\\/(?>customize\\\\/getCustomizePageName|recommend\\\\/getRecommendInfoFlows|activity\\\\/getSquareActivityList|theme\\\\/getThemeList|post\\\\/getPostsByTags|evaluate\\\\/getEvaluateCards)\\\\/v\\\\d\\\\?\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\". = { returnStatus: \\\"SUCCEED\\\", hasMore: false, data: [] }\") }",
+    "3207": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/bd-api\\\\.kuwo\\\\.cn\\\\/api\\\\/service\\\\/resource\\\\/recommend\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data.resourceList[] |= del(.resource)\") }",
+    "3208": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/api\\\\.swiftgram\\\\.app\\\\/v0\\\\/settings\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"announcements_data\", \"random_body\")]) }",
+    "3209": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/api\\\\.charmdeer\\\\.com\\\\/services\\\\/render\\\\/app\\\\/lux\\\\/feed\\\\/home\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".list = []\") }",
+    "3210": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/oneapp-api\\\\.faw-vw\\\\.com\\\\/search\\\\/firstPage\\\\/getPromptList\\\\/v\\\\d\\\\?\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\". = { returnStatus: \\\"SUCCEED\\\", hasMore: false, data: [] }\") }",
+    "3211": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/maicai\\\\.api\\\\.ddxq\\\\.mobi\\\\/homeApi\\\\/newDetails\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"suspension\", \"random_body\")]) }",
+    "3212": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/misc-api-prd-mx\\\\.wandafilm\\\\.com\\\\/commend\\\\/common_banner_batch\\\\.api\\\\?bannerInfos=%5B%7B%22cinemaI\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"WX_index_mp-&-boxAD\", \"WX_index_mp-&-boxAD0\")]) }",
+    "3213": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/oneapp-api\\\\.faw-vw\\\\.com\\\\/content\\\\/booth\\\\/getBoothList\\\\/v\\\\d\\\\?.*showPositionCode=VWAPP_(?>ICE|MEB)_HOME_(?>OWNER_BANNER|PROSPECTS_BANNER|CUSTOM_BANNER|KONGO|CUSTOM_KONGO)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\". = { returnStatus: \\\"SUCCEED\\\", hasMore: false, data: [] }\") }",
+    "3214": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/bd-api\\\\.kuwo\\\\.cn\\\\/api\\\\/voice\\\\/room\\\\/v\\\\d\\\\/sidebar\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"(.data) = {}\") }",
+    "3215": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/oneapp-api\\\\.faw-vw\\\\.com\\\\/benefits\\\\/benefitsCard\\\\/getInfo\\\\/v\\\\d\\\\?\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\". = { returnStatus: \\\"SUCCEED\\\", hasMore: false, data: [] }\") }",
+    "3216": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/oneapp-api\\\\.faw-vw\\\\.com\\\\/content\\\\/booth\\\\/getBoothList\\\\/v\\\\d\\\\?.*showPositionCode=VWAPP_HOME_BUOY\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\". = { returnStatus: \\\"SUCCEED\\\", hasMore: false, data: [] }\") }",
+    "3217": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/alsc-buy2\\\\.ele\\\\.me\\\\/h5\\\\/mtop\\\\.alsc\\\\.eleme\\\\.order\\\\.detail\\\\.miniapp\\\\.build\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"orderDetailCdpTriggerInfo\", \"random_body\")]) }",
+    "3218": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/(?>a|s)\\\\.ajmide\\\\.com\\\\/v\\\\d\\\\/get_init_config\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"if (.data?.loading_img? and (.data.loading_img|type==\\\"array\\\") and (.data.loading_img|length>0)) then (.data.loading_img=[(.data.loading_img[0] | .imgpath=\\\"https://upload-qn.ajmide.com/__splash_pixel.png\\\")]) else . end\") }",
+    "3219": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/zone\\\\.guiderank-app\\\\.com\\\\/guiderank-web\\\\/app\\\\/common\\\\/getInitData\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"SpecialSalePageMidTabConfig\", \"random_body\")]) }",
+    "3220": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/waimai-guide\\\\.ele\\\\.me\\\\/\\\\w+\\\\/mtop\\\\.venus\\\\.shopresourceservice\\\\.getshopresource\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"posterList\", \"random_body\")]) }",
+    "3221": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/app\\\\.zhuanzhuan\\\\.com\\\\/zz\\\\/v\\\\d\\\\/zzinfoshow\\\\/getchoicegoodsinfos\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"infoData\", \"random_body\")]) }",
+    "3222": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/api\\\\.wandacm\\\\.com\\\\.cn\\\\/wdmp\\\\/common\\\\/v\\\\d\\\\/xmt\\\\/nsettingInfo\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"popConfig\", \"random_body\")]) }",
+    "3223": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/app\\\\.zhuanzhuan\\\\.com\\\\/zz\\\\/transfer\\\\/getpersonalcenter\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"pendantInfo\", \"random_body\")]) }",
+    "3224": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/(?>a|s)\\\\.ajmide\\\\.com\\\\/v\\\\d\\\\/index_tab\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"if (.data|type==\\\"array\\\") then (.data = ([.data[] | select(((.tab_id|tostring)==\\\"2\\\") or (.tab_name==\\\"听广播\\\"))] | map(.position=\\\"1\\\" | .fixed=\\\"1\\\"))) else . end\") }",
+    "3225": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/zgrb\\\\.epicc\\\\.com\\\\.cn\\\\/G-HAPP\\\\/headLine\\\\/headLineInit\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"data\", \"data0\")]) }",
+    "3226": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/bd-api\\\\.kuwo\\\\.cn\\\\/api\\\\/service\\\\/music\\\\/recommendList\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data.musicList[] |= del(.showAd)\") }",
+    "3227": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/api\\\\.xiaoyuzhoufm\\\\.com\\\\/v\\\\d\\\\/discovery-feed\\\\/list\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data |= map(select(.type == \\\"DISCOVERY_EPISODE_RECOMMEND\\\" or .type == \\\"EDITOR_PICK\\\"))\") }",
+    "3228": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/starplucker\\\\.cyapi\\\\.cn\\\\/v\\\\d\\\\/config\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"del(.search_suggestions)?\") }",
+    "3229": "error Syntax: expected a type, a pattern and a regex with its replacement",
+    "3230": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/oneapp-api\\\\.faw-vw\\\\.com\\\\/content\\\\/collection\\\\/getCollectionList\\\\/v\\\\d\\\\?\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\". = { returnStatus: \\\"SUCCEED\\\", hasMore: false, data: {} }\") }",
+    "3231": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/membase-yxapp\\\\.feiniu\\\\.com\\\\/misc\\\\/memberIndex\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"myADArray\", \"myADArray0\")]) }",
+    "3232": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/(?>a|s)\\\\.ajmide\\\\.com\\\\/(?>v\\\\d\\\\/get_(?>radio_station|live_bocai)|index\\\\.php\\\\?r=program(%2F|\\\\/)radio-station-top-list)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"if (.data? and (.data|type==\\\"object\\\") and (.data|has(\\\"radioList\\\"))) then (.data={radioList:.data.radioList}) elif (.data? and (.data|type==\\\"object\\\") and (.data|has(\\\"img_path\\\"))) then (.data.img_path=\\\"\\\" | .data.schema=\\\"\\\" | .data.title=\\\"\\\" | .data.resource_id=\\\"\\\" | .data.topicId=0) elif (.data? and (.data|type==\\\"array\\\")) then (.data=[]) else . end\") }",
+    "3233": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/waimai-guide\\\\.ele\\\\.me\\\\/h5\\\\/mtop\\\\.alsc\\\\.eleme\\\\.miniapp\\\\.homepage\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"wechat_miniapp_scene_card_template\", \"zirawell\")]) }",
+    "3234": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/wcmp\\\\.189\\\\.cn\\\\/xcxApiService\\\\/api\\\\/gateway\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"adItems\", \"random_body\")]) }",
+    "3235": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/api\\\\.boohee\\\\.com\\\\/meta-interface\\\\/v\\\\d\\\\/index\\\\/record_index\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"articles\", \"random_body\")]) }",
+    "3236": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/(?>a|s)\\\\.ajmide\\\\.com\\\\/v\\\\d\\\\/get_(?>search_keywords|search_home|bar_img)\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"if (.data? and ((.data|has(\\\"hotImg\\\")) or (.data|has(\\\"hotKeywords\\\")) or (.data|has(\\\"hotPrograms\\\")) or (.data|has(\\\"boCaiList\\\")) or (.data|has(\\\"adInfo\\\")))) then (del(.data.hotImg) | .data.hotKeywords=[] | .data.hotPrograms=[] | .data.boCaiList=[] | .data.adInfo=[]) elif (.data? and (.data|has(\\\"search_bar_banner\\\"))) then del(.data.search_bar_banner) elif (.data? and (.data|has(\\\"list\\\"))) then (.data.list=[]) else . end\") }",
+    "3237": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/www\\\\.i3zh\\\\.com\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"cm-pop-up-banners\", \"random_body\")]) }",
+    "3238": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/bd-api\\\\.kuwo\\\\.cn\\\\/api\\\\/service\\\\/global\\\\/config\\\\/scene\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data.showShopEntry=false|.data.idolTabShow=true\") }",
+    "3239": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/shopping\\\\.juneyaoair\\\\.com\\\\/mobile\\\\/shop\\\\/mobile\\\\/app\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"\\\"index_pop_wap_enable\\\":true\", \"\\\"index_pop_wap_enable\\\":false\")]) }",
+    "3240": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/(h3\\\\.)?open\\\\.taou\\\\.com\\\\/maimai\\\\/feed\\\\/v\\\\d\\\\/detail_recommend_feeds\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"feeds\", \"random_body\")]) }",
+    "3241": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/www\\\\.flyert(rip)?\\\\.com(\\\\.cn)?\\\\/.*\\\\.php\\\\?.*module=basicdata&type=forumlist\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"adv\", \"adv0\")]) }",
+    "3242": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/lcen\\\\.xiaote\\\\.net\\\\/api\\\\/graphql\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"screenSplashAd\", \"random-response\")]) }",
+    "3243": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/nam\\\\.veta\\\\.naver\\\\.com\\\\/gfp\\\\/v\\\\d\\\\?\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"ads\", \"ads0\")]) }",
+    "3244": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/m\\\\.lkcoffee\\\\.com\\\\/ecapi\\\\/resource\\\\/m\\\\/member\\\\/exchange\\\\/page\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"\\\\{.+\\\\}\", \"{status:SUCCESS}\")]) }",
+    "3245": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/m\\\\.lkcoffee\\\\.com\\\\/capi\\\\/resource\\\\/m\\\\/growUp\\\\/main\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"\\\"popTitle\\\":\\\".+?\\\"\", \"\\\"popTitle\\\":\\\"\\\"\")]) }",
+    "3246": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/starplucker\\\\.cyapi\\\\.cn\\\\/v\\\\d\\\\/config\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"(.pic_page_card_orders[]?, .map_page_card_orders[]?) |= select(.name | test(\\\"^(A|C01)\\\") | not)\") }",
+    "3247": "BodyRewriteDef { response: false, pattern: \"^https?:\\\\/\\\\/vv\\\\.video\\\\.qq\\\\.com\\\\/getvinfo\", conditions: HeadConditionsDef { request: None, response: None }, action: Replace([(\"&sppreviewtype=\\\\d(.*)&spsrt=\\\\d\", \"&sppreviewtype=0$1&spsrt=0\")]) }"
+  },
+  "map-local": {
+    "count": 1062,
+    "sha256": "f49139f9dc7fab6f2c1e7495620939a8f1a50704937b018d6914bca9c22269af",
+    "errors": {
+      "2117": "error Unknown: unknown data-type \"json\"",
+      "2118": "error Unknown: unknown data-type \"json\"",
+      "2119": "error Unknown: unknown data-type \"json\"",
+      "2121": "error Unknown: unknown data-type \"json\"",
+      "2122": "error Unknown: unknown data-type \"json\"",
+      "2123": "error Unknown: unknown data-type \"json\"",
+      "2124": "error Unknown: unknown data-type \"json\"",
+      "2127": "error Unknown: unknown data-type \"json\"",
+      "2128": "error Unknown: unknown data-type \"json\"",
+      "2129": "error Unknown: unknown data-type \"json\"",
+      "2130": "error Unknown: unknown data-type \"json\"",
+      "2133": "error Unknown: unknown data-type \"json\"",
+      "2134": "error Unknown: unknown data-type \"json\"",
+      "2135": "error Unknown: unknown data-type \"json\"",
+      "2139": "error Unknown: unknown data-type \"json\"",
+      "2140": "error Unknown: unknown data-type \"json\"",
+      "2142": "error Unknown: unknown data-type \"json\"",
+      "2143": "error Unknown: unknown data-type \"json\"",
+      "2145": "error Unknown: unknown data-type \"json\"",
+      "2146": "error Unknown: unknown data-type \"json\"",
+      "2147": "error Unknown: unknown data-type \"json\"",
+      "2149": "error Unknown: unknown data-type \"json\"",
+      "2150": "error Unknown: unknown data-type \"json\"",
+      "2151": "error Unknown: unknown data-type \"json\"",
+      "2152": "error Unknown: unknown data-type \"json\"",
+      "2154": "error Unknown: unknown data-type \"json\"",
+      "2155": "error Unknown: unknown data-type \"json\"",
+      "2158": "error Unknown: unknown data-type \"json\"",
+      "2160": "error Unknown: unknown data-type \"json\"",
+      "2161": "error Unknown: unknown data-type \"json\"",
+      "2164": "error Unknown: unknown data-type \"json\"",
+      "2166": "error Unknown: unknown data-type \"json\"",
+      "2168": "error Unknown: unknown data-type \"json\"",
+      "2172": "error Unknown: unknown data-type \"json\"",
+      "2176": "error Unknown: unknown data-type \"json\"",
+      "2177": "error Unknown: unknown data-type \"json\"",
+      "2178": "error Unknown: unknown data-type \"json\"",
+      "2182": "error Unknown: unknown data-type \"json\"",
+      "2183": "error Unknown: unknown data-type \"json\"",
+      "2188": "error Unknown: unknown data-type \"json\"",
+      "2189": "error Unknown: unknown data-type \"json\"",
+      "2190": "error Unknown: unknown data-type \"json\"",
+      "2191": "error Unknown: unknown data-type \"json\"",
+      "2192": "error Unknown: unknown data-type \"json\"",
+      "2193": "error Unknown: unknown data-type \"json\"",
+      "2194": "error Unknown: unknown data-type \"json\"",
+      "2195": "error Unknown: unknown data-type \"json\"",
+      "2196": "error Unknown: unknown data-type \"json\"",
+      "2198": "error Unknown: unknown data-type \"json\"",
+      "2199": "error Unknown: unknown data-type \"json\"",
+      "2200": "error Unknown: unknown data-type \"json\"",
+      "2201": "error Unknown: unknown data-type \"json\"",
+      "2202": "error Unknown: unknown data-type \"json\"",
+      "2203": "error Unknown: unknown data-type \"json\"",
+      "2204": "error Unknown: unknown data-type \"json\"",
+      "2207": "error Unknown: unknown data-type \"json\"",
+      "2208": "error Unknown: unknown data-type \"json\"",
+      "2210": "error Unknown: unknown data-type \"json\"",
+      "2211": "error Unknown: unknown data-type \"json\"",
+      "2212": "error Unknown: unknown data-type \"json\"",
+      "2215": "error Unknown: unknown data-type \"json\"",
+      "2216": "error Unknown: unknown data-type \"json\"",
+      "2217": "error Unknown: unknown data-type \"json\"",
+      "2219": "error Unknown: unknown data-type \"json\"",
+      "2220": "error Unknown: unknown data-type \"json\"",
+      "2221": "error Unknown: unknown data-type \"json\"",
+      "2222": "error Unknown: unknown data-type \"json\"",
+      "2225": "error Unknown: unknown data-type \"json\"",
+      "2228": "error Unknown: unknown data-type \"json\"",
+      "2230": "error Unknown: unknown data-type \"json\"",
+      "2232": "error Unknown: unknown data-type \"json\"",
+      "2233": "error Unknown: unknown data-type \"json\"",
+      "2234": "error Unknown: unknown data-type \"json\"",
+      "2235": "error Unknown: unknown data-type \"json\"",
+      "2236": "error Unknown: unknown data-type \"json\"",
+      "2237": "error Unknown: unknown data-type \"json\"",
+      "2238": "error Unknown: unknown data-type \"json\"",
+      "2240": "error Unknown: unknown data-type \"json\"",
+      "2242": "error Unknown: unknown data-type \"json\"",
+      "2243": "error Unknown: unknown data-type \"json\"",
+      "2244": "error Unknown: unknown data-type \"json\"",
+      "2245": "error Unknown: unknown data-type \"json\"",
+      "2247": "error Unknown: unknown data-type \"json\"",
+      "2248": "error Unknown: unknown data-type \"json\"",
+      "2251": "error Unknown: unknown data-type \"json\"",
+      "2252": "error Unknown: unknown data-type \"json\"",
+      "2253": "error Unknown: unknown data-type \"json\"",
+      "2255": "error Unknown: unknown data-type \"json\"",
+      "2256": "error Unknown: unknown data-type \"json\"",
+      "2257": "error Unknown: unknown data-type \"json\"",
+      "2258": "error Unknown: unknown data-type \"json\"",
+      "2260": "error Unknown: unknown data-type \"json\"",
+      "2261": "error Unknown: unknown data-type \"json\"",
+      "2263": "error Unknown: unknown data-type \"json\"",
+      "2264": "error Unknown: unknown data-type \"json\"",
+      "2266": "error Unknown: unknown data-type \"json\"",
+      "2267": "error Unknown: unknown data-type \"json\"",
+      "2270": "error Unknown: unknown data-type \"json\"",
+      "2271": "error Unknown: unknown data-type \"json\"",
+      "2274": "error Unknown: unknown data-type \"json\"",
+      "2275": "error Unknown: unknown data-type \"json\"",
+      "2277": "error Unknown: unknown data-type \"json\"",
+      "2278": "error Unknown: unknown data-type \"json\"",
+      "2279": "error Unknown: unknown data-type \"json\"",
+      "2280": "error Unknown: unknown data-type \"json\"",
+      "2281": "error Unknown: unknown data-type \"json\"",
+      "2282": "error Unknown: unknown data-type \"json\"",
+      "2283": "error Unknown: unknown data-type \"json\"",
+      "2284": "error Unknown: unknown data-type \"json\"",
+      "2286": "error Unknown: unknown data-type \"json\"",
+      "2287": "error Unknown: unknown data-type \"json\"",
+      "2289": "error Unknown: unknown data-type \"json\"",
+      "2290": "error Unknown: unknown data-type \"json\"",
+      "2291": "error Unknown: unknown data-type \"json\"",
+      "2292": "error Unknown: unknown data-type \"json\"",
+      "2294": "error Unknown: unknown data-type \"json\"",
+      "2295": "error Unknown: unknown data-type \"json\"",
+      "2298": "error Unknown: unknown data-type \"json\"",
+      "2299": "error Unknown: unknown data-type \"json\"",
+      "2300": "error Unknown: unknown data-type \"json\"",
+      "2301": "error Unknown: unknown data-type \"json\"",
+      "2304": "error Unknown: unknown data-type \"json\"",
+      "2305": "error Unknown: unknown data-type \"json\"",
+      "2307": "error Unknown: unknown data-type \"json\"",
+      "2308": "error Unknown: unknown data-type \"json\"",
+      "2310": "error Unknown: unknown data-type \"json\"",
+      "2311": "error Unknown: unknown data-type \"json\"",
+      "2312": "error Unknown: unknown data-type \"json\"",
+      "2316": "error Unknown: unknown data-type \"json\"",
+      "2317": "error Unknown: unknown data-type \"json\"",
+      "2319": "error Unknown: unknown data-type \"json\"",
+      "2320": "error Unknown: unknown data-type \"json\"",
+      "2321": "error Unknown: unknown data-type \"json\"",
+      "2322": "error Unknown: unknown data-type \"json\"",
+      "2323": "error Unknown: unknown data-type \"json\"",
+      "2325": "error Unknown: unknown data-type \"json\"",
+      "2328": "error Unknown: unknown data-type \"json\"",
+      "2329": "error Unknown: unknown data-type \"json\"",
+      "2330": "error Unknown: unknown data-type \"json\"",
+      "2331": "error Unknown: unknown data-type \"json\"",
+      "2332": "error Unknown: unknown data-type \"json\"",
+      "2333": "error Unknown: unknown data-type \"json\"",
+      "2334": "error Unknown: unknown data-type \"json\"",
+      "2335": "error Unknown: unknown data-type \"json\"",
+      "2336": "error Unknown: unknown data-type \"json\"",
+      "2337": "error Unknown: unknown data-type \"json\"",
+      "2338": "error Unknown: unknown data-type \"json\"",
+      "2339": "error Unknown: unknown data-type \"json\"",
+      "2340": "error Unknown: unknown data-type \"json\"",
+      "2342": "error Unknown: unknown data-type \"json\"",
+      "2344": "error Unknown: unknown data-type \"json\"",
+      "2345": "error Unknown: unknown data-type \"json\"",
+      "2346": "error Unknown: unknown data-type \"json\"",
+      "2347": "error Unknown: unknown data-type \"json\"",
+      "2348": "error Unknown: unknown data-type \"json\"",
+      "2349": "error Unknown: unknown data-type \"json\"",
+      "2351": "error Unknown: unknown data-type \"json\"",
+      "2352": "error Unknown: unknown data-type \"json\"",
+      "2354": "error Unknown: unknown data-type \"json\"",
+      "2355": "error Unknown: unknown data-type \"json\"",
+      "2356": "error Unknown: unknown data-type \"json\"",
+      "2357": "error Unknown: unknown data-type \"json\"",
+      "2359": "error Unknown: unknown data-type \"json\"",
+      "2360": "error Unknown: unknown data-type \"json\"",
+      "2361": "error Unknown: unknown data-type \"json\"",
+      "2365": "error Unknown: unknown data-type \"json\"",
+      "2366": "error Unknown: unknown data-type \"json\"",
+      "2367": "error Unknown: unknown data-type \"json\"",
+      "2368": "error Unknown: unknown data-type \"json\"",
+      "2370": "error Unknown: unknown data-type \"json\"",
+      "2373": "error Unknown: unknown data-type \"json\"",
+      "2374": "error Unknown: unknown data-type \"json\"",
+      "2378": "error Unknown: unknown data-type \"json\"",
+      "2380": "error Unknown: unknown data-type \"json\"",
+      "2381": "error Unknown: unknown data-type \"json\"",
+      "2382": "error Unknown: unknown data-type \"json\"",
+      "2384": "error Unknown: unknown data-type \"json\"",
+      "2385": "error Unknown: unknown data-type \"json\"",
+      "2386": "error Unknown: unknown data-type \"json\"",
+      "2387": "error Unknown: unknown data-type \"json\"",
+      "2388": "error Unknown: unknown data-type \"json\"",
+      "2389": "error Unknown: unknown data-type \"json\"",
+      "2390": "error Unknown: unknown data-type \"json\"",
+      "2394": "error Unknown: unknown data-type \"json\"",
+      "2396": "error Unknown: unknown data-type \"json\"",
+      "2397": "error Unknown: unknown data-type \"json\"",
+      "2398": "error Unknown: unknown data-type \"json\"",
+      "2399": "error Unknown: unknown data-type \"json\"",
+      "2400": "error Unknown: unknown data-type \"json\"",
+      "2401": "error Unknown: unknown data-type \"json\"",
+      "2402": "error Unknown: unknown data-type \"json\"",
+      "2403": "error Unknown: unknown data-type \"json\"",
+      "2404": "error Unknown: unknown data-type \"json\"",
+      "2405": "error Unknown: unknown data-type \"json\"",
+      "2407": "error Unknown: unknown data-type \"json\"",
+      "2408": "error Unknown: unknown data-type \"json\"",
+      "2409": "error Unknown: unknown data-type \"json\"",
+      "2410": "error Unknown: unknown data-type \"json\"",
+      "2413": "error Unknown: unknown data-type \"json\"",
+      "2415": "error Unknown: unknown data-type \"json\"",
+      "2416": "error Unknown: unknown data-type \"json\"",
+      "2417": "error Unknown: unknown data-type \"json\"",
+      "2419": "error Unknown: unknown data-type \"json\"",
+      "2420": "error Unknown: unknown data-type \"json\"",
+      "2421": "error Unknown: unknown data-type \"json\"",
+      "2422": "error Unknown: unknown data-type \"json\"",
+      "2423": "error Unknown: unknown data-type \"json\"",
+      "2425": "error Unknown: unknown data-type \"json\"",
+      "2426": "error Unknown: unknown data-type \"json\"",
+      "2427": "error Unknown: unknown data-type \"json\"",
+      "2429": "error Unknown: unknown data-type \"json\"",
+      "2430": "error Unknown: unknown data-type \"json\"",
+      "2431": "error Unknown: unknown data-type \"json\"",
+      "2433": "error Unknown: unknown data-type \"json\"",
+      "2434": "error Unknown: unknown data-type \"json\"",
+      "2435": "error Unknown: unknown data-type \"json\"",
+      "2436": "error Unknown: unknown data-type \"json\"",
+      "2437": "error Unknown: unknown data-type \"json\"",
+      "2438": "error Unknown: unknown data-type \"json\"",
+      "2439": "error Unknown: unknown data-type \"json\"",
+      "2440": "error Unknown: unknown data-type \"json\"",
+      "2443": "error Unknown: unknown data-type \"json\"",
+      "2444": "error Unknown: unknown data-type \"json\"",
+      "2445": "error Unknown: unknown data-type \"json\"",
+      "2446": "error Unknown: unknown data-type \"json\"",
+      "2447": "error Unknown: unknown data-type \"json\"",
+      "2448": "error Unknown: unknown data-type \"json\"",
+      "2450": "error Unknown: unknown data-type \"json\"",
+      "2453": "error Unknown: unknown data-type \"json\"",
+      "2455": "error Unknown: unknown data-type \"json\"",
+      "2457": "error Unknown: unknown data-type \"json\"",
+      "2459": "error Unknown: unknown data-type \"json\"",
+      "2460": "error Unknown: unknown data-type \"json\"",
+      "2461": "error Unknown: unknown data-type \"json\"",
+      "2462": "error Unknown: unknown data-type \"json\"",
+      "2463": "error Unknown: unknown data-type \"json\"",
+      "2464": "error Unknown: unknown data-type \"json\"",
+      "2466": "error Unknown: unknown data-type \"json\"",
+      "2470": "error Unknown: unknown data-type \"json\"",
+      "2471": "error Unknown: unknown data-type \"json\"",
+      "2472": "error Unknown: unknown data-type \"json\"",
+      "2473": "error Unknown: unknown data-type \"json\"",
+      "2475": "error Unknown: unknown data-type \"json\"",
+      "2477": "error Unknown: unknown data-type \"json\"",
+      "2479": "error Unknown: unknown data-type \"json\"",
+      "2481": "error Unknown: unknown data-type \"json\"",
+      "2482": "error Unknown: unknown data-type \"json\"",
+      "2486": "error Unknown: unknown data-type \"json\"",
+      "2488": "error Unknown: unknown data-type \"json\"",
+      "2490": "error Unknown: unknown data-type \"json\"",
+      "2491": "error Unknown: unknown data-type \"json\"",
+      "2493": "error Unknown: unknown data-type \"json\"",
+      "2496": "error Unknown: unknown data-type \"json\"",
+      "2497": "error Unknown: unknown data-type \"json\"",
+      "2498": "error Unknown: unknown data-type \"json\"",
+      "2501": "error Unknown: unknown data-type \"json\"",
+      "2502": "error Unknown: unknown data-type \"json\"",
+      "2503": "error Unknown: unknown data-type \"json\"",
+      "2504": "error Unknown: unknown data-type \"json\"",
+      "2505": "error Unknown: unknown data-type \"json\"",
+      "2507": "error Unknown: unknown data-type \"json\"",
+      "2509": "error Unknown: unknown data-type \"json\"",
+      "2511": "error Unknown: unknown data-type \"json\"",
+      "2512": "error Unknown: unknown data-type \"json\"",
+      "2513": "error Unknown: unknown data-type \"json\"",
+      "2514": "error Unknown: unknown data-type \"json\"",
+      "2515": "error Unknown: unknown data-type \"json\"",
+      "2516": "error Unknown: unknown data-type \"json\"",
+      "2517": "error Unknown: unknown data-type \"json\"",
+      "2518": "error Unknown: unknown data-type \"json\"",
+      "2520": "error Unknown: unknown data-type \"json\"",
+      "2522": "error Unknown: unknown data-type \"json\"",
+      "2523": "error Unknown: unknown data-type \"json\"",
+      "2524": "error Unknown: unknown data-type \"json\"",
+      "2527": "error Unknown: unknown data-type \"json\"",
+      "2528": "error Unknown: unknown data-type \"json\"",
+      "2530": "error Unknown: unknown data-type \"json\"",
+      "2532": "error Unknown: unknown data-type \"json\"",
+      "2533": "error Unknown: unknown data-type \"json\"",
+      "2536": "error Unknown: unknown data-type \"json\"",
+      "2537": "error Unknown: unknown data-type \"json\"",
+      "2538": "error Unknown: unknown data-type \"json\"",
+      "2539": "error Unknown: unknown data-type \"json\"",
+      "2541": "error Unknown: unknown data-type \"json\"",
+      "2543": "error Unknown: unknown data-type \"json\"",
+      "2544": "error Unknown: unknown data-type \"json\"",
+      "2547": "error Unknown: unknown data-type \"json\"",
+      "2548": "error Unknown: unknown data-type \"json\"",
+      "2549": "error Unknown: unknown data-type \"json\"",
+      "2550": "error Unknown: unknown data-type \"json\"",
+      "2553": "error Unknown: unknown data-type \"json\"",
+      "2554": "error Unknown: unknown data-type \"json\"",
+      "2556": "error Unknown: unknown data-type \"json\"",
+      "2557": "error Unknown: unknown data-type \"json\"",
+      "2558": "error Unknown: unknown data-type \"json\"",
+      "2559": "error Unknown: unknown data-type \"json\"",
+      "2560": "error Unknown: unknown data-type \"json\"",
+      "2561": "error Unknown: unknown data-type \"json\"",
+      "2563": "error Unknown: unknown data-type \"json\"",
+      "2564": "error Unknown: unknown data-type \"json\"",
+      "2565": "error Unknown: unknown data-type \"json\"",
+      "2566": "error Unknown: unknown data-type \"json\"",
+      "2567": "error Unknown: unknown data-type \"json\"",
+      "2569": "error Unknown: unknown data-type \"json\"",
+      "2570": "error Unknown: unknown data-type \"json\"",
+      "2572": "error Unknown: unknown data-type \"json\"",
+      "2574": "error Unknown: unknown data-type \"json\"",
+      "2575": "error Unknown: unknown data-type \"json\"",
+      "2576": "error Unknown: unknown data-type \"json\"",
+      "2577": "error Unknown: unknown data-type \"json\"",
+      "2578": "error Unknown: unknown data-type \"json\"",
+      "2579": "error Unknown: unknown data-type \"json\"",
+      "2581": "error Unknown: unknown data-type \"json\"",
+      "2583": "error Unknown: unknown data-type \"json\"",
+      "2585": "error Unknown: unknown data-type \"json\"",
+      "2587": "error Unknown: unknown data-type \"json\"",
+      "2589": "error Unknown: unknown data-type \"json\"",
+      "2590": "error Unknown: unknown data-type \"json\"",
+      "2591": "error Unknown: unknown data-type \"json\"",
+      "2592": "error Unknown: unknown data-type \"json\"",
+      "2593": "error Unknown: unknown data-type \"json\"",
+      "2594": "error Unknown: unknown data-type \"json\"",
+      "2595": "error Unknown: unknown data-type \"json\"",
+      "2596": "error Unknown: unknown data-type \"json\"",
+      "2598": "error Unknown: unknown data-type \"json\"",
+      "2599": "error Unknown: unknown data-type \"json\"",
+      "2600": "error Unknown: unknown data-type \"json\"",
+      "2601": "error Unknown: unknown data-type \"json\"",
+      "2603": "error Unknown: unknown data-type \"json\"",
+      "2604": "error Unknown: unknown data-type \"json\"",
+      "2605": "error Unknown: unknown data-type \"json\"",
+      "2606": "error Unknown: unknown data-type \"json\"",
+      "2608": "error Unknown: unknown data-type \"json\"",
+      "2609": "error Unknown: unknown data-type \"json\"",
+      "2610": "error Unknown: unknown data-type \"json\"",
+      "2611": "error Unknown: unknown data-type \"json\"",
+      "2612": "error Unknown: unknown data-type \"json\"",
+      "2613": "error Unknown: unknown data-type \"json\"",
+      "2614": "error Unknown: unknown data-type \"json\"",
+      "2616": "error Unknown: unknown data-type \"json\"",
+      "2619": "error Unknown: unknown data-type \"json\"",
+      "2620": "error Unknown: unknown data-type \"json\"",
+      "2622": "error Unknown: unknown data-type \"json\"",
+      "2624": "error Unknown: unknown data-type \"json\"",
+      "2626": "error Unknown: unknown data-type \"json\"",
+      "2627": "error Unknown: unknown data-type \"json\"",
+      "2628": "error Unknown: unknown data-type \"json\"",
+      "2629": "error Unknown: unknown data-type \"json\"",
+      "2630": "error Unknown: unknown data-type \"json\"",
+      "2632": "error Unknown: unknown data-type \"json\"",
+      "2635": "error Unknown: unknown data-type \"json\"",
+      "2636": "error Unknown: unknown data-type \"json\"",
+      "2639": "error Unknown: unknown data-type \"json\"",
+      "2640": "error Unknown: unknown data-type \"json\"",
+      "2641": "error Unknown: unknown data-type \"json\"",
+      "2642": "error Unknown: unknown data-type \"json\"",
+      "2644": "error Unknown: unknown data-type \"json\"",
+      "2646": "error Unknown: unknown data-type \"json\"",
+      "2647": "error Unknown: unknown data-type \"json\"",
+      "2651": "error Unknown: unknown data-type \"json\"",
+      "2652": "error Unknown: unknown data-type \"json\"",
+      "2653": "error Unknown: unknown data-type \"json\"",
+      "2656": "error Unknown: unknown data-type \"json\"",
+      "2657": "error Unknown: unknown data-type \"json\"",
+      "2659": "error Unknown: unknown data-type \"json\"",
+      "2660": "error Unknown: unknown data-type \"json\"",
+      "2662": "error Unknown: unknown data-type \"json\"",
+      "2664": "error Unknown: unknown data-type \"json\"",
+      "2665": "error Unknown: unknown data-type \"json\"",
+      "2666": "error Unknown: unknown data-type \"json\"",
+      "2667": "error Unknown: unknown data-type \"json\"",
+      "2668": "error Unknown: unknown data-type \"json\"",
+      "2669": "error Unknown: unknown data-type \"json\"",
+      "2670": "error Unknown: unknown data-type \"json\"",
+      "2671": "error Unknown: unknown data-type \"json\"",
+      "2672": "error Unknown: unknown data-type \"json\"",
+      "2674": "error Unknown: unknown data-type \"json\"",
+      "2675": "error Unknown: unknown data-type \"json\"",
+      "2679": "error Unknown: unknown data-type \"json\"",
+      "2680": "error Unknown: unknown data-type \"json\"",
+      "2683": "error Unknown: unknown data-type \"json\"",
+      "2684": "error Unknown: unknown data-type \"json\"",
+      "2685": "error Unknown: unknown data-type \"json\"",
+      "2686": "error Unknown: unknown data-type \"json\"",
+      "2689": "error Unknown: unknown data-type \"json\"",
+      "2690": "error Unknown: unknown data-type \"json\"",
+      "2691": "error Unknown: unknown data-type \"json\"",
+      "2693": "error Unknown: unknown data-type \"json\"",
+      "2698": "error Unknown: unknown data-type \"json\"",
+      "2699": "error Unknown: unknown data-type \"json\"",
+      "2700": "error Unknown: unknown data-type \"json\"",
+      "2701": "error Unknown: unknown data-type \"json\"",
+      "2702": "error Unknown: unknown data-type \"json\"",
+      "2703": "error Unknown: unknown data-type \"json\"",
+      "2705": "error Unknown: unknown data-type \"json\"",
+      "2706": "error Unknown: unknown data-type \"json\"",
+      "2707": "error Unknown: unknown data-type \"json\"",
+      "2710": "error Unknown: unknown data-type \"json\"",
+      "2711": "error Unknown: unknown data-type \"json\"",
+      "2712": "error Unknown: unknown data-type \"json\"",
+      "2713": "error Unknown: unknown data-type \"json\"",
+      "2715": "error Unknown: unknown data-type \"json\"",
+      "2717": "error Unknown: unknown data-type \"json\"",
+      "2718": "error Unknown: unknown data-type \"json\"",
+      "2719": "error Unknown: unknown data-type \"json\"",
+      "2720": "error Unknown: unknown data-type \"json\"",
+      "2721": "error Unknown: unknown data-type \"json\"",
+      "2722": "error Unknown: unknown data-type \"json\"",
+      "2723": "error Unknown: unknown data-type \"json\"",
+      "2724": "error Unknown: unknown data-type \"json\"",
+      "2727": "error Unknown: unknown data-type \"json\"",
+      "2728": "error Unknown: unknown data-type \"json\"",
+      "2730": "error Unknown: unknown data-type \"json\"",
+      "2732": "error Unknown: unknown data-type \"json\"",
+      "2733": "error Unknown: unknown data-type \"json\"",
+      "2735": "error Unknown: unknown data-type \"json\"",
+      "2736": "error Unknown: unknown data-type \"json\"",
+      "2737": "error Unknown: unknown data-type \"json\"",
+      "2738": "error Unknown: unknown data-type \"json\"",
+      "2739": "error Unknown: unknown data-type \"json\"",
+      "2740": "error Unknown: unknown data-type \"json\"",
+      "2742": "error Unknown: unknown data-type \"json\"",
+      "2744": "error Unknown: unknown data-type \"json\"",
+      "2748": "error Unknown: unknown data-type \"json\"",
+      "2749": "error Unknown: unknown data-type \"json\"",
+      "2750": "error Unknown: unknown data-type \"json\"",
+      "2752": "error Unknown: unknown data-type \"json\"",
+      "2753": "error Unknown: unknown data-type \"json\"",
+      "2754": "error Unknown: unknown data-type \"json\"",
+      "2755": "error Unknown: unknown data-type \"json\"",
+      "2756": "error Unknown: unknown data-type \"json\"",
+      "2757": "error Unknown: unknown data-type \"json\"",
+      "2758": "error Unknown: unknown data-type \"json\"",
+      "2759": "error Unknown: unknown data-type \"json\"",
+      "2761": "error Unknown: unknown data-type \"json\"",
+      "2763": "error Unknown: unknown data-type \"json\"",
+      "2764": "error Unknown: unknown data-type \"json\"",
+      "2765": "error Unknown: unknown data-type \"json\"",
+      "2766": "error Unknown: unknown data-type \"json\"",
+      "2770": "error Unknown: unknown data-type \"json\"",
+      "2771": "error Unknown: unknown data-type \"json\"",
+      "2772": "error Unknown: unknown data-type \"json\"",
+      "2773": "error Unknown: unknown data-type \"json\"",
+      "2774": "error Unknown: unknown data-type \"json\"",
+      "2775": "error Unknown: unknown data-type \"json\"",
+      "2776": "error Unknown: unknown data-type \"json\"",
+      "2777": "error Unknown: unknown data-type \"json\"",
+      "2778": "error Unknown: unknown data-type \"json\"",
+      "2779": "error Unknown: unknown data-type \"json\"",
+      "2780": "error Unknown: unknown data-type \"json\"",
+      "2781": "error Unknown: unknown data-type \"json\"",
+      "2783": "error Unknown: unknown data-type \"json\"",
+      "2784": "error Unknown: unknown data-type \"json\"",
+      "2785": "error Unknown: unknown data-type \"json\"",
+      "2786": "error Unknown: unknown data-type \"json\"",
+      "2787": "error Unknown: unknown data-type \"json\"",
+      "2788": "error Unknown: unknown data-type \"json\"",
+      "2790": "error Unknown: unknown data-type \"json\"",
+      "2793": "error Unknown: unknown data-type \"json\"",
+      "2794": "error Unknown: unknown data-type \"json\"",
+      "2795": "error Unknown: unknown data-type \"json\"",
+      "2796": "error Unknown: unknown data-type \"json\"",
+      "2797": "error Unknown: unknown data-type \"json\"",
+      "2798": "error Unknown: unknown data-type \"json\"",
+      "2799": "error Unknown: unknown data-type \"json\"",
+      "2800": "error Unknown: unknown data-type \"json\"",
+      "2802": "error Unknown: unknown data-type \"json\"",
+      "2803": "error Unknown: unknown data-type \"json\"",
+      "2805": "error Unknown: unknown data-type \"json\"",
+      "2806": "error Unknown: unknown data-type \"json\"",
+      "2811": "error Unknown: unknown data-type \"json\"",
+      "2812": "error Unknown: unknown data-type \"json\"",
+      "2814": "error Unknown: unknown data-type \"json\"",
+      "2815": "error Unknown: unknown data-type \"json\"",
+      "2816": "error Unknown: unknown data-type \"json\"",
+      "2817": "error Unknown: unknown data-type \"json\"",
+      "2818": "error Unknown: unknown data-type \"json\"",
+      "2819": "error Unknown: unknown data-type \"json\"",
+      "2820": "error Unknown: unknown data-type \"json\"",
+      "2821": "error Unknown: unknown data-type \"json\"",
+      "2822": "error Unknown: unknown data-type \"json\"",
+      "2823": "error Unknown: unknown data-type \"json\"",
+      "2824": "error Unknown: unknown data-type \"json\"",
+      "2825": "error Unknown: unknown data-type \"json\"",
+      "2827": "error Unknown: unknown data-type \"json\"",
+      "2828": "error Unknown: unknown data-type \"json\"",
+      "2829": "error Unknown: unknown data-type \"json\"",
+      "2830": "error Unknown: unknown data-type \"json\"",
+      "2832": "error Unknown: unknown data-type \"json\"",
+      "2833": "error Unknown: unknown data-type \"json\"",
+      "2834": "error Unknown: unknown data-type \"json\"",
+      "2836": "error Unknown: unknown data-type \"json\"",
+      "2837": "error Unknown: unknown data-type \"json\"",
+      "2838": "error Unknown: unknown data-type \"json\"",
+      "2841": "error Unknown: unknown data-type \"json\"",
+      "2842": "error Unknown: unknown data-type \"json\"",
+      "2844": "error Unknown: unknown data-type \"json\"",
+      "2845": "error Unknown: unknown data-type \"json\"",
+      "2846": "error Unknown: unknown data-type \"json\"",
+      "2847": "error Unknown: unknown data-type \"json\"",
+      "2848": "error Unknown: unknown data-type \"json\"",
+      "2849": "error Unknown: unknown data-type \"json\"",
+      "2850": "error Unknown: unknown data-type \"json\"",
+      "2852": "error Unknown: unknown data-type \"json\"",
+      "2853": "error Unknown: unknown data-type \"json\"",
+      "2854": "error Unknown: unknown data-type \"json\"",
+      "2855": "error Unknown: unknown data-type \"json\"",
+      "2857": "error Unknown: unknown data-type \"json\"",
+      "2860": "error Unknown: unknown data-type \"json\"",
+      "2862": "error Unknown: unknown data-type \"json\"",
+      "2864": "error Unknown: unknown data-type \"json\"",
+      "2865": "error Unknown: unknown data-type \"json\"",
+      "2866": "error Unknown: unknown data-type \"json\"",
+      "2868": "error Unknown: unknown data-type \"json\"",
+      "2869": "error Unknown: unknown data-type \"json\"",
+      "2870": "error Unknown: unknown data-type \"json\"",
+      "2873": "error Unknown: unknown data-type \"json\"",
+      "2874": "error Unknown: unknown data-type \"json\"",
+      "2875": "error Unknown: unknown data-type \"json\"",
+      "2878": "error Unknown: unknown data-type \"json\"",
+      "2879": "error Unknown: unknown data-type \"json\"",
+      "2882": "error Unknown: unknown data-type \"json\"",
+      "2884": "error Unknown: unknown data-type \"json\"",
+      "2885": "error Unknown: unknown data-type \"json\"",
+      "2886": "error Unknown: unknown data-type \"json\"",
+      "2890": "error Unknown: unknown data-type \"json\"",
+      "2891": "error Unknown: unknown data-type \"json\"",
+      "2892": "error Unknown: unknown data-type \"json\"",
+      "2897": "error Unknown: unknown data-type \"json\"",
+      "2898": "error Unknown: unknown data-type \"json\"",
+      "2900": "error Unknown: unknown data-type \"json\"",
+      "2901": "error Unknown: unknown data-type \"json\"",
+      "2902": "error Unknown: unknown data-type \"json\"",
+      "2903": "error Unknown: unknown data-type \"json\"",
+      "2905": "error Unknown: unknown data-type \"json\"",
+      "2906": "error Unknown: unknown data-type \"json\"",
+      "2908": "error Unknown: unknown data-type \"json\"",
+      "2909": "error Unknown: unknown data-type \"json\"",
+      "2910": "error Unknown: unknown data-type \"json\"",
+      "2911": "error Unknown: unknown data-type \"json\"",
+      "2912": "error Unknown: unknown data-type \"json\"",
+      "2913": "error Unknown: unknown data-type \"json\"",
+      "2914": "error Unknown: unknown data-type \"json\"",
+      "2916": "error Unknown: unknown data-type \"json\"",
+      "2917": "error Unknown: unknown data-type \"json\"",
+      "2918": "error Unknown: unknown data-type \"json\"",
+      "2919": "error Unknown: unknown data-type \"json\"",
+      "2920": "error Unknown: unknown data-type \"json\"",
+      "2921": "error Unknown: unknown data-type \"json\"",
+      "2922": "error Unknown: unknown data-type \"json\"",
+      "2924": "error Unknown: unknown data-type \"json\"",
+      "2925": "error Unknown: unknown data-type \"json\"",
+      "2926": "error Unknown: unknown data-type \"json\"",
+      "2927": "error Unknown: unknown data-type \"json\"",
+      "2928": "error Unknown: unknown data-type \"json\"",
+      "2929": "error Unknown: unknown data-type \"json\"",
+      "2930": "error Unknown: unknown data-type \"json\"",
+      "2931": "error Unknown: unknown data-type \"json\"",
+      "2934": "error Unknown: unknown data-type \"json\"",
+      "2935": "error Unknown: unknown data-type \"json\"",
+      "2936": "error Unknown: unknown data-type \"json\"",
+      "2937": "error Unknown: unknown data-type \"json\"",
+      "2938": "error Unknown: unknown data-type \"json\"",
+      "2939": "error Unknown: unknown data-type \"json\"",
+      "2940": "error Unknown: unknown data-type \"json\"",
+      "2941": "error Unknown: unknown data-type \"json\"",
+      "2943": "error Unknown: unknown data-type \"json\"",
+      "2944": "error Unknown: unknown data-type \"json\"",
+      "2947": "error Unknown: unknown data-type \"json\"",
+      "2948": "error Unknown: unknown data-type \"json\"",
+      "2949": "error Unknown: unknown data-type \"json\"",
+      "2950": "error Unknown: unknown data-type \"json\"",
+      "2951": "error Unknown: unknown data-type \"json\"",
+      "2952": "error Unknown: unknown data-type \"json\"",
+      "2953": "error Unknown: unknown data-type \"json\"",
+      "2954": "error Unknown: unknown data-type \"json\"",
+      "2959": "error Unknown: unknown data-type \"json\"",
+      "2960": "error Unknown: unknown data-type \"json\"",
+      "2961": "error Unknown: unknown data-type \"json\"",
+      "2962": "error Unknown: unknown data-type \"json\"",
+      "2963": "error Unknown: unknown data-type \"json\"",
+      "2964": "error Unknown: unknown data-type \"json\"",
+      "2965": "error Unknown: unknown data-type \"json\"",
+      "2966": "error Unknown: unknown data-type \"json\"",
+      "2967": "error Unknown: unknown data-type \"json\"",
+      "2968": "error Unknown: unknown data-type \"json\"",
+      "2969": "error Unknown: unknown data-type \"json\"",
+      "2970": "error Unknown: unknown data-type \"json\"",
+      "2971": "error Unknown: unknown data-type \"json\"",
+      "2973": "error Unknown: unknown data-type \"json\"",
+      "2974": "error Unknown: unknown data-type \"json\"",
+      "2975": "error Unknown: unknown data-type \"json\"",
+      "2977": "error Unknown: unknown data-type \"json\"",
+      "2978": "error Unknown: unknown data-type \"json\"",
+      "2980": "error Unknown: unknown data-type \"json\"",
+      "2981": "error Unknown: unknown data-type \"json\"",
+      "2982": "error Unknown: unknown data-type \"json\"",
+      "2984": "error Unknown: unknown data-type \"json\"",
+      "2985": "error Unknown: unknown data-type \"json\"",
+      "2987": "error Unknown: unknown data-type \"json\"",
+      "2988": "error Unknown: unknown data-type \"json\"",
+      "2989": "error Unknown: unknown data-type \"json\"",
+      "2990": "error Unknown: unknown data-type \"json\"",
+      "2991": "error Unknown: unknown data-type \"json\"",
+      "2992": "error Unknown: unknown data-type \"json\"",
+      "2993": "error Unknown: unknown data-type \"json\"",
+      "2994": "error Unknown: unknown data-type \"json\"",
+      "2995": "error Unknown: unknown data-type \"json\"",
+      "2997": "error Unknown: unknown data-type \"json\"",
+      "2998": "error Unknown: unknown data-type \"json\"",
+      "3000": "error Unknown: unknown data-type \"json\"",
+      "3002": "error Unknown: unknown data-type \"json\"",
+      "3003": "error Unknown: unknown data-type \"json\"",
+      "3004": "error Unknown: unknown data-type \"json\"",
+      "3005": "error Unknown: unknown data-type \"json\"",
+      "3007": "error Unknown: unknown data-type \"json\"",
+      "3008": "error Unknown: unknown data-type \"json\"",
+      "3009": "error Unknown: unknown data-type \"json\"",
+      "3012": "error Unknown: unknown data-type \"json\"",
+      "3013": "error Unknown: unknown data-type \"json\"",
+      "3014": "error Unknown: unknown data-type \"json\"",
+      "3017": "error Unknown: unknown data-type \"json\"",
+      "3019": "error Unknown: unknown data-type \"json\"",
+      "3021": "error Unknown: unknown data-type \"json\"",
+      "3022": "error Unknown: unknown data-type \"json\"",
+      "3026": "error Unknown: unknown data-type \"json\"",
+      "3028": "error Unknown: unknown data-type \"json\"",
+      "3029": "error Unknown: unknown data-type \"json\"",
+      "3030": "error Unknown: unknown data-type \"json\"",
+      "3031": "error Unknown: unknown data-type \"json\"",
+      "3032": "error Unknown: unknown data-type \"json\"",
+      "3033": "error Unknown: unknown data-type \"json\"",
+      "3034": "error Unknown: unknown data-type \"json\"",
+      "3036": "error Unknown: unknown data-type \"json\"",
+      "3037": "error Unknown: unknown data-type \"json\"",
+      "3041": "error Unknown: unknown data-type \"json\"",
+      "3042": "error Unknown: unknown data-type \"json\"",
+      "3044": "error Unknown: unknown data-type \"json\"",
+      "3045": "error Unknown: unknown data-type \"json\"",
+      "3046": "error Unknown: unknown data-type \"json\"",
+      "3049": "error Unknown: unknown data-type \"json\"",
+      "3050": "error Unknown: unknown data-type \"json\"",
+      "3052": "error Unknown: unknown data-type \"json\"",
+      "3053": "error Unknown: unknown data-type \"json\"",
+      "3056": "error Unknown: unknown data-type \"json\"",
+      "3057": "error Unknown: unknown data-type \"json\"",
+      "3058": "error Unknown: unknown data-type \"json\"",
+      "3059": "error Unknown: unknown data-type \"json\"",
+      "3060": "error Unknown: unknown data-type \"json\"",
+      "3061": "error Unknown: unknown data-type \"json\"",
+      "3063": "error Unknown: unknown data-type \"json\"",
+      "3064": "error Unknown: unknown data-type \"json\"",
+      "3065": "error Unknown: unknown data-type \"json\"",
+      "3066": "error Unknown: unknown data-type \"json\"",
+      "3067": "error Unknown: unknown data-type \"json\"",
+      "3068": "error Unknown: unknown data-type \"json\"",
+      "3069": "error Unknown: unknown data-type \"json\"",
+      "3070": "error Unknown: unknown data-type \"json\"",
+      "3071": "error Unknown: unknown data-type \"json\"",
+      "3072": "error Unknown: unknown data-type \"json\"",
+      "3073": "error Unknown: unknown data-type \"json\"",
+      "3074": "error Unknown: unknown data-type \"json\"",
+      "3076": "error Unknown: unknown data-type \"json\"",
+      "3077": "error Unknown: unknown data-type \"json\"",
+      "3079": "error Unknown: unknown data-type \"json\"",
+      "3080": "error Unknown: unknown data-type \"json\"",
+      "3081": "error Unknown: unknown data-type \"json\"",
+      "3082": "error Unknown: unknown data-type \"json\"",
+      "3083": "error Unknown: unknown data-type \"json\"",
+      "3085": "error Unknown: unknown data-type \"json\"",
+      "3086": "error Unknown: unknown data-type \"json\"",
+      "3087": "error Unknown: unknown data-type \"json\"",
+      "3088": "error Unknown: unknown data-type \"json\"",
+      "3090": "error Unknown: unknown data-type \"json\"",
+      "3091": "error Unknown: unknown data-type \"json\"",
+      "3094": "error Unknown: unknown data-type \"json\"",
+      "3096": "error Unknown: unknown data-type \"json\"",
+      "3097": "error Unknown: unknown data-type \"json\"",
+      "3099": "error Unknown: unknown data-type \"json\"",
+      "3100": "error Unknown: unknown data-type \"json\"",
+      "3101": "error Unknown: unknown data-type \"json\"",
+      "3102": "error Unknown: unknown data-type \"json\"",
+      "3103": "error Unknown: unknown data-type \"json\"",
+      "3104": "error Unknown: unknown data-type \"json\"",
+      "3105": "error Unknown: unknown data-type \"json\"",
+      "3106": "error Unknown: unknown data-type \"json\"",
+      "3107": "error Unknown: unknown data-type \"json\"",
+      "3108": "error Unknown: unknown data-type \"json\"",
+      "3109": "error Unknown: unknown data-type \"json\"",
+      "3110": "error Unknown: unknown data-type \"json\"",
+      "3111": "error Unknown: unknown data-type \"json\"",
+      "3112": "error Unknown: unknown data-type \"json\"",
+      "3116": "error Unknown: unknown data-type \"json\"",
+      "3118": "error Unknown: unknown data-type \"json\"",
+      "3119": "error Unknown: unknown data-type \"json\"",
+      "3121": "error Unknown: unknown data-type \"json\"",
+      "3122": "error Unknown: unknown data-type \"json\"",
+      "3123": "error Unknown: unknown data-type \"json\"",
+      "3125": "error Unknown: unknown data-type \"json\"",
+      "3126": "error Unknown: unknown data-type \"json\"",
+      "3127": "error Unknown: unknown data-type \"json\"",
+      "3128": "error Unknown: unknown data-type \"json\"",
+      "3129": "error Unknown: unknown data-type \"json\"",
+      "3130": "error Unknown: unknown data-type \"json\"",
+      "3133": "error Unknown: unknown data-type \"json\"",
+      "3134": "error Unknown: unknown data-type \"json\"",
+      "3135": "error Unknown: unknown data-type \"json\"",
+      "3136": "error Unknown: unknown data-type \"json\"",
+      "3137": "error Unknown: unknown data-type \"json\"",
+      "3139": "error Unknown: unknown data-type \"json\"",
+      "3140": "error Unknown: unknown data-type \"json\"",
+      "3141": "error Unknown: unknown data-type \"json\"",
+      "3142": "error Unknown: unknown data-type \"json\"",
+      "3144": "error Unknown: unknown data-type \"json\"",
+      "3145": "error Unknown: unknown data-type \"json\"",
+      "3146": "error Unknown: unknown data-type \"json\"",
+      "3147": "error Unknown: unknown data-type \"json\"",
+      "3148": "error Unknown: unknown data-type \"json\"",
+      "3149": "error Unknown: unknown data-type \"json\"",
+      "3150": "error Unknown: unknown data-type \"json\"",
+      "3151": "error Unknown: unknown data-type \"json\"",
+      "3152": "error Unknown: unknown data-type \"json\"",
+      "3155": "error Unknown: unknown data-type \"json\"",
+      "3156": "error Unknown: unknown data-type \"json\"",
+      "3157": "error Unknown: unknown data-type \"json\"",
+      "3159": "error Unknown: unknown data-type \"json\"",
+      "3160": "error Unknown: unknown data-type \"json\"",
+      "3161": "error Unknown: unknown data-type \"json\"",
+      "3162": "error Unknown: unknown data-type \"json\"",
+      "3163": "error Unknown: unknown data-type \"json\"",
+      "3164": "error Unknown: unknown data-type \"json\"",
+      "3165": "error Unknown: unknown data-type \"json\"",
+      "3166": "error Unknown: unknown data-type \"json\"",
+      "3167": "error Unknown: unknown data-type \"json\"",
+      "3168": "error Unknown: unknown data-type \"json\"",
+      "3169": "error Unknown: unknown data-type \"json\"",
+      "3170": "error Unknown: unknown data-type \"json\"",
+      "3172": "error Unknown: unknown data-type \"json\"",
+      "3174": "error Unknown: unknown data-type \"json\"",
+      "3175": "error Unknown: unknown data-type \"json\"",
+      "3176": "error Unknown: unknown data-type \"json\"",
+      "3178": "error Unknown: unknown data-type \"json\"",
+      "3180": "error Unknown: unknown data-type \"json\""
+    }
+  },
+  "request-body-mock": {},
+  "script": {
+    "count": 307,
+    "sha256": "ba886b3d7b811c0d57cb0f232ccbb0302583a9930dc758eda47554ec69927bf2",
+    "errors": {}
+  },
+  "rules": {
+    "count": 1446,
+    "sha256": "e9f1c3323f614da3615a1acc94970830c5204777aba2cb9933f302085a8bd1c5",
+    "errors": {}
+  },
+  "rule-sets": [],
+  "resources": [
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Data/u51.json",
+      "kind": "map-local",
+      "lines": [
+        2262
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Data/cmb.json",
+      "kind": "map-local",
+      "lines": [
+        2442
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Data/mt_aggregate.json",
+      "kind": "map-local",
+      "lines": [
+        2871
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Data/iyunmai.json",
+      "kind": "map-local",
+      "lines": [
+        3143
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Data/qi.json",
+      "kind": "map-local",
+      "lines": [
+        3154
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/weibo.js",
+      "kind": "script",
+      "lines": [
+        3255,
+        3268,
+        3288,
+        3294,
+        3299,
+        3306,
+        3336,
+        3344,
+        3361,
+        3384,
+        3401,
+        3411,
+        3450,
+        3473,
+        3481,
+        3513,
+        3525,
+        3529,
+        3552
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/kkmh.js",
+      "kind": "script",
+      "lines": [
+        3256,
+        3332,
+        3388,
+        3441
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/keep.js",
+      "kind": "script",
+      "lines": [
+        3257,
+        3311,
+        3375,
+        3382,
+        3480
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/soul.js",
+      "kind": "script",
+      "lines": [
+        3258,
+        3274,
+        3295,
+        3296,
+        3342,
+        3397,
+        3433,
+        3501,
+        3503
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/cntv.js",
+      "kind": "script",
+      "lines": [
+        3259,
+        3266,
+        3279,
+        3300,
+        3307,
+        3308,
+        3328,
+        3331,
+        3338,
+        3345,
+        3352,
+        3358,
+        3362,
+        3373,
+        3377,
+        3380,
+        3394,
+        3408,
+        3413,
+        3422,
+        3437,
+        3478,
+        3502,
+        3524,
+        3534,
+        3541
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/cotti.js",
+      "kind": "script",
+      "lines": [
+        3260
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/qmai.js",
+      "kind": "script",
+      "lines": [
+        3261
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/goofish.js",
+      "kind": "script",
+      "lines": [
+        3262,
+        3297,
+        3305
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/xmly.js",
+      "kind": "script",
+      "lines": [
+        3263,
+        3340,
+        3369,
+        3392,
+        3396
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/didi.js",
+      "kind": "script",
+      "lines": [
+        3264,
+        3277,
+        3374,
+        3494
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/wechatApplet.js",
+      "kind": "script",
+      "lines": [
+        3265,
+        3270,
+        3303,
+        3304,
+        3313,
+        3343,
+        3348,
+        3410,
+        3439
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/sqkb.js",
+      "kind": "script",
+      "lines": [
+        3267,
+        3551
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/umetrip.js",
+      "kind": "script",
+      "lines": [
+        3269
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/dushu365.js",
+      "kind": "script",
+      "lines": [
+        3271,
+        3272,
+        3395,
+        3432,
+        3484,
+        3495,
+        3516,
+        3517,
+        3553
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/adrive.js",
+      "kind": "script",
+      "lines": [
+        3273,
+        3454
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/smzdm.js",
+      "kind": "script",
+      "lines": [
+        3275,
+        3286,
+        3317,
+        3320,
+        3370,
+        3427,
+        3453,
+        3465,
+        3554
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/taobao.js",
+      "kind": "script",
+      "lines": [
+        3276,
+        3500
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/163news.js",
+      "kind": "script",
+      "lines": [
+        3278,
+        3400,
+        3470
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/xiaohongshu.js",
+      "kind": "script",
+      "lines": [
+        3280,
+        3283,
+        3290,
+        3293,
+        3314,
+        3393,
+        3426,
+        3455,
+        3485,
+        3546,
+        3549
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/coolapk.js",
+      "kind": "script",
+      "lines": [
+        3281,
+        3479,
+        3507
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/bilibiliJson.js",
+      "kind": "script",
+      "lines": [
+        3282,
+        3284,
+        3346,
+        3367,
+        3381,
+        3512,
+        3540
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/zhihu.js",
+      "kind": "script",
+      "lines": [
+        3285,
+        3440,
+        3449,
+        3451,
+        3472,
+        3520,
+        3544,
+        3561
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/ddxq.js",
+      "kind": "script",
+      "lines": [
+        3287,
+        3326,
+        3530
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/zsgj.js",
+      "kind": "script",
+      "lines": [
+        3289
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/xiaoheihe.js",
+      "kind": "script",
+      "lines": [
+        3291
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/dianping.js",
+      "kind": "script",
+      "lines": [
+        3292,
+        3416
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/mgw.js",
+      "kind": "script",
+      "lines": [
+        3298,
+        3319,
+        3372,
+        3510,
+        3521,
+        3532
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/rrtv.js",
+      "kind": "script",
+      "lines": [
+        3301,
+        3318,
+        3359,
+        3364,
+        3379,
+        3467,
+        3471,
+        3514,
+        3550
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/163music.js",
+      "kind": "script",
+      "lines": [
+        3302,
+        3337,
+        3425,
+        3447,
+        3461,
+        3486,
+        3509
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/tflj.js",
+      "kind": "script",
+      "lines": [
+        3309,
+        3515
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/blued.js",
+      "kind": "script",
+      "lines": [
+        3310
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/picc.js",
+      "kind": "script",
+      "lines": [
+        3312,
+        3366
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/javdb.js",
+      "kind": "script",
+      "lines": [
+        3315
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/abc.js",
+      "kind": "script",
+      "lines": [
+        3316,
+        3527
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/airchina.js",
+      "kind": "script",
+      "lines": [
+        3321
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/xmgtv.js",
+      "kind": "script",
+      "lines": [
+        3322
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/amap.js",
+      "kind": "script",
+      "lines": [
+        3323,
+        3431,
+        3468,
+        3483,
+        3487,
+        3492,
+        3499,
+        3504,
+        3505,
+        3506,
+        3511,
+        3519,
+        3535,
+        3538
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/babytree.js",
+      "kind": "script",
+      "lines": [
+        3324
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/Unlock/kuwo.js",
+      "kind": "script",
+      "lines": [
+        3325,
+        3334,
+        3391,
+        3436,
+        3444
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/tiebaJson.js",
+      "kind": "script",
+      "lines": [
+        3327,
+        3429,
+        3443
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/mafengwo.js",
+      "kind": "script",
+      "lines": [
+        3329
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/bilibiliManga.js",
+      "kind": "script",
+      "lines": [
+        3330,
+        3371,
+        3406,
+        3475
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/gaoding.js",
+      "kind": "script",
+      "lines": [
+        3333,
+        3423
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/pdd.js",
+      "kind": "script",
+      "lines": [
+        3335,
+        3497
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/qidian.js",
+      "kind": "script",
+      "lines": [
+        3339
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/adsense.js",
+      "kind": "script",
+      "lines": [
+        3341,
+        3353,
+        3417,
+        3418
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/freshippo.js",
+      "kind": "script",
+      "lines": [
+        3347,
+        3562
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/xunlei.js",
+      "kind": "script",
+      "lines": [
+        3349
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/bilibiliProtoA.js",
+      "kind": "script",
+      "lines": [
+        3350,
+        3363,
+        3435,
+        3462,
+        3482,
+        3531
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/cainiao.js",
+      "kind": "script",
+      "lines": [
+        3351,
+        3434
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/quark.js",
+      "kind": "script",
+      "lines": [
+        3354
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/zhuanzhuan.js",
+      "kind": "script",
+      "lines": [
+        3355,
+        3360
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/baiduMap.js",
+      "kind": "script",
+      "lines": [
+        3356
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/haier.js",
+      "kind": "script",
+      "lines": [
+        3357,
+        3476
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/manner.js",
+      "kind": "script",
+      "lines": [
+        3365
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/chaoge.js",
+      "kind": "script",
+      "lines": [
+        3368,
+        3385
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/sptcc.js",
+      "kind": "script",
+      "lines": [
+        3376
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/juneyaoair.js",
+      "kind": "script",
+      "lines": [
+        3383
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/txnews.js",
+      "kind": "script",
+      "lines": [
+        3386
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/Plugins/Wechat_Unblock_URL.js",
+      "kind": "script",
+      "lines": [
+        3387
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/peiyinxiu.js",
+      "kind": "script",
+      "lines": [
+        3389,
+        3414,
+        3424,
+        3457,
+        3560
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/jd.js",
+      "kind": "script",
+      "lines": [
+        3390
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/meituan.js",
+      "kind": "script",
+      "lines": [
+        3398
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/ecitic.js",
+      "kind": "script",
+      "lines": [
+        3399
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/mcloud.js",
+      "kind": "script",
+      "lines": [
+        3402
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/reddit.js",
+      "kind": "script",
+      "lines": [
+        3403
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/spdbccc.js",
+      "kind": "script",
+      "lines": [
+        3404
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/boohee.js",
+      "kind": "script",
+      "lines": [
+        3405,
+        3442,
+        3493,
+        3558
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/360cam.js",
+      "kind": "script",
+      "lines": [
+        3407
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/fliggy.js",
+      "kind": "script",
+      "lines": [
+        3409,
+        3542
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/ltsst.js",
+      "kind": "script",
+      "lines": [
+        3412
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/alicdn.js",
+      "kind": "script",
+      "lines": [
+        3415
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/cmbcc.js",
+      "kind": "script",
+      "lines": [
+        3419,
+        3421
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/ppx.js",
+      "kind": "script",
+      "lines": [
+        3420,
+        3456
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/douyu.js",
+      "kind": "script",
+      "lines": [
+        3428,
+        3445,
+        3452
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/Unlock/bybutter.js",
+      "kind": "script",
+      "lines": [
+        3430
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/quda.js",
+      "kind": "script",
+      "lines": [
+        3438
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/maimai.js",
+      "kind": "script",
+      "lines": [
+        3446
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/Unlock/meitu.js",
+      "kind": "script",
+      "lines": [
+        3448
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/foliday.js",
+      "kind": "script",
+      "lines": [
+        3458
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/tuhu.js",
+      "kind": "script",
+      "lines": [
+        3459,
+        3548,
+        3559
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/sdb.js",
+      "kind": "script",
+      "lines": [
+        3460
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/baiduPan.js",
+      "kind": "script",
+      "lines": [
+        3463,
+        3556
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/spotify.js",
+      "kind": "script",
+      "lines": [
+        3464
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/163youdao.js",
+      "kind": "script",
+      "lines": [
+        3466
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/NobyDa/Script/master/Bahamut/BahamutAnimeAds.js",
+      "kind": "script",
+      "lines": [
+        3469
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/ys7.js",
+      "kind": "script",
+      "lines": [
+        3474
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/flyert.js",
+      "kind": "script",
+      "lines": [
+        3477
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/wjx.js",
+      "kind": "script",
+      "lines": [
+        3488
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/guiderank.js",
+      "kind": "script",
+      "lines": [
+        3489
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/mishop.js",
+      "kind": "script",
+      "lines": [
+        3490
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/qbb.js",
+      "kind": "script",
+      "lines": [
+        3491
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/sougou.js",
+      "kind": "script",
+      "lines": [
+        3496
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/51cto.js",
+      "kind": "script",
+      "lines": [
+        3498
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/tiebaProto.js",
+      "kind": "script",
+      "lines": [
+        3508
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/mdb.js",
+      "kind": "script",
+      "lines": [
+        3518
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/meituanwm.js",
+      "kind": "script",
+      "lines": [
+        3522,
+        3555
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/amdc.js",
+      "kind": "script",
+      "lines": [
+        3523
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/ithome.js",
+      "kind": "script",
+      "lines": [
+        3526
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/youtube.js",
+      "kind": "script",
+      "lines": [
+        3528
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/eleme.js",
+      "kind": "script",
+      "lines": [
+        3533
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/duitang.js",
+      "kind": "script",
+      "lines": [
+        3536
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/51job.js",
+      "kind": "script",
+      "lines": [
+        3537,
+        3543
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/yunda.js",
+      "kind": "script",
+      "lines": [
+        3539
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/usmile.js",
+      "kind": "script",
+      "lines": [
+        3545
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/ccblife.js",
+      "kind": "script",
+      "lines": [
+        3547
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/ccbHome.js",
+      "kind": "script",
+      "lines": [
+        3557
+      ]
+    }
+  ],
+  "network": {},
+  "declared-scripts": [
+    3255,
+    3256,
+    3257,
+    3258,
+    3259,
+    3260,
+    3261,
+    3262,
+    3263,
+    3264,
+    3265,
+    3266,
+    3267,
+    3268,
+    3269,
+    3270,
+    3271,
+    3272,
+    3273,
+    3274,
+    3275,
+    3276,
+    3277,
+    3278,
+    3279,
+    3280,
+    3281,
+    3282,
+    3283,
+    3284,
+    3285,
+    3286,
+    3287,
+    3288,
+    3289,
+    3290,
+    3291,
+    3292,
+    3293,
+    3294,
+    3295,
+    3296,
+    3297,
+    3298,
+    3299,
+    3300,
+    3301,
+    3302,
+    3303,
+    3304,
+    3305,
+    3306,
+    3307,
+    3308,
+    3309,
+    3310,
+    3311,
+    3312,
+    3313,
+    3314,
+    3315,
+    3316,
+    3317,
+    3318,
+    3319,
+    3320,
+    3321,
+    3322,
+    3323,
+    3324,
+    3325,
+    3326,
+    3327,
+    3328,
+    3329,
+    3330,
+    3331,
+    3332,
+    3333,
+    3334,
+    3335,
+    3336,
+    3337,
+    3338,
+    3339,
+    3340,
+    3341,
+    3342,
+    3343,
+    3344,
+    3345,
+    3346,
+    3347,
+    3348,
+    3349,
+    3350,
+    3351,
+    3352,
+    3353,
+    3354,
+    3355,
+    3356,
+    3357,
+    3358,
+    3359,
+    3360,
+    3361,
+    3362,
+    3363,
+    3364,
+    3365,
+    3366,
+    3367,
+    3368,
+    3369,
+    3370,
+    3371,
+    3372,
+    3373,
+    3374,
+    3375,
+    3376,
+    3377,
+    3379,
+    3380,
+    3381,
+    3382,
+    3383,
+    3384,
+    3385,
+    3386,
+    3387,
+    3388,
+    3389,
+    3390,
+    3391,
+    3392,
+    3393,
+    3394,
+    3395,
+    3396,
+    3397,
+    3398,
+    3399,
+    3400,
+    3401,
+    3402,
+    3403,
+    3404,
+    3405,
+    3406,
+    3407,
+    3408,
+    3409,
+    3410,
+    3411,
+    3412,
+    3413,
+    3414,
+    3415,
+    3416,
+    3417,
+    3418,
+    3419,
+    3420,
+    3421,
+    3422,
+    3423,
+    3424,
+    3425,
+    3426,
+    3427,
+    3428,
+    3429,
+    3430,
+    3431,
+    3432,
+    3433,
+    3434,
+    3435,
+    3436,
+    3437,
+    3438,
+    3439,
+    3440,
+    3441,
+    3442,
+    3443,
+    3444,
+    3445,
+    3446,
+    3447,
+    3448,
+    3449,
+    3450,
+    3451,
+    3452,
+    3453,
+    3454,
+    3455,
+    3456,
+    3457,
+    3458,
+    3459,
+    3460,
+    3461,
+    3462,
+    3463,
+    3464,
+    3465,
+    3466,
+    3467,
+    3468,
+    3469,
+    3470,
+    3471,
+    3472,
+    3473,
+    3474,
+    3475,
+    3476,
+    3477,
+    3478,
+    3479,
+    3480,
+    3481,
+    3482,
+    3483,
+    3484,
+    3485,
+    3486,
+    3487,
+    3488,
+    3489,
+    3490,
+    3491,
+    3492,
+    3493,
+    3494,
+    3495,
+    3496,
+    3497,
+    3498,
+    3499,
+    3500,
+    3501,
+    3502,
+    3503,
+    3504,
+    3505,
+    3506,
+    3507,
+    3508,
+    3509,
+    3510,
+    3511,
+    3512,
+    3513,
+    3514,
+    3515,
+    3516,
+    3517,
+    3518,
+    3519,
+    3520,
+    3521,
+    3522,
+    3523,
+    3524,
+    3525,
+    3526,
+    3527,
+    3528,
+    3529,
+    3530,
+    3531,
+    3532,
+    3533,
+    3534,
+    3535,
+    3536,
+    3537,
+    3538,
+    3539,
+    3540,
+    3541,
+    3542,
+    3543,
+    3544,
+    3545,
+    3546,
+    3547,
+    3548,
+    3549,
+    3550,
+    3551,
+    3552,
+    3553,
+    3554,
+    3555,
+    3556,
+    3557,
+    3558,
+    3559,
+    3560,
+    3561,
+    3562
+  ],
+  "ignored": []
+}

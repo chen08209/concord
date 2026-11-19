@@ -4,6 +4,7 @@
 mod heads;
 mod hosts;
 mod issue;
+pub mod module;
 mod pattern;
 mod rules;
 mod script;
@@ -176,7 +177,7 @@ fn each_line<T>(lines: &[String], read: impl Fn(&str) -> T) -> Vec<MitmLine<T>> 
 }
 
 /// A line's bad items as one error, of the first item's kind.
-fn host_items(line: &str) -> Items<HostEntryDef> {
+pub(crate) fn host_items(line: &str) -> Items<HostEntryDef> {
     let (items, errors) = parse_host_line(line);
     let error = errors.first().map(|first| {
         let message = errors
@@ -189,7 +190,7 @@ fn host_items(line: &str) -> Items<HostEntryDef> {
     Items { items, error }
 }
 
-fn source_items(line: &str) -> Items<SourceEntryDef> {
+pub(crate) fn source_items(line: &str) -> Items<SourceEntryDef> {
     let (items, error) = parse_source_line(line);
     Items { items, error }
 }

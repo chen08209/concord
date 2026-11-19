@@ -1,0 +1,114 @@
+{
+  "format": "surge",
+  "meta": {
+    "name": "BiliBiliAds",
+    "desc": "BiliBiliAds",
+    "author": null,
+    "icon": "icon not found",
+    "homepage": null,
+    "category": "ddgksf2013",
+    "system": null,
+    "requirement": null,
+    "argumentsDesc": null
+  },
+  "off": null,
+  "arguments": [],
+  "hostname": [
+    {
+      "line": 87,
+      "items": "-broadcast.chat.bilibili.com, -cm.bilibili.com, -*cdn*.biliapi.net, -*tracker*.biliapi.net, app.bilibili.com, api.live.bilibili.com, *.bilibili.com, *.bili*.*, *.bilibili.*, grpc.biliapi.net, *biliapi.net"
+    }
+  ],
+  "force-http-hostname": [],
+  "skip-server-cert-verify": null,
+  "client-source-address": [],
+  "h2": null,
+  "url-rewrite": {},
+  "header-rewrite": {},
+  "body-rewrite": {},
+  "map-local": {
+    "8": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/bilibili.2025.04.02/c136\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \" \", status: 200, header: {}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "11": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/api\\\\.bilibili\\\\.com\\\\/pgc\\\\/activity\\\\/deliver\\\\/material\\\\/receive\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{}\", status: 200, header: {\"content-type\": \"application/json\"}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "14": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/api\\\\.bilibili\\\\.com\\\\/x\\\\/vip\\\\/ads\\\\/material\\\\/report\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{}\", status: 200, header: {\"content-type\": \"application/json\"}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "17": "MapLocalDef { pattern: \"^https://api.bilibili.com/pgc/season/player/cards\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{}\", status: 200, header: {\"content-type\": \"application/json\"}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "20": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/api\\\\.bilibili\\\\.com\\\\/pgc\\\\/season\\\\/player\\\\/ogv\\\\/cards\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{}\", status: 200, header: {\"content-type\": \"application/json\"}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "23": "MapLocalDef { pattern: \"^https://app.bilibili.com/x/v2/splash/show\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{}\", status: 200, header: {\"content-type\": \"application/json\"}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "26": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/manga\\\\.bilibili\\\\.com\\\\/twirp\\\\/comic\\\\.v\\\\d\\\\.Comic\\\\/(Flash|ListFlash|GetActivityTab)\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{}\", status: 200, header: {\"content-type\": \"application/json\"}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "29": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/app\\\\.bilibili\\\\.com\\\\/x\\\\/v\\\\d\\\\/search\\\\/defaultwords\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{}\", status: 200, header: {\"content-type\": \"application/json\"}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "32": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/(app\\\\.bilibili\\\\.com|grpc\\\\.biliapi\\\\.net)\\\\/bilibili\\\\.app\\\\.interface\\\\.v1\\\\.Search\\\\/Default\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \" \", status: 200, header: {}, content_type: \"text/plain; charset=utf-8\", request: false }"
+  },
+  "request-body-mock": {},
+  "script": {
+    "36": "ScriptDef { name: \"bilibili.ads\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/BiliBiliAds/ddgksf2013_bilibili.ads.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/api\\\\.bili(api|bili)\\\\.(net|com)\\\\/pgc\\\\/season\\\\/app\\\\/related\\\\/recommend\\\\?\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(60.0), argument: None }",
+    "39": "ScriptDef { name: \"bilibili.ads\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/BiliBiliAds/ddgksf2013_bilibili.ads.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/api\\\\.live\\\\.bilibili\\\\.com\\\\/xlive\\\\/e-commerce-interface\\\\/v\\\\d\\\\/ecommerce-user\\\\/get_shopping_info\\\\?\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(60.0), argument: None }",
+    "42": "ScriptDef { name: \"bilibili.ads\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/BiliBiliAds/ddgksf2013_bilibili.ads.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/api\\\\.live\\\\.bilibili\\\\.com\\\\/xlive\\\\/app-room\\\\/v1\\\\/index\\\\/getInfoByRoom\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(60.0), argument: None }",
+    "45": "ScriptDef { name: \"bilibili.ads\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/BiliBiliAds/ddgksf2013_bilibili.ads.js\", kind: HttpResponse, pattern: Some(\"^https:\\\\/\\\\/app\\\\.bilibili\\\\.com\\\\/x\\\\/v2\\\\/splash\\\\/list\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(60.0), argument: None }",
+    "48": "ScriptDef { name: \"bilibili.ads\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/BiliBiliAds/ddgksf2013_bilibili.ads.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/api\\\\.live\\\\.bilibili\\\\.com\\\\/xlive\\\\/app-interface\\\\/v2\\\\/index\\\\/feed\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(60.0), argument: None }",
+    "51": "ScriptDef { name: \"bilibili.ads\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/BiliBiliAds/ddgksf2013_bilibili.ads.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/app\\\\.bilibili\\\\.com\\\\/x\\\\/v2\\\\/feed\\\\/index\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(60.0), argument: None }",
+    "54": "ScriptDef { name: \"bilibili.ads\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/BiliBiliAds/ddgksf2013_bilibili.ads.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/api\\\\.(bilibili|biliapi)\\\\.(com|net)\\\\/pgc\\\\/page\\\\/bangumi\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(60.0), argument: None }",
+    "57": "ScriptDef { name: \"bilibili.ads\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/BiliBiliAds/ddgksf2013_bilibili.ads.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/api\\\\.(bilibili|biliapi)\\\\.(com|net)\\\\/pgc\\\\/page\\\\/cinema\\\\/tab\\\\?\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(60.0), argument: None }",
+    "60": "ScriptDef { name: \"bilibili.ads\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/BiliBiliAds/ddgksf2013_bilibili.ads.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/app\\\\.bilibili\\\\.com\\\\/x\\\\/resource\\\\/show\\\\/tab\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(60.0), argument: None }",
+    "63": "ScriptDef { name: \"bilibili.ads\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/BiliBiliAds/ddgksf2013_bilibili.ads.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/app\\\\.bilibili\\\\.com\\\\/x\\\\/v2\\\\/account\\\\/mine\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(60.0), argument: None }",
+    "66": "ScriptDef { name: \"bilibili.ads\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/BiliBiliAds/ddgksf2013_bilibili.ads.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/app\\\\.bilibili\\\\.com\\\\/x\\\\/resource\\\\/top\\\\/activity\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(60.0), argument: None }",
+    "69": "ScriptDef { name: \"bilibili.ads\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/BiliBiliAds/ddgksf2013_bilibili.ads.js\", kind: HttpResponse, pattern: Some(\"^https://app.bilibili.com/x/v2/search/square\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(60.0), argument: None }",
+    "72": "ScriptDef { name: \"response.bundle\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/BiliBiliAds/BiliUniverse_response.bundle.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/(grpc\\\\.biliapi\\\\.net|app\\\\.bilibili\\\\.com)\\\\/bilibili\\\\.polymer\\\\.app\\\\.search\\\\.v1\\\\.Search\\\\/SearchAll$\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: true, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(60.0), argument: None }",
+    "75": "ScriptDef { name: \"response.bundle\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/BiliBiliAds/BiliUniverse_response.bundle.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/(app\\\\.bilibili\\\\.com|grpc\\\\.biliapi\\\\.net)\\\\/bilibili\\\\.community\\\\.service\\\\.dm\\\\.v1\\\\.DM\\\\/(DmView|DmSegMobile)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: true, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(60.0), argument: None }",
+    "78": "ScriptDef { name: \"response.bundle\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/BiliBiliAds/BiliUniverse_response.bundle.js\", kind: HttpResponse, pattern: Some(\"^https:\\\\/\\\\/(grpc\\\\.biliapi\\\\.net|app\\\\.bilibili\\\\.com)\\\\/bilibili\\\\.app\\\\.interface\\\\.v1\\\\.Teenagers\\\\/ModeStatus\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: true, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(60.0), argument: None }",
+    "81": "ScriptDef { name: \"response.bundle\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/BiliBiliAds/BiliUniverse_response.bundle.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/(app\\\\.bilibili\\\\.com|grpc\\\\.biliapi\\\\.net)\\\\/bilibili\\\\.app\\\\.(view|viewunite)\\\\.v1\\\\.View\\\\/(View|TFInfo)$\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: true, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(60.0), argument: None }",
+    "84": "ScriptDef { name: \"response.bundle\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/BiliBiliAds/BiliUniverse_response.bundle.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/(app\\\\.bilibili\\\\.com|grpc\\\\.biliapi\\\\.net)\\\\/bilibili\\\\.app\\\\.dynamic\\\\.v2\\\\.Dynamic\\\\/Dyn(All|Video)$\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: true, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(60.0), argument: None }"
+  },
+  "rules": {},
+  "rule-sets": [],
+  "resources": [
+    {
+      "url": "https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/BiliBiliAds/ddgksf2013_bilibili.ads.js",
+      "kind": "script",
+      "lines": [
+        36,
+        39,
+        42,
+        45,
+        48,
+        51,
+        54,
+        57,
+        60,
+        63,
+        66,
+        69
+      ]
+    },
+    {
+      "url": "https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/BiliBiliAds/BiliUniverse_response.bundle.js",
+      "kind": "script",
+      "lines": [
+        72,
+        75,
+        78,
+        81,
+        84
+      ]
+    }
+  ],
+  "network": {},
+  "declared-scripts": [
+    36,
+    39,
+    42,
+    45,
+    48,
+    51,
+    54,
+    57,
+    60,
+    63,
+    66,
+    69,
+    72,
+    75,
+    78,
+    81,
+    84
+  ],
+  "ignored": []
+}

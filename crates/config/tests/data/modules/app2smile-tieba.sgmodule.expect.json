@@ -1,0 +1,81 @@
+{
+  "format": "surge",
+  "meta": {
+    "name": "贴吧去广告(>=iOS15)",
+    "desc": "260106;开屏广告;推荐和吧内帖子列表的直播及广告;详情页直播/关联商品/广告;看图模式广告;首页和帖子详情页右下角悬浮广告;部分吧内的置顶/最新中间的广告/head图片广告/head直播",
+    "author": null,
+    "icon": null,
+    "homepage": null,
+    "category": null,
+    "system": null,
+    "requirement": null,
+    "argumentsDesc": "per_filter_video:设置为1则推荐页不展示视频贴"
+  },
+  "off": null,
+  "arguments": [
+    {
+      "name": "per_filter_video",
+      "kind": {
+        "type": "text"
+      },
+      "number": false,
+      "default": "0",
+      "line": 3
+    }
+  ],
+  "hostname": [
+    {
+      "line": 11,
+      "items": "tiebac.baidu.com"
+    }
+  ],
+  "force-http-hostname": [],
+  "skip-server-cert-verify": null,
+  "client-source-address": [],
+  "h2": null,
+  "url-rewrite": {},
+  "header-rewrite": {},
+  "body-rewrite": {},
+  "map-local": {},
+  "request-body-mock": {},
+  "script": {
+    "14": "ScriptDef { name: \"贴吧json\", path: \"https://raw.githubusercontent.com/app2smile/rules/master/js/tieba-json.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/(tiebac|c\\\\.tieba)\\\\.baidu\\\\.com\\\\/(c\\\\/(s\\\\/sync|f\\\\/(ad\\\\/getSplashAd|frs\\\\/(page|threadlist|generalTabList)|pb\\\\/(pic)?page|excellent\\\\/personalized))$|tiebaads\\\\/commonbatch\\\\?)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "15": "ScriptDef { name: \"贴吧proto\", path: \"https://raw.githubusercontent.com/app2smile/rules/master/js/tieba-proto.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/(tiebac|c\\\\.tieba)\\\\.baidu\\\\.com\\\\/c\\\\/(b\\\\/ad\\\\/adBid|f\\\\/(frs\\\\/(page|threadlist|generalTabList)|ad\\\\/getFeedAd|pb\\\\/page|excellent\\\\/personalized))\\\\?cmd\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: true, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: Some(String(\"per_filter_video_thread=0\")) }"
+  },
+  "rules": {
+    "8": "RULE-SET,mitm-25165ec904b1 => REJECT-DROP"
+  },
+  "rule-sets": [
+    {
+      "name": "mitm-25165ec904b1",
+      "domain": false,
+      "source": {
+        "type": "url",
+        "url": "https://raw.githubusercontent.com/app2smile/rules/master/rule/tieba-ad.list",
+        "interval": null
+      }
+    }
+  ],
+  "resources": [
+    {
+      "url": "https://raw.githubusercontent.com/app2smile/rules/master/js/tieba-json.js",
+      "kind": "script",
+      "lines": [
+        14
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/app2smile/rules/master/js/tieba-proto.js",
+      "kind": "script",
+      "lines": [
+        15
+      ]
+    }
+  ],
+  "network": {},
+  "declared-scripts": [
+    14,
+    15
+  ],
+  "ignored": []
+}

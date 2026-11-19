@@ -190,7 +190,7 @@ impl ScriptDef {
 
 /// A line with a type parameter is Surge's form, so that a name may start with
 /// a type; any other is Loon's legacy one.
-fn split_script_line(line: &str) -> Result<(String, String, Params), LineError> {
+pub(crate) fn split_script_line(line: &str) -> Result<(String, String, Params), LineError> {
     let (name, rest) = match line.split_once('=') {
         Some((name, rest)) => (Some(name), Some(rest)),
         None => (None, None),

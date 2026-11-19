@@ -52,6 +52,16 @@ impl MitmService {
         Err(unavailable())
     }
 
+    pub fn read_module(
+        &self,
+        _text: &str,
+        _arguments: &std::collections::BTreeMap<String, String>,
+        _attachments: &std::collections::BTreeMap<String, String>,
+        _language: String,
+    ) -> Result<Value, Failure> {
+        Err(unavailable())
+    }
+
     pub async fn run_script(&self, _name: &str) -> Result<Value, Failure> {
         Err(unavailable())
     }

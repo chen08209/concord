@@ -1,0 +1,97 @@
+[
+  {
+    "name": "romeo-Bilibili_remove_ads.sgmodule",
+    "url": "https://raw.githubusercontent.com/ifflagged/Romeo/5685038ec50b505d6d24691b01b5ae8ca05a6142/Modules/Surge/Kelee/Bilibili_remove_ads.sgmodule",
+    "sha256": "016c30294c6139ba96ca8c573d7c4787ab6959c90e5b878324cb614aa7e2eb42"
+  },
+  {
+    "name": "romeo-Remove_ads_by_keli.sgmodule",
+    "url": "https://raw.githubusercontent.com/ifflagged/Romeo/5685038ec50b505d6d24691b01b5ae8ca05a6142/Modules/Surge/Kelee/Remove_ads_by_keli.sgmodule",
+    "sha256": "7377f47b729f5c06e9bdf949ae758b72ace8f23d3633aef3c3dce69790373400"
+  },
+  {
+    "name": "romeo-YouTube_remove_ads.sgmodule",
+    "url": "https://raw.githubusercontent.com/ifflagged/Romeo/5685038ec50b505d6d24691b01b5ae8ca05a6142/Modules/Surge/Kelee/YouTube_remove_ads.sgmodule",
+    "sha256": "8506728f5872fc7e3121b4586ae6f4b1a5fc52854b6912c7c63d62b93bb78ba1"
+  },
+  {
+    "name": "romeo-Adblock4limbo.sgmodule",
+    "url": "https://raw.githubusercontent.com/ifflagged/Romeo/5685038ec50b505d6d24691b01b5ae8ca05a6142/Modules/Surge/ddgksf2013/Adblock4limbo.sgmodule",
+    "sha256": "8d8d30e3c5fbf99d1632b5a8623a4c8efcf15f7b00c9d3d958cff969d55d0d9e"
+  },
+  {
+    "name": "romeo-AmapAds.sgmodule",
+    "url": "https://raw.githubusercontent.com/ifflagged/Romeo/5685038ec50b505d6d24691b01b5ae8ca05a6142/Modules/Surge/ddgksf2013/AmapAds.sgmodule",
+    "sha256": "ea860d81e96fe49399b49f2275c8bd42785c09eb788d54e60fd36907e37e75a5"
+  },
+  {
+    "name": "romeo-BiliBiliAds.sgmodule",
+    "url": "https://raw.githubusercontent.com/ifflagged/Romeo/5685038ec50b505d6d24691b01b5ae8ca05a6142/Modules/Surge/ddgksf2013/BiliBiliAds.sgmodule",
+    "sha256": "cf9348e3191bd1de3053765e7d0018b52faced0ca3ccdd2f66fde1673bc8a17b"
+  },
+  {
+    "name": "romeo-Applet.sgmodule",
+    "url": "https://raw.githubusercontent.com/ifflagged/Romeo/5685038ec50b505d6d24691b01b5ae8ca05a6142/Modules/Surge/ddgksf2013/Applet.sgmodule",
+    "sha256": "f053c2e3799a19447ff331042cf0821143f8cf029b1bc3ddb81f0e8779d23089"
+  },
+  {
+    "name": "romeo-Didichuxing.sgmodule",
+    "url": "https://raw.githubusercontent.com/ifflagged/Romeo/5685038ec50b505d6d24691b01b5ae8ca05a6142/Modules/Surge/ddgksf2013/Didichuxing.sgmodule",
+    "sha256": "2ac709d4226251957e699d1b0b29f89398f44adfae36cc630eec9a9f084e0e8b"
+  },
+  {
+    "name": "romeo-DualSubs.YouTube.sgmodule",
+    "url": "https://raw.githubusercontent.com/ifflagged/Romeo/5685038ec50b505d6d24691b01b5ae8ca05a6142/Modules/Surge/ddgksf2013/DualSubs.YouTube.sgmodule",
+    "sha256": "07c48c15efeaee3034f2cee10e858393d2b48dbe2f2a7a0a18b370844cc222e0"
+  },
+  {
+    "name": "romeo-BilibiliAutoRegion.sgmodule",
+    "url": "https://raw.githubusercontent.com/ifflagged/Romeo/5685038ec50b505d6d24691b01b5ae8ca05a6142/Modules/Surge/ddgksf2013/BilibiliAutoRegion.sgmodule",
+    "sha256": "5710706759ac0aa53baad52fccf6aca5981937401afaaec889e2a8b629bff56f"
+  },
+  {
+    "name": "romeo-Beta-BiliBili.Surge.Vip.sgmodule",
+    "url": "https://raw.githubusercontent.com/ifflagged/Romeo/5685038ec50b505d6d24691b01b5ae8ca05a6142/Modules/Surge/ddgksf2013/Beta/BiliBili.Surge.Vip.sgmodule",
+    "sha256": "7a8086ee4dc4da1e844e451ef35501c1d3822bd4e0816ea495b469b8014f91a2"
+  },
+  {
+    "name": "romeo-myblockads.sgmodule",
+    "url": "https://raw.githubusercontent.com/ifflagged/Romeo/5685038ec50b505d6d24691b01b5ae8ca05a6142/Modules/Surge/rucu6/myblockads.sgmodule",
+    "sha256": "68d97ab5ec2655b2d74ce81b418b132c7f42d0fc18b74cfc08d0071603399acf"
+  },
+  {
+    "name": "romeo-bilibili.sgmodule",
+    "url": "https://raw.githubusercontent.com/ifflagged/Romeo/5685038ec50b505d6d24691b01b5ae8ca05a6142/Modules/Surge/rucu6/bilibili.sgmodule",
+    "sha256": "6d8fa3e04734787d3cac45308112fdbeba12aa2ebf6ee7e00ae74ed135c70f47"
+  },
+  {
+    "name": "romeo-Beta-myblockads.sgmodule",
+    "url": "https://raw.githubusercontent.com/ifflagged/Romeo/5685038ec50b505d6d24691b01b5ae8ca05a6142/Modules/Surge/rucu6/Beta/myblockads.sgmodule",
+    "sha256": "81dab87d534e7e744d536632ccc5e6b63ffdfd7e2961f43fdd9e412f59969945"
+  },
+  {
+    "name": "keywos-noAdrule.sgmodule",
+    "url": "https://raw.githubusercontent.com/Keywos/rule/a06d921d370ad6fca9e972a3f76e64d90bc8cfae/module/noAdrule.sgmodule",
+    "sha256": "68b4cdd00870dc7ec6b8d51ea3bd0772b89a1998139109f80c300de909c8a950"
+  },
+  {
+    "name": "keywos-bilibili.sgmodule",
+    "url": "https://raw.githubusercontent.com/Keywos/rule/a06d921d370ad6fca9e972a3f76e64d90bc8cfae/module/bilibili.sgmodule",
+    "sha256": "98dc10f9c09f99f2e91bf97e548b9eef25d6eb64f9d6f5279c855a340adcf8f6"
+  },
+  {
+    "name": "keywos-Sub-Store-Mock--.sgmodule",
+    "url": "https://raw.githubusercontent.com/Keywos/rule/a06d921d370ad6fca9e972a3f76e64d90bc8cfae/module/Sub-Store-Mock--.sgmodule",
+    "sha256": "b5f1bfa5c7f2eaa13a164c7be572581b36ecae011416d34bb5040cb3db6d23e6"
+  },
+  {
+    "name": "keywos-GroupAuto.sgmodule",
+    "url": "https://raw.githubusercontent.com/Keywos/rule/a06d921d370ad6fca9e972a3f76e64d90bc8cfae/module/GroupAuto.sgmodule",
+    "sha256": "b49b06588564f1771085f37e7b04761978d0119b5d5661f468ab4f25f4b346af"
+  },
+  {
+    "name": "bm7-TikTokJP.sgmodule",
+    "url": "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/0b6897dc17e0c513d25449c935a9694818e32f0c/external/Shadowrocket/TikTokUnlock/TikTokJP/TikTokJP.sgmodule",
+    "sha256": "17189ac97945ce304ee767e19a7f78ebf3f2cc4df65015c55d2e43fcb8b29f85"
+  }
+]

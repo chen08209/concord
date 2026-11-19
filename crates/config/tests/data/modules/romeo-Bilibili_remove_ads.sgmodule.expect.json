@@ -1,0 +1,90 @@
+{
+  "format": "surge",
+  "meta": {
+    "name": "哔哩哔哩去广告",
+    "desc": "过滤哔哩哔哩广告、移除青少年模式弹窗和交互式弹幕、移除无用功能和链接跟踪参数，增加空降助手以便跳过视频中插入的广告。此插件仅建议iOS 15以上设备使用，且必须启用MitM-over-HTTP/2功能。\n\n空降助手是第三方提供的功能，依赖于Android版空降助手的服务器数据运作，可能会存在不准确或者失效的问题，此功能与哔哩哔哩官方无关。",
+    "author": "kokoryh[https://github.com/kokoryh]",
+    "icon": "icon not found",
+    "homepage": "https://hub.kelee.one",
+    "category": "Kelee",
+    "system": "ios",
+    "requirement": null,
+    "argumentsDesc": null
+  },
+  "off": null,
+  "arguments": [
+    {
+      "name": "displayUpList",
+      "kind": {
+        "type": "text"
+      },
+      "number": false,
+      "default": "show",
+      "line": 13
+    },
+    {
+      "name": "purifyComment",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "line": 13
+    },
+    {
+      "name": "optimizeRequest",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "line": 13
+    },
+    {
+      "name": "sponsorBlock",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "false",
+      "line": 13
+    },
+    {
+      "name": "logLevel",
+      "kind": {
+        "type": "text"
+      },
+      "number": false,
+      "default": "off",
+      "line": 13
+    }
+  ],
+  "hostname": [
+    {
+      "line": 23,
+      "items": "grpc.biliapi.net, app.bilibili.com, api.bilibili.com, api.live.bilibili.com, line3-h5-mobile-api.biligame.com"
+    }
+  ],
+  "force-http-hostname": [],
+  "skip-server-cert-verify": null,
+  "client-source-address": [],
+  "h2": null,
+  "url-rewrite": {},
+  "header-rewrite": {},
+  "body-rewrite": {},
+  "map-local": {},
+  "request-body-mock": {},
+  "script": {},
+  "rules": {
+    "16": "DOMAIN,api.biliapi.com => REJECT",
+    "17": "DOMAIN,app.biliapi.com => REJECT",
+    "18": "DOMAIN,api.biliapi.net => REJECT",
+    "19": "DOMAIN,app.biliapi.net => REJECT",
+    "20": "AND,((DOMAIN-SUFFIX,chat.bilibili.com),(OR,((DOMAIN-KEYWORD,stun),(DOMAIN-KEYWORD,tracker),(DOMAIN-KEYWORD,p2p)))) => REJECT"
+  },
+  "rule-sets": [],
+  "resources": [],
+  "network": {},
+  "declared-scripts": [],
+  "ignored": []
+}

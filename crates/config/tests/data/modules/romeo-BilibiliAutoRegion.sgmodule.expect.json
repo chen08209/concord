@@ -1,0 +1,35 @@
+{
+  "format": "surge",
+  "meta": {
+    "name": "BilibiliAutoRegion",
+    "desc": "BilibiliAutoRegion",
+    "author": null,
+    "icon": "icon not found",
+    "homepage": null,
+    "category": "Jacob",
+    "system": null,
+    "requirement": null,
+    "argumentsDesc": null
+  },
+  "off": null,
+  "arguments": [],
+  "hostname": [],
+  "force-http-hostname": [],
+  "skip-server-cert-verify": null,
+  "client-source-address": [],
+  "h2": null,
+  "url-rewrite": {},
+  "header-rewrite": {},
+  "body-rewrite": {},
+  "map-local": {
+    "7": "error Syntax: unclosed quote"
+  },
+  "request-body-mock": {},
+  "script": {},
+  "rules": {},
+  "rule-sets": [],
+  "resources": [],
+  "network": {},
+  "declared-scripts": [],
+  "ignored": []
+}

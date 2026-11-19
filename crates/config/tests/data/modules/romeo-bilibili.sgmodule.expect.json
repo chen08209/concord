@@ -1,0 +1,96 @@
+{
+  "format": "surge",
+  "meta": {
+    "name": "哔哩哔哩",
+    "desc": "没有广告的哔哩哔哩更值得干杯。",
+    "author": "RuCu6[https://github.com/RuCu6], kokoryh[https://github.com/kokoryh], 可莉🅥[https://gitlab.com/lodepuly/vpn_tool]",
+    "icon": "icon not found",
+    "homepage": null,
+    "category": "rucu6",
+    "system": null,
+    "requirement": null,
+    "argumentsDesc": null
+  },
+  "off": null,
+  "arguments": [
+    {
+      "name": "displayUpList",
+      "kind": {
+        "type": "text"
+      },
+      "number": false,
+      "default": "show",
+      "line": 8
+    },
+    {
+      "name": "optimizeRequest",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "line": 8
+    },
+    {
+      "name": "purifyComment",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "line": 8
+    },
+    {
+      "name": "sponsorBlock",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "line": 8
+    },
+    {
+      "name": "logLevel",
+      "kind": {
+        "type": "text"
+      },
+      "number": false,
+      "default": "error",
+      "line": 8
+    }
+  ],
+  "hostname": [
+    {
+      "line": 28,
+      "items": "*live.bilibili.com, *api.biligame.com, ap?.bilibili.com, grpc.biliapi.net, m.bilibili.com, manga.bilibili.com, www.bilibili.com"
+    }
+  ],
+  "force-http-hostname": [],
+  "skip-server-cert-verify": null,
+  "client-source-address": [],
+  "h2": null,
+  "url-rewrite": {},
+  "header-rewrite": {},
+  "body-rewrite": {},
+  "map-local": {},
+  "request-body-mock": {},
+  "script": {},
+  "rules": {
+    "12": "DST-PORT,4480 => REJECT-NO-DROP",
+    "13": "DST-PORT,4483 => REJECT-NO-DROP",
+    "14": "DST-PORT,9102 => REJECT-NO-DROP",
+    "15": "AND,((DOMAIN-SUFFIX,chat.bilibili.com),(OR,((DOMAIN-KEYWORD,stun),(DOMAIN-KEYWORD,tracker),(DOMAIN-KEYWORD,p2p)))) => REJECT",
+    "17": "DOMAIN,api.biliapi.com => REJECT",
+    "18": "DOMAIN,api.biliapi.net => REJECT",
+    "19": "DOMAIN,app.biliapi.com => REJECT",
+    "20": "DOMAIN,app.biliapi.net => REJECT",
+    "22": "DOMAIN,dns.google => REJECT",
+    "24": "URL-REGEX,^http:\\/\\/upos-sz-static\\.bilivideo\\.com\\/ssaxcode\\/\\w{2}\\/\\w{2}\\/\\w{32}-1-SPLASH => REJECT-TINYGIF",
+    "25": "URL-REGEX,^http:\\/\\/[\\d\\.]+:8000\\/v1\\/resource\\/\\w{32}-1-SPLASH => REJECT-TINYGIF"
+  },
+  "rule-sets": [],
+  "resources": [],
+  "network": {},
+  "declared-scripts": [],
+  "ignored": []
+}

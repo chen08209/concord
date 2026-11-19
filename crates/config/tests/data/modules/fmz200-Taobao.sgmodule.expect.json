@@ -1,0 +1,106 @@
+{
+  "format": "surge",
+  "meta": {
+    "name": "淘宝",
+    "desc": "某些APP要清除缓存或者重新安装拦截广告才会生效！",
+    "author": "奶思",
+    "icon": null,
+    "homepage": "https://github.com/fmz200/wool_scripts",
+    "category": "奶思的模块",
+    "system": null,
+    "requirement": null,
+    "argumentsDesc": null
+  },
+  "off": null,
+  "arguments": [
+    {
+      "name": "tcbc_enable",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "true",
+      "line": 12
+    }
+  ],
+  "hostname": [
+    {
+      "line": 73,
+      "items": "acs.m.taobao.com, guide-acs.m.taobao.com, poplayer.template.alibaba.com"
+    }
+  ],
+  "force-http-hostname": [],
+  "skip-server-cert-verify": null,
+  "client-source-address": [],
+  "h2": null,
+  "url-rewrite": {},
+  "header-rewrite": {},
+  "body-rewrite": {},
+  "map-local": {
+    "49": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/acs\\\\.m\\\\.taobao\\\\.com\\\\/gw\\\\/mtop\\\\.alibaba\\\\.advertisementservice\\\\.getadv\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{}\", status: 200, header: {\"content-type\": \"application/json\"}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "51": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/acs\\\\.m\\\\.taobao\\\\.com\\\\/gw\\\\/mtop\\\\.alimama\\\\.etao\\\\.config\\\\.query\\\\/.+?etao_advertise\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{}\", status: 200, header: {\"content-type\": \"application/json\"}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "53": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/acs\\\\.m\\\\.taobao\\\\.com\\\\/gw\\\\/mtop\\\\.alimusic\\\\.common\\\\.mobileservice\\\\.startinit\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{}\", status: 200, header: {\"content-type\": \"application/json\"}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "55": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/acs\\\\.m\\\\.taobao\\\\.com\\\\/gw\\\\/mtop\\\\.etao\\\\.noah\\\\.query\\\\/.+tao_splash\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{}\", status: 200, header: {\"content-type\": \"application/json\"}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "57": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/acs\\\\.m\\\\.taobao\\\\.com\\\\/gw\\\\/mtop\\\\.film\\\\.mtopadvertiseapi\\\\.queryadvertise\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{}\", status: 200, header: {\"content-type\": \"application/json\"}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "59": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/acs\\\\.m\\\\.taobao\\\\.com\\\\/gw\\\\/mtop\\\\.o2o\\\\.ad\\\\.gateway\\\\.get\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{}\", status: 200, header: {\"content-type\": \"application/json\"}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "61": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/acs\\\\.m\\\\.taobao\\\\.com\\\\/gw\\\\/mtop\\\\.taobao\\\\.idle\\\\.home\\\\.welcome\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{}\", status: 200, header: {\"content-type\": \"application/json\"}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "63": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/acs\\\\.m\\\\.taobao\\\\.com\\\\/gw\\\\/mtop\\\\.trip\\\\.activity\\\\.querytmsresources\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{}\", status: 200, header: {\"content-type\": \"application/json\"}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "65": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/guide-acs\\\\.m\\\\.taobao\\\\.com\\\\/gw\\\\/mtop\\\\.taobao\\\\.(volvo\\\\.secondfloor\\\\.getconfig|wireless\\\\.home\\\\.newface\\\\.awesome\\\\.get)\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{}\", status: 200, header: {\"content-type\": \"application/json\"}, content_type: \"text/plain; charset=utf-8\", request: false }"
+  },
+  "request-body-mock": {},
+  "script": {
+    "68": "ScriptDef { name: \"淘宝\", path: \"https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/myBlockAds.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/guide-acs\\\\.m\\\\.taobao\\\\.com\\\\/gw\\\\/mtop\\\\.taobao\\\\.(cloudvideo\\\\.video\\\\.query|wireless\\\\.home\\\\.splash\\\\.awesome\\\\.get)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(60.0), argument: None }",
+    "70": "ScriptDef { name: \"淘宝\", path: \"https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/myBlockAds.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/poplayer\\\\.template\\\\.alibaba\\\\.com\\\\/\\\\w+\\\\.json\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(60.0), argument: None }"
+  },
+  "rules": {
+    "15": "DOMAIN-SUFFIX,apoll.m.taobao.com => REJECT",
+    "16": "DOMAIN-SUFFIX,h-adashx.ut.taobao.com => REJECT",
+    "17": "DOMAIN-SUFFIX,w.m.taobao.com => REJECT",
+    "18": "DOMAIN,tunion-api.m.taobao.com => REJECT",
+    "19": "DOMAIN-SUFFIX,re.m.taobao.com => REJECT",
+    "20": "DOMAIN-SUFFIX,agoodm.m.taobao.com => REJECT",
+    "21": "DOMAIN-SUFFIX,ai.taobao.com => REJECT",
+    "22": "DOMAIN-SUFFIX,api.waptest.taobao.com => REJECT",
+    "23": "DOMAIN-SUFFIX,dsp.simba.taobao.com => REJECT",
+    "24": "DOMAIN-SUFFIX,fav.simba.taobao.com => REJECT",
+    "25": "DOMAIN-SUFFIX,m.simba.taobao.com => REJECT",
+    "26": "DOMAIN-SUFFIX,mclick.simba.taobao.com => REJECT",
+    "27": "DOMAIN-SUFFIX,re.taobao.com => REJECT",
+    "28": "DOMAIN-SUFFIX,redirect.simba.taobao.com => REJECT",
+    "29": "DOMAIN-SUFFIX,simba.m.taobao.com => REJECT",
+    "30": "DOMAIN-SUFFIX,srd.simba.taobao.com => REJECT",
+    "31": "DOMAIN-SUFFIX,temai.taobao.com => REJECT",
+    "32": "DOMAIN-SUFFIX,textlink.simba.taobao.com => REJECT",
+    "33": "DOMAIN-SUFFIX,unitacs.m.taobao.com => REJECT",
+    "34": "DOMAIN-SUFFIX,acs4baichuan.m.taobao.com => REJECT",
+    "35": "DOMAIN-SUFFIX,adashbc.ut.taobao.com => REJECT",
+    "36": "DOMAIN-SUFFIX,adash-c.ut.taobao.com => REJECT",
+    "37": "DOMAIN-SUFFIX,adashxgc.ut.taobao.com => REJECT",
+    "38": "DOMAIN-SUFFIX,adashx4yt.m.taobao.com => REJECT",
+    "39": "DOMAIN-SUFFIX,tunion-api.m.taobao.com => REJECT",
+    "40": "DOMAIN-SUFFIX,tns.simba.taobao.com => REJECT",
+    "41": "DOMAIN-SUFFIX,click.mz.simba.taobao.com => REJECT",
+    "42": "DOMAIN-SUFFIX,click.simba.taobao.com => REJECT",
+    "43": "DOMAIN-SUFFIX,click.tz.simba.taobao.com => REJECT",
+    "44": "DOMAIN-SUFFIX,stat.simba.taobao.com => REJECT",
+    "45": "DOMAIN-SUFFIX,m-adash.m.taobao.com => REJECT",
+    "46": "DOMAIN-SUFFIX,adashbc.m.taobao.com => REJECT"
+  },
+  "rule-sets": [],
+  "resources": [
+    {
+      "url": "https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/myBlockAds.js",
+      "kind": "script",
+      "lines": [
+        68,
+        70
+      ]
+    }
+  ],
+  "network": {},
+  "declared-scripts": [
+    68,
+    70
+  ],
+  "ignored": []
+}

@@ -1,9 +1,11 @@
+use std::collections::BTreeMap;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, AtomicI32, Ordering};
 
 use arc_swap::ArcSwapOption;
 use concord_common::Tasks;
 use concord_config::MitmDef;
+use concord_config::mitm::module::{Environment, ModuleInput};
 use concord_mitm::{
     CaError, EVENT_NETWORK_CHANGED, LocalClock, Mitm, MitmEnv, RawConfig as MitmConfig,
 };
@@ -88,6 +90,25 @@ impl MitmService {
             .map_err(|err| Failure::new("invalid_arguments", err.to_string()))?;
         let validation = self.started()?.validate(&raw);
         Ok(serde_json::to_value(validation).unwrap_or(Value::Null))
+    }
+
+    /// How `text` reads as a module with these argument values and attachments, on this system
+    /// in the host's `language`.
+    pub fn read_module(
+        &self,
+        text: &str,
+        arguments: &BTreeMap<String, String>,
+        attachments: &BTreeMap<String, String>,
+        language: String,
+    ) -> Result<Value, Failure> {
+        let environment = Environment::current(language);
+        let input = ModuleInput {
+            arguments,
+            attachments,
+            environment: &environment,
+        };
+        let view = self.started()?.read_module(text, &input);
+        Ok(serde_json::to_value(view).unwrap_or(Value::Null))
     }
 
     pub async fn run_script(&self, name: &str) -> Result<Value, Failure> {

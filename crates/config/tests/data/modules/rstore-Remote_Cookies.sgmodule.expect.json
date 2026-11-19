@@ -1,0 +1,167 @@
+{
+  "format": "surge",
+  "meta": {
+    "name": "Cookie获取大合集",
+    "desc": "此远程订阅用于解决任务脚本的cookie获取",
+    "author": "zirawell[https://github.com/zirawell]",
+    "icon": null,
+    "homepage": "https://github.com/zirawell/R-Store/tree/main/Rule/Surge/README.md",
+    "category": null,
+    "system": null,
+    "requirement": null,
+    "argumentsDesc": null
+  },
+  "off": null,
+  "arguments": [],
+  "hostname": [
+    {
+      "line": 43,
+      "items": "passport.iqiyi.com, www.52pojie.cn, tiebac.baidu.com, c.tieba.baidu.com, app.bilibili.com, m.bilibili.com, xmc.ximalaya.com, vip.video.qq.com, pbaccess.video.qq.com, ngabbs.com, yunbusiness.ccb.com, *.amap.com, m.ctrip.com, hweb-personalcenter.huazhu.com, www.flyert.com.cn"
+    }
+  ],
+  "force-http-hostname": [],
+  "skip-server-cert-verify": null,
+  "client-source-address": [],
+  "h2": null,
+  "url-rewrite": {},
+  "header-rewrite": {},
+  "body-rewrite": {},
+  "map-local": {},
+  "request-body-mock": {},
+  "script": {
+    "13": "ScriptDef { name: \"Remote_Cookies\", path: \"https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/CheckIn/iqiyi.js\", kind: HttpRequest, pattern: Some(\"^https?:\\\\/\\\\/passport\\\\.iqiyi\\\\.com\\\\/apis\\\\/user\\\\/\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: false, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "15": "ScriptDef { name: \"Remote_Cookies\", path: \"https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/CheckIn/52pj.js\", kind: HttpRequest, pattern: Some(\"^https?:\\\\/\\\\/www\\\\.52pojie\\\\.cn\\\\/home\\\\.php\\\\?\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: false, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "17": "ScriptDef { name: \"Remote_Cookies\", path: \"https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/CheckIn/tieba.js\", kind: HttpRequest, pattern: Some(\"^https?:\\\\/\\\\/(c\\\\.)?tieba(c)?\\\\.baidu\\\\.com\\\\/c\\\\/u\\\\/follow\\\\/getFoldedMessageUserInfo\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: false, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "19": "ScriptDef { name: \"Remote_Cookies\", path: \"https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/CheckIn/bilibili.js\", kind: HttpRequest, pattern: Some(\"^https?:\\\\/\\\\/app\\\\.bilibili\\\\.com\\\\/x\\\\/resource\\\\/fingerprint\\\\?\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: false, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "20": "ScriptDef { name: \"Remote_Cookies\", path: \"https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/CheckIn/bilibili.js\", kind: HttpRequest, pattern: Some(\"^https?:\\\\/\\\\/m.bilibili.com/$\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: false, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "22": "ScriptDef { name: \"Remote_Cookies\", path: \"https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/CheckIn/bilibiliManga.js\", kind: HttpRequest, pattern: Some(\"^https?:\\\\/\\\\/app\\\\.bilibili\\\\.com\\\\/x\\\\/v2\\\\/account\\\\/myinfo\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: false, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "24": "ScriptDef { name: \"Remote_Cookies\", path: \"https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/CheckIn/xmly.js\", kind: HttpRequest, pattern: Some(\"^https?:\\\\/\\\\/xmc\\\\.ximalaya\\\\.com\\\\/xmlymain-login-web\\\\/login\\\\/\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: false, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "26": "ScriptDef { name: \"Remote_Cookies\", path: \"https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/CheckIn/txtv.js\", kind: HttpRequest, pattern: Some(\"^https?:\\\\/\\\\/vip\\\\.video\\\\.qq\\\\.com\\\\/rpc\\\\/trpc\\\\.new_task_system\\\\.task_system\\\\.TaskSystem\\\\/ReadTaskList\\\\?\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: false, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "27": "ScriptDef { name: \"Remote_Cookies\", path: \"https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/CheckIn/txtv.js\", kind: HttpRequest, pattern: Some(\"^https?:\\\\/\\\\/pbaccess\\\\.video\\\\.qq\\\\.com\\\\/trpc\\\\.videosearch\\\\.hot_rank\\\\.HotRankServantHttp\\\\/HotRankHttp\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: false, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "28": "ScriptDef { name: \"Remote_Cookies\", path: \"https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/CheckIn/txtv.js\", kind: HttpRequest, pattern: Some(\"^https?:\\\\/\\\\/pbaccess\\\\.video\\\\.qq.\\\\com\\\\/trpc\\\\.video_account_login\\\\.web_login_trpc\\\\.WebLoginTrpc\\\\/NewRefresh\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "30": "ScriptDef { name: \"Remote_Cookies\", path: \"https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/CheckIn/nga.js\", kind: HttpRequest, pattern: Some(\"^https?:\\\\/\\\\/ngabbs.com\\\\/nuke.php$\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "32": "ScriptDef { name: \"Remote_Cookies\", path: \"https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/CheckIn/ccblife.js\", kind: HttpRequest, pattern: Some(\"^https?:\\\\/\\\\/yunbusiness\\\\.ccb\\\\.com\\\\/(clp_coupon|clp_service)\\\\/txCtrl\\\\?txcode=(A3341A038|autoLogin)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "34": "ScriptDef { name: \"Remote_Cookies\", path: \"https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/CheckIn/amap.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/(m5(|-zb)|dache)\\\\.amap\\\\.com\\\\/(ws\\\\/yuece\\\\/(act|openapi\\\\/activity\\\\/current)\\\\/query|common\\\\/(alipaymini|wxmini)\\\\?_ENCRYPT=)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "36": "ScriptDef { name: \"Remote_Cookies\", path: \"https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/CheckIn/ctrip.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/m\\\\.ctrip\\\\.com\\\\/restapi\\\\/soa2\\\\/\\\\d+\\\\/[a-zA-Z]+Login(?:$|\\\\?)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "38": "ScriptDef { name: \"Remote_Cookies\", path: \"https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/CheckIn/huazhu.js\", kind: HttpRequest, pattern: Some(\"^https?:\\\\/\\\\/hweb-personalcenter\\\\.huazhu\\\\.com\\\\/login\\\\/autoLogin$\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: false, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "40": "ScriptDef { name: \"Remote_Cookies\", path: \"https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/CheckIn/flyert.js\", kind: HttpRequest, pattern: Some(\"^https?:\\\\/\\\\/www\\\\.flyert\\\\.com\\\\.cn\\\\/api\\\\/mobile\\\\/index\\\\.php\\\\?module=getdata&.*\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: false, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }"
+  },
+  "rules": {},
+  "rule-sets": [],
+  "resources": [
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/CheckIn/iqiyi.js",
+      "kind": "script",
+      "lines": [
+        13
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/CheckIn/52pj.js",
+      "kind": "script",
+      "lines": [
+        15
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/CheckIn/tieba.js",
+      "kind": "script",
+      "lines": [
+        17
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/CheckIn/bilibili.js",
+      "kind": "script",
+      "lines": [
+        19,
+        20
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/CheckIn/bilibiliManga.js",
+      "kind": "script",
+      "lines": [
+        22
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/CheckIn/xmly.js",
+      "kind": "script",
+      "lines": [
+        24
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/CheckIn/txtv.js",
+      "kind": "script",
+      "lines": [
+        26,
+        27,
+        28
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/CheckIn/nga.js",
+      "kind": "script",
+      "lines": [
+        30
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/CheckIn/ccblife.js",
+      "kind": "script",
+      "lines": [
+        32
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/CheckIn/amap.js",
+      "kind": "script",
+      "lines": [
+        34
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/CheckIn/ctrip.js",
+      "kind": "script",
+      "lines": [
+        36
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/CheckIn/huazhu.js",
+      "kind": "script",
+      "lines": [
+        38
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/CheckIn/flyert.js",
+      "kind": "script",
+      "lines": [
+        40
+      ]
+    }
+  ],
+  "network": {},
+  "declared-scripts": [
+    13,
+    15,
+    17,
+    19,
+    20,
+    22,
+    24,
+    26,
+    27,
+    28,
+    30,
+    32,
+    34,
+    36,
+    38,
+    40
+  ],
+  "ignored": []
+}

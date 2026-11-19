@@ -10,11 +10,13 @@ use concord_tls::TrustStore;
 use crate::ca::{Authority, CaError, CertificateInfo};
 use crate::capture::{Body, CaptureStore, Exchange, ExchangeList};
 use concord_config::mitm::MitmDef;
+use concord_config::mitm::module::ModuleInput;
 
 use crate::config::{Config, ParseEnv, RawConfig, Validation, check, normalize_fingerprint};
 use crate::cron::LocalClock;
 use crate::engine::{MitmEngine, Shared};
 use crate::limits::Pressure;
+use crate::module_view::{ModuleView, view_module};
 use crate::script::{EVENT_ENGINE_STARTED, EVENT_PROFILE_RELOADED, ScriptHost, ScriptRuntime};
 use crate::task::{ScriptOutput, ScriptRunError};
 
@@ -142,6 +144,10 @@ impl Mitm {
 
     pub fn validate(&self, raw: &RawConfig) -> Validation {
         check(raw, &self.parse_env())
+    }
+
+    pub fn read_module(&self, text: &str, input: &ModuleInput<'_>) -> ModuleView {
+        view_module(text, input, &self.parse_env())
     }
 
     /// Replaces the section, keeping the engine, its schedule and the tasks

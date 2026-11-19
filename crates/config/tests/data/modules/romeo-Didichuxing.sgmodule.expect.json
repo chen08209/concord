@@ -1,0 +1,81 @@
+{
+  "format": "surge",
+  "meta": {
+    "name": "滴滴出行",
+    "desc": "Didichuxing",
+    "author": "怎么肥事",
+    "icon": "icon not found",
+    "homepage": null,
+    "category": "ddgksf2013",
+    "system": null,
+    "requirement": null,
+    "argumentsDesc": null
+  },
+  "off": null,
+  "arguments": [],
+  "hostname": [
+    {
+      "line": 66,
+      "items": "117.51.168.*, 113.46.225.*, common.diditaxi.com.cn, freight.xiaojukeji.com, daijia.kuaidadi.com, 162.14.157.*, ct.xiaojukeji.com, res.xiaojukeji.com, conf.diditaxi.com.cn, api.udache.com, 123.207.209.*, 112.53.55.225, 120.241.142.*, 120.241.143.*, 116.85.*, 139.199.240.84, mapi.xiaojukeji.com, manhattan.webapp.xiaojukeji.com, ddpay.xiaojukeji.com"
+    }
+  ],
+  "force-http-hostname": [],
+  "skip-server-cert-verify": null,
+  "client-source-address": [],
+  "h2": null,
+  "url-rewrite": {},
+  "header-rewrite": {},
+  "body-rewrite": {
+    "27": "BodyRewriteDef { response: true, pattern: \"^https:\\\\/\\\\/common\\\\.diditaxi\\\\.com\\\\.cn\\\\/common\\\\/v[5-9]\\\\/usercenter\\\\/layout\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data.layout.order |= map(select(. == \\\"center_base_info_card\\\" or . == \\\"center_order_related_card\\\" or . == \\\"center_wallet_finance_card\\\")) | (.data.instances.center_wallet_finance_card.data.view_info |= map(select(.title == \\\"优惠卡券\\\"))) | del(.data.instances.center_marketing_card, .data.instances.center_member_card, .data.instances.center_tool_card, .data.instances.center_widget_list)\") }",
+    "28": "BodyRewriteDef { response: true, pattern: \"^https:\\\\/\\\\/common\\\\.diditaxi\\\\.com\\\\.cn\\\\/common\\\\/v\\\\d\\\\/usercenter\\\\/me\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data.cards |= (map(select(.title != \\\"天天领福利\\\" and .title != \\\"金融服务\\\" and .title != \\\"更多服务\\\" and .title != \\\"企业服务\\\" and .title != \\\"安全中心\\\")) | map(if .tag == \\\"wallet\\\" then (.items |= map(select(.title == \\\"优惠券\\\"))) | (if .card_type == 4 then .bottom_items |= map(select(.title == \\\"省钱套餐\\\" or .title == \\\"出行里程\\\")) else . end) else . end))\") }",
+    "29": "BodyRewriteDef { response: true, pattern: \"^https:\\\\/\\\\/conf\\\\.diditaxi\\\\.com\\\\.cn\\\\/homepage\\\\/v\\\\d\\\\/core\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data.order_cards.nav_list_card.data |= map(select(.nav_id == \\\"dache_anycar\\\" or .nav_id == \\\"driverservice\\\" or .nav_id == \\\"bike\\\" or .nav_id == \\\"carmate\\\" or .nav_id == \\\"nav_more_v3\\\")) | .data.disorder_cards.bottom_nav_list.data |= map(select(.id == \\\"v6x_home\\\" or .id == \\\"home_page\\\" or .id == \\\"user_center\\\")) | .data.disorder_cards.top_nav_list.data.top_nav_info |= map(select(.name != \\\"旅行\\\" and .name != \\\"车主\\\"))\") }",
+    "30": "BodyRewriteDef { response: true, pattern: \"^https:\\\\/\\\\/api\\\\.udache\\\\.com\\\\/gulfstream\\\\/pre-sale\\\\/v1\\\\/other\\\\/pGetSceneList\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data.scene_list |= map(select(.text != \\\"优惠商城\\\")) | .data.show_data |= map(.scene_ids |= map(select(. != \\\"scene_coupon_mall\\\")))\") }",
+    "31": "BodyRewriteDef { response: true, pattern: \"^https:\\\\/\\\\/conf\\\\.diditaxi\\\\.com\\\\.cn\\\\/homepage\\\\/v1\\\\/oversea\\\\/layout\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"del(.data.instances.oversea_main_banner)\") }",
+    "32": "BodyRewriteDef { response: true, pattern: \"^https:\\\\/\\\\/api\\\\.udache\\\\.com\\\\/gulfstream\\\\/porsche\\\\/v1\\\\/dache_homepage_layout\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"del(.data.instances[\\\"xp-card-01\\\"])\") }",
+    "33": "BodyRewriteDef { response: true, pattern: \"^https:\\\\/\\\\/api\\\\.udache\\\\.com\\\\/gulfstream\\\\/passenger-center\\\\/v2\\\\/other\\\\/pInTripLayout\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"del(.data.order_components[8].data) | .data.order_components |= map(select(.name != \\\"passenger_common_casper\\\"))\") }",
+    "34": "BodyRewriteDef { response: true, pattern: \"^https:\\\\/\\\\/mapi\\\\.xiaojukeji\\\\.com\\\\/passenger-wallet\\\\/api\\\\/v[\\\\d.]+\\\\/wallet\\\\/homepage\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data.cardList |= (map(if .mcode == \\\"index_assets_v6\\\" then .detailData |= (del(.myCreditLimit) | .discountList |= .[:3] | del(.noticeList)) else . end) | map(select(.mcode == \\\"index_assets_v6\\\")))\") }",
+    "35": "BodyRewriteDef { response: true, pattern: \"^https:\\\\/\\\\/manhattan\\\\.webapp\\\\.xiaojukeji\\\\.com\\\\/zootopia\\\\/api\\\\/my-assets\\\\/get-assets-data\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"del(.data.myQuotaModularRes, .data.assetsData.myQuotaModularRes, .data.banner, .data.assetsData.banner, .data.myGuaranteeModularRes, .data.assetsData.myGuaranteeModularRes)\") }",
+    "36": "BodyRewriteDef { response: true, pattern: \"^https:\\\\/\\\\/manhattan\\\\.webapp\\\\.xiaojukeji\\\\.com\\\\/zootopia\\\\/api\\\\/my-assets\\\\/module-is-show\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data = []\") }",
+    "37": "BodyRewriteDef { response: true, pattern: \"^https:\\\\/\\\\/ddpay\\\\.xiaojukeji\\\\.com\\\\/ddpay\\\\/api\\\\/manhattan-small-change\\\\/get-all-config\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data.result = []\") }",
+    "38": "BodyRewriteDef { response: true, pattern: \"^https:\\\\/\\\\/ddpay\\\\.xiaojukeji\\\\.com\\\\/ddpay\\\\/api\\\\/manhattan-small-change\\\\/get-apollo-config\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data.result.hideList = []\") }"
+  },
+  "map-local": {
+    "41": "MapLocalDef { pattern: \"^https:\\\\/\\\\/res\\\\.xiaojukeji\\\\.com\\\\/resapi\\\\/activity\\\\/getMulti\\\\?\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{}\", status: 200, header: {\"content-type\": \"application/json\"}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "43": "MapLocalDef { pattern: \"^https:\\\\/\\\\/res\\\\.xiaojukeji\\\\.com\\\\/resapi\\\\/activity\\\\/xpget\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{}\", status: 200, header: {\"content-type\": \"application/json\"}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "45": "MapLocalDef { pattern: \"^https:\\\\/\\\\/ct\\\\.xiaojukeji\\\\.com\\\\/agent\\\\/v3\\\\/feeds\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{}\", status: 200, header: {\"content-type\": \"application/json\"}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "47": "MapLocalDef { pattern: \"^https:\\\\/\\\\/freight\\\\.xiaojukeji\\\\.com\\\\/gateway\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{}\", status: 200, header: {\"content-type\": \"application/json\"}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "49": "MapLocalDef { pattern: \"^https:\\\\/\\\\/daijia\\\\.kuaidadi\\\\.com:443\\\\/gateway\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{}\", status: 200, header: {\"content-type\": \"application/json\"}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "51": "MapLocalDef { pattern: \"^https:\\\\/\\\\/res\\\\.xiaojukeji\\\\.com\\\\/resapi\\\\/activity\\\\/mget\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{}\", status: 200, header: {\"content-type\": \"application/json\"}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "53": "MapLocalDef { pattern: \"^https:\\\\/\\\\/conf\\\\.diditaxi\\\\.com\\\\.cn\\\\/homepage\\\\/v\\\\d\\\\/other\\\\/fast\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{}\", status: 200, header: {\"content-type\": \"application/json\"}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "55": "MapLocalDef { pattern: \"^https:\\\\/\\\\/conf\\\\.diditaxi\\\\.com\\\\.cn\\\\/homepage\\\\/v\\\\d\\\\/other\\\\/slow\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{}\", status: 200, header: {\"content-type\": \"application/json\"}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "57": "MapLocalDef { pattern: \"^https:\\\\/\\\\/conf\\\\.diditaxi\\\\.com\\\\.cn\\\\/dynamic\\\\/conf\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{}\", status: 200, header: {\"content-type\": \"application/json\"}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "59": "MapLocalDef { pattern: \"^https:\\\\/\\\\/api\\\\.udache\\\\.com\\\\/gulfstream\\\\/watson\\\\/v1\\\\/bubble\\\\/getBubble\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{}\", status: 200, header: {\"content-type\": \"application/json\"}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "61": "MapLocalDef { pattern: \"^https:\\\\/\\\\/res\\\\.xiaojukeji\\\\.com\\\\/resapi\\\\/activity\\\\/getInsActivityV2\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{}\", status: 200, header: {\"content-type\": \"application/json\"}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "63": "MapLocalDef { pattern: \"^https:\\\\/\\\\/conf\\\\.diditaxi\\\\.com\\\\.cn\\\\/ota\\\\/na\\\\/yuantu\\\\/infoList\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{}\", status: 200, header: {\"content-type\": \"application/json\"}, content_type: \"text/plain; charset=utf-8\", request: false }"
+  },
+  "request-body-mock": {},
+  "script": {},
+  "rules": {
+    "9": "DOMAIN,gwp.xiaojukeji.com => REJECT",
+    "10": "IP-CIDR,139.199.244.6/32 => REJECT no-resolve",
+    "11": "IP-CIDR,113.46.225.9/32 => REJECT no-resolve",
+    "12": "IP-CIDR,139.199.244.7/32 => REJECT no-resolve",
+    "13": "IP-CIDR,113.46.225.8/32 => REJECT no-resolve",
+    "14": "IP-CIDR,123.207.209.39/32 => REJECT no-resolve",
+    "15": "IP-CIDR,123.207.209.60/32 => REJECT no-resolve",
+    "16": "IP-CIDR,139.199.240.15/32 => REJECT no-resolve",
+    "17": "IP-CIDR,139.199.240.12/32 => REJECT no-resolve",
+    "18": "IP-CIDR,116.85.3.37/32 => REJECT no-resolve",
+    "19": "IP-CIDR,162.14.157.2/32 => REJECT no-resolve",
+    "20": "IP-CIDR,162.14.157.24/32 => REJECT no-resolve",
+    "21": "IP-CIDR,116.85.1.0/32 => REJECT no-resolve",
+    "22": "IP-CIDR,116.85.1.17/32 => REJECT no-resolve",
+    "23": "IP-CIDR,116.85.1.22/32 => REJECT no-resolve",
+    "24": "IP-CIDR,116.85.3.25/32 => REJECT no-resolve"
+  },
+  "rule-sets": [],
+  "resources": [],
+  "network": {},
+  "declared-scripts": [],
+  "ignored": []
+}

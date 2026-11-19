@@ -1,0 +1,50 @@
+{
+  "format": "surge",
+  "meta": {
+    "name": "微博轻享版去广告",
+    "desc": "Version 6.6.8 is the last supported release",
+    "author": null,
+    "icon": null,
+    "homepage": null,
+    "category": "AdBlock",
+    "system": null,
+    "requirement": null,
+    "argumentsDesc": null
+  },
+  "off": null,
+  "arguments": [],
+  "hostname": [
+    {
+      "line": 21,
+      "items": "api.weibo.cn, weibointl.api.weibo.cn"
+    }
+  ],
+  "force-http-hostname": [],
+  "skip-server-cert-verify": null,
+  "client-source-address": [],
+  "h2": null,
+  "url-rewrite": {},
+  "header-rewrite": {},
+  "body-rewrite": {
+    "14": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/api\\\\.weibo\\\\.cn\\\\/2\\\\/statuses\\\\/unread_hot_timeline$\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"del(.ad, .advertises, .trends) | if .statuses then .statuses |= map(select(((.promotion.type == \\\"ad\\\") or (.mblogtypename | IN(\\\"广告\\\", \\\"廣告\\\", \\\"热推\\\", \\\"熱推\\\"))) | not)) end\") }",
+    "15": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/weibointl\\\\.api\\\\.weibo\\\\.cn\\\\/portal\\\\.php\\\\?a=get_coopen_ads&\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\".data |= . + {\\\"ad_list\\\":[],\\\"pic_ad\\\":[],\\\"gdt_video_ad_ios\\\":[],\\\"display_ad\\\":0,\\\"ad_ios_id\\\":null,\\\"app_ad_ios_id\\\":null,\\\"reserve_ad_ios_id\\\":\\\"\\\",\\\"reserve_app_ad_ios_id\\\":\\\"\\\",\\\"ad_duration\\\":604800,\\\"ad_cd_interval\\\":604800}\") }",
+    "16": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/weibointl\\\\.api\\\\.weibo\\\\.cn\\\\/portal\\\\.php\\\\?a=trends&\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"if .data.order then .data.order = [\\\"search_topic\\\"] end\") }",
+    "17": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/weibointl\\\\.api\\\\.weibo\\\\.cn\\\\/portal\\\\.php\\\\?a=search_topic&\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"if .data.search_topic.cards[0].type == \\\"searchtop\\\" then del(.data.search_topic.cards[0]) end\") }",
+    "18": "BodyRewriteDef { response: true, pattern: \"^https?:\\\\/\\\\/weibointl\\\\.api\\\\.weibo\\\\.cn\\\\/portal\\\\.php\\\\?a=user_center&\", conditions: HeadConditionsDef { request: None, response: None }, action: Jq(\"if .data.cards then .data.cards[].items |= map(select(.type != \\\"personal_vip\\\")) | .data.cards |= map(select((.items | length) > 0)) end\") }"
+  },
+  "map-local": {
+    "9": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/api\\\\.weibo\\\\.cn\\\\/2\\\\/ad\\\\/weibointl\\\\?\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{}\", status: 200, header: {\"content-type\": \"application/json\"}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "10": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/weibointl\\\\.api\\\\.weibo\\\\.cn\\\\/portal\\\\.php\\\\?a=get_searching_info&\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{\\\"retcode\\\":0,\\\"info\\\":\\\"\\\",\\\"data\\\":{\\\"expiration_time\\\":\\\"86400\\\",\\\"cards\\\":[{\\\"tip\\\":\\\"搜索微博\\\",\\\"word\\\":\\\"\\\"}]}}\", status: 200, header: {\"content-type\": \"text/html\"}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "11": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/weibointl\\\\.api\\\\.weibo\\\\.cn\\\\/portal\\\\.php\\\\?ct=feed&a=search_topic&\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{\\\"retcode\\\":0,\\\"info\\\":\\\"\\\",\\\"data\\\":[],\\\"ext\\\":{}}\", status: 200, header: {\"content-type\": \"text/html\"}, content_type: \"text/plain; charset=utf-8\", request: false }"
+  },
+  "request-body-mock": {},
+  "script": {},
+  "rules": {
+    "6": "DOMAIN-SUFFIX,biz.weibo.com => REJECT"
+  },
+  "rule-sets": [],
+  "resources": [],
+  "network": {},
+  "declared-scripts": [],
+  "ignored": []
+}

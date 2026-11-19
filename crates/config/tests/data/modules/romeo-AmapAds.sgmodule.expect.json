@@ -1,0 +1,95 @@
+{
+  "format": "surge",
+  "meta": {
+    "name": "AmapAds",
+    "desc": "AmapAds",
+    "author": null,
+    "icon": "icon not found",
+    "homepage": null,
+    "category": "ddgksf2013",
+    "system": null,
+    "requirement": null,
+    "argumentsDesc": null
+  },
+  "off": null,
+  "arguments": [],
+  "hostname": [
+    {
+      "line": 67,
+      "items": "m5.amap.com, m5-zb.amap.com, center.amap.com, amap-aos-info-nogw.amap.com, ai.amap.com"
+    }
+  ],
+  "force-http-hostname": [],
+  "skip-server-cert-verify": null,
+  "client-source-address": [],
+  "h2": null,
+  "url-rewrite": {
+    "11": "UrlRewriteDef { pattern: \"^https?:\\\\/\\\\/.*\\\\.amap\\\\.com\\\\/ws\\\\/asa\\\\/ads_attribution\", head: None, replacement: \"\", action: Reject }"
+  },
+  "header-rewrite": {},
+  "body-rewrite": {},
+  "map-local": {
+    "15": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/.*\\\\.amap\\\\.com\\\\/ws\\\\/aos\\\\/alimama\\\\/splash_screen\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \" \", status: 200, header: {}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "18": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/.*\\\\.amap\\\\.com\\\\/v\\\\d\\\\/ai_rec\\\\/\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{}\", status: 200, header: {\"content-type\": \"application/json\"}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "21": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/.*\\\\.amap\\\\.com\\\\/ws\\\\/faas\\\\/amap-navigation\\\\/card-service-route-plan\\\\?\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{}\", status: 200, header: {\"content-type\": \"application/json\"}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "24": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/.*\\\\.amap\\\\.com\\\\/ws\\\\/boss\\\\/order_web\\\\/\\\\w{8}_information\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \" \", status: 200, header: {}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "27": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/.*\\\\.amap\\\\.com\\\\/ws\\\\/shield\\\\/scene\\\\/recommend\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{}\", status: 200, header: {\"content-type\": \"application/json\"}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "30": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/.*\\\\.amap\\\\.com\\\\/uploadimg\\\\/\\\\w+\\\\.gif\", conditions: HeadConditionsDef { request: None, response: None }, body: TinyGif, data: \"\", status: 200, header: {}, content_type: \"image/gif\", request: false }",
+    "33": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/.*\\\\.amap\\\\.com\\\\/ws\\\\/valueadded\\\\/weather\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{}\", status: 200, header: {\"content-type\": \"application/json\"}, content_type: \"text/plain; charset=utf-8\", request: false }"
+  },
+  "request-body-mock": {},
+  "script": {
+    "37": "ScriptDef { name: \"amdc\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/AmapAds/ddgksf2013_amdc.js\", kind: HttpResponse, pattern: Some(\"^http:\\\\/\\\\/amdc\\\\.m\\\\.taobao\\\\.com\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(60.0), argument: None }",
+    "40": "ScriptDef { name: \"amap\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/AmapAds/ddgksf2013_amap.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/.*\\\\.amap\\\\.com\\\\/ws\\\\/message\\\\/notice\\\\/list\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(60.0), argument: None }",
+    "43": "ScriptDef { name: \"amap\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/AmapAds/ddgksf2013_amap.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/.*\\\\.amap\\\\.com\\\\/ws\\\\/shield\\\\/frogserver\\\\/aocs\\\\/updatable\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(60.0), argument: None }",
+    "46": "ScriptDef { name: \"amap\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/AmapAds/ddgksf2013_amap.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/.*\\\\.amap\\\\.com\\\\/ws\\\\/shield\\\\/search\\\\/nearbyrec_smart\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(60.0), argument: None }",
+    "49": "ScriptDef { name: \"amap\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/AmapAds/ddgksf2013_amap.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/.*\\\\.amap\\\\.com\\\\/ws\\\\/promotion-web\\\\/resource\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(60.0), argument: None }",
+    "52": "ScriptDef { name: \"amap\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/AmapAds/ddgksf2013_amap.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/.*\\\\.amap\\\\.com\\\\/ws\\\\/faas\\\\/amap-navigation\\\\/main-page\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(60.0), argument: None }",
+    "55": "ScriptDef { name: \"amap\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/AmapAds/ddgksf2013_amap.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/.*\\\\.amap\\\\.com\\\\/ws\\\\/valueadded\\\\/alimama\\\\/splash_screen\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(60.0), argument: None }",
+    "58": "ScriptDef { name: \"amap\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/AmapAds/ddgksf2013_amap.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/.*\\\\.amap\\\\.com\\\\/ws\\\\/msgbox\\\\/pull\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(60.0), argument: None }",
+    "61": "ScriptDef { name: \"amap\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/AmapAds/ddgksf2013_amap.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/.*\\\\.amap\\\\.com\\\\/ws\\\\/shield\\\\/dsp\\\\/profile\\\\/index\\\\/nodefaas\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(60.0), argument: None }",
+    "64": "ScriptDef { name: \"amap\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/AmapAds/ddgksf2013_amap.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/.*\\\\.amap\\\\.com\\\\/ws\\\\/shield\\\\/search\\\\/new_hotword\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(60.0), argument: None }"
+  },
+  "rules": {
+    "7": "DOMAIN-SUFFIX,optimus-ads.amap.com => DIRECT"
+  },
+  "rule-sets": [],
+  "resources": [
+    {
+      "url": "https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/AmapAds/ddgksf2013_amdc.js",
+      "kind": "script",
+      "lines": [
+        37
+      ]
+    },
+    {
+      "url": "https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/AmapAds/ddgksf2013_amap.js",
+      "kind": "script",
+      "lines": [
+        40,
+        43,
+        46,
+        49,
+        52,
+        55,
+        58,
+        61,
+        64
+      ]
+    }
+  ],
+  "network": {},
+  "declared-scripts": [
+    37,
+    40,
+    43,
+    46,
+    49,
+    52,
+    55,
+    58,
+    61,
+    64
+  ],
+  "ignored": []
+}

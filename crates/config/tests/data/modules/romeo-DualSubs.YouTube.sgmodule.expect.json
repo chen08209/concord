@@ -1,0 +1,120 @@
+{
+  "format": "surge",
+  "meta": {
+    "name": "🍿️ DualSubs: ▶️ YouTube",
+    "desc": "YouTube 增强及双语字幕(歌词)",
+    "author": "VirgilClyne[https://github.com/VirgilClyne]",
+    "icon": "icon not found",
+    "homepage": "https://DualSubs.github.io/guide/youtube",
+    "category": "ddgksf2013",
+    "system": null,
+    "requirement": null,
+    "argumentsDesc": null
+  },
+  "off": null,
+  "arguments": [],
+  "hostname": [
+    {
+      "line": 57,
+      "items": "dualsubs.github.io, www.youtube.com, m.youtube.com, tv.youtube.com, music.youtube.com, youtubei.googleapis.com, -redirector*.googlevideo.com, *.googlevideo.com"
+    }
+  ],
+  "force-http-hostname": [],
+  "skip-server-cert-verify": null,
+  "client-source-address": [],
+  "h2": null,
+  "url-rewrite": {},
+  "header-rewrite": {},
+  "body-rewrite": {},
+  "map-local": {
+    "12": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/([\\\\w-]+)\\\\.googlevideo\\\\.com\\\\/initplayback(\\\\?.*oad=.+)$\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"{}\", status: 200, header: {\"content-type\": \"application/json\"}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "14": "MapLocalDef { pattern: \"^https:\\\\/\\\\/dualsubs\\\\.github\\\\.io\\\\/api\\\\/YouTube(?:\\\\?.*)?$\", conditions: HeadConditionsDef { request: None, response: None }, body: File, data: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/DualSubs.YouTube/DualSubs_DualSubs.YouTube.PreferencePanes.json\", status: 200, header: {}, content_type: \"application/json\", request: false }"
+  },
+  "request-body-mock": {},
+  "script": {
+    "18": "ScriptDef { name: \"api\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/DualSubs.YouTube/NSNanoCat_api.js\", kind: HttpRequest, pattern: Some(\"^https:\\\\/\\\\/dualsubs\\\\.github\\\\.io\\\\/api\\\\/(?:get|set|delete)(?:\\\\?.*)?$\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: false, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(60.0), argument: None }",
+    "21": "ScriptDef { name: \"request.bundle\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/DualSubs.YouTube/DualSubs_request.bundle.js\", kind: HttpRequest, pattern: Some(\"^https?:\\\\/\\\\/(www|m|tv)\\\\.youtube\\\\.com\\\\/youtubei\\\\/v1\\\\/player(\\\\?.+)?$\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: true, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(60.0), argument: None }",
+    "24": "ScriptDef { name: \"response.bundle\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/DualSubs.YouTube/DualSubs_response.bundle.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/(www|m|tv)\\\\.youtube\\\\.com\\\\/youtubei\\\\/v1\\\\/player(\\\\?.+)?$\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: true, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(60.0), argument: None }",
+    "27": "ScriptDef { name: \"request.bundle\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/DualSubs.YouTube/DualSubs_request.bundle.js\", kind: HttpRequest, pattern: Some(\"^https?:\\\\/\\\\/youtubei\\\\.googleapis\\\\.com\\\\/youtubei\\\\/v1\\\\/player(\\\\?.+)?$\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: true, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(60.0), argument: None }",
+    "30": "ScriptDef { name: \"response.bundle\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/DualSubs.YouTube/DualSubs_response.bundle.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/youtubei\\\\.googleapis\\\\.com\\\\/youtubei\\\\/v1\\\\/player(\\\\?.+)?$\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: true, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(60.0), argument: None }",
+    "33": "ScriptDef { name: \"response.bundle\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/DualSubs.YouTube/DualSubs_response.bundle.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/youtubei\\\\.googleapis\\\\.com\\\\/youtubei\\\\/v1\\\\/get_watch(\\\\?.+)?$\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: true, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(60.0), argument: None }",
+    "36": "ScriptDef { name: \"request.bundle\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/DualSubs.YouTube/DualSubs_request.bundle.js\", kind: HttpRequest, pattern: Some(\"^https?:\\\\/\\\\/(www|m)\\\\.youtube\\\\.com\\\\/api\\\\/timedtext\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: false, binary_body: true, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(60.0), argument: None }",
+    "39": "ScriptDef { name: \"Composite.Subtitles.response.bundle\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/DualSubs.YouTube/DualSubs_Composite.Subtitles.response.bundle.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/(www|m)\\\\.youtube\\\\.com\\\\/api\\\\/timedtext\\\\?(.*)subtype=(Official|External)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(60.0), argument: None }",
+    "42": "ScriptDef { name: \"Translate.response.bundle\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/DualSubs.YouTube/DualSubs_Translate.response.bundle.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/(www|m)\\\\.youtube\\\\.com\\\\/api\\\\/timedtext\\\\?(.*)subtype=Translate\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(60.0), argument: None }",
+    "45": "ScriptDef { name: \"request.bundle\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/DualSubs.YouTube/DualSubs_request.bundle.js\", kind: HttpRequest, pattern: Some(\"^https?:\\\\/\\\\/music\\\\.youtube\\\\.com\\\\/youtubei\\\\/v1\\\\/browse(\\\\?.+)?$\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: true, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(60.0), argument: None }",
+    "48": "ScriptDef { name: \"request.bundle\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/DualSubs.YouTube/DualSubs_request.bundle.js\", kind: HttpRequest, pattern: Some(\"^https?:\\\\/\\\\/youtubei\\\\.googleapis\\\\.com\\\\/youtubei\\\\/v1\\\\/browse(\\\\?.+)?$\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: true, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(60.0), argument: None }",
+    "51": "ScriptDef { name: \"Translate.response.bundle\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/DualSubs.YouTube/DualSubs_Translate.response.bundle.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/music\\\\.youtube\\\\.com\\\\/youtubei\\\\/v1\\\\/browse\\\\?(.*)subtype=Translate\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(60.0), argument: None }",
+    "54": "ScriptDef { name: \"Translate.response.bundle\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/DualSubs.YouTube/DualSubs_Translate.response.bundle.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/youtubei\\\\.googleapis\\\\.com\\\\/youtubei\\\\/v1\\\\/browse\\\\?(.*)subtype=Translate\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(60.0), argument: None }"
+  },
+  "rules": {},
+  "rule-sets": [],
+  "resources": [
+    {
+      "url": "https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/DualSubs.YouTube/DualSubs_DualSubs.YouTube.PreferencePanes.json",
+      "kind": "map-local",
+      "lines": [
+        14
+      ]
+    },
+    {
+      "url": "https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/DualSubs.YouTube/NSNanoCat_api.js",
+      "kind": "script",
+      "lines": [
+        18
+      ]
+    },
+    {
+      "url": "https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/DualSubs.YouTube/DualSubs_request.bundle.js",
+      "kind": "script",
+      "lines": [
+        21,
+        27,
+        36,
+        45,
+        48
+      ]
+    },
+    {
+      "url": "https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/DualSubs.YouTube/DualSubs_response.bundle.js",
+      "kind": "script",
+      "lines": [
+        24,
+        30,
+        33
+      ]
+    },
+    {
+      "url": "https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/DualSubs.YouTube/DualSubs_Composite.Subtitles.response.bundle.js",
+      "kind": "script",
+      "lines": [
+        39
+      ]
+    },
+    {
+      "url": "https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/DualSubs.YouTube/DualSubs_Translate.response.bundle.js",
+      "kind": "script",
+      "lines": [
+        42,
+        51,
+        54
+      ]
+    }
+  ],
+  "network": {},
+  "declared-scripts": [
+    18,
+    21,
+    24,
+    27,
+    30,
+    33,
+    36,
+    39,
+    42,
+    45,
+    48,
+    51,
+    54
+  ],
+  "ignored": []
+}

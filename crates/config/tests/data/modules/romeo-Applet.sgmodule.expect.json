@@ -1,0 +1,71 @@
+{
+  "format": "surge",
+  "meta": {
+    "name": "Applet",
+    "desc": "Applet",
+    "author": null,
+    "icon": "icon not found",
+    "homepage": null,
+    "category": "ddgksf2013",
+    "system": null,
+    "requirement": null,
+    "argumentsDesc": null
+  },
+  "off": null,
+  "arguments": [],
+  "hostname": [
+    {
+      "line": 24,
+      "items": "api.blibee.com, ucmp.sf-express.com, www.bbkj.work, wx.wxqqurl.cn, wp3.lobdol.cn, awg.enmonster.com, mp.weixin.qq.com, wx.mygolbs.com, jabi.coding.net, api.bspapp.com, 3dd0be8a-54fe-43ff-a0e7-f670c4f20432.bspapp.com, *.tslt.xyz, g.syshhc.top, c.jxjt888.top, www.laoguikeji.cn, qj.bpojie.com, b.tslt.xyz, m.xgjyouhui.com, www.freeheikeji.cn, xcx.xianbaow.com, *.smkj33.top, *.ddly666.top, hkj178.com, a.jxjt888.top, lysl2020.com, www.i3zh.com, iosoi.cn, jt.jxjt888.top, gjsx.vip, d.syshhc.top, gz.gongzijx.com, tvapp.guilaile.cn, www.benbenfx.xyz, 4thdimension.top, tan.ipnas.ltd"
+    }
+  ],
+  "force-http-hostname": [],
+  "skip-server-cert-verify": null,
+  "client-source-address": [],
+  "h2": null,
+  "url-rewrite": {},
+  "header-rewrite": {},
+  "body-rewrite": {},
+  "map-local": {
+    "8": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/api\\\\.blibee\\\\.com\\\\/cvsnotify-api\\\\/cvs\\\\/notify\\\\/app\\\\/banner\\\\/v\\\\d+$\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \" \", status: 200, header: {}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "11": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/ucmp\\\\.sf-express\\\\.com\\\\/proxy\\\\/operation-platform\\\\/info-flow-adver\\\\/query$\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \" \", status: 200, header: {}, content_type: \"text/plain; charset=utf-8\", request: false }"
+  },
+  "request-body-mock": {},
+  "script": {
+    "15": "ScriptDef { name: \"replaceBody\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/Applet/Script-Hub-Org_replace-body.js\", kind: HttpResponse, pattern: Some(\"^(http|https):\\\\/\\\\/mp\\\\.weixin\\\\.qq\\\\.com\\\\/mp\\\\/getappmsgad\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(30.0), argument: Some(String(\"advertisement-%3Eddgksf2013\")) }",
+    "18": "ScriptDef { name: \"zhangshanggongjiao\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/Applet/ddgksf2013_zhangshanggongjiao.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/wx\\\\.mygolbs\\\\.com\\\\/WxBusServer\\\\/ApiData\\\\.do\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(60.0), argument: None }",
+    "21": "ScriptDef { name: \"applet\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/Applet/ddgksf2013_applet.js\", kind: HttpResponse, pattern: Some(\"^(https?://)?([a-zA-Z0-9]+(-[a-zA-Z0-9]+)*\\\\.)+[a-zA-Z]{2,}(:\\\\d+)?/wp-json/[a-zA-Z0-9_-]+/(mp\\\\/)?v\\\\d/posts\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(60.0), argument: None }"
+  },
+  "rules": {},
+  "rule-sets": [],
+  "resources": [
+    {
+      "url": "https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/Applet/Script-Hub-Org_replace-body.js",
+      "kind": "script",
+      "lines": [
+        15
+      ]
+    },
+    {
+      "url": "https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/Applet/ddgksf2013_zhangshanggongjiao.js",
+      "kind": "script",
+      "lines": [
+        18
+      ]
+    },
+    {
+      "url": "https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/Applet/ddgksf2013_applet.js",
+      "kind": "script",
+      "lines": [
+        21
+      ]
+    }
+  ],
+  "network": {},
+  "declared-scripts": [
+    15,
+    18,
+    21
+  ],
+  "ignored": []
+}

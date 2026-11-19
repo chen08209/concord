@@ -61,9 +61,12 @@ pub struct Field {
     pub to: usize,
 }
 
-/// Splits on spaces and keeps a double-quoted run, which may start inside a
-/// field as in `data="{}"`, in one field without its quotes. Inside quotes only
-/// `\"` is unescaped, so a regex keeps its backslashes.
+/// Splits on spaces and keeps a double-quoted run, which may start inside a field as in
+/// `data="{}"`, in one field without its quotes. Inside quotes only `\"` is unescaped, so a
+/// regex keeps its backslashes. Modules written for Surge rely on two more readings: a value
+/// after `=` runs to the quote before a space or the line's end, keeping the quotes of the
+/// JSON inside it (`data="{"k":1}"`), and a field that starts with a quote not closed before
+/// a space or the line's end is taken as written (`"k":\{.+\}`, a body regex over a JSON key).
 pub fn split_fields(line: &str) -> Result<Vec<Field>, LineError> {
     let bytes = line.as_bytes();
     let mut fields = Vec::new();
@@ -73,16 +76,22 @@ pub fn split_fields(line: &str) -> Result<Vec<Field>, LineError> {
             i += 1;
             continue;
         }
+        let literal = bytes.get(i) == Some(&b'"') && !closes_before_space(bytes, i + 1);
         let mut text = Vec::new();
         let mut quoted = false;
+        let mut value = false;
         while let Some(&c) = bytes.get(i) {
             if quoted && c == b'\\' && bytes.get(i + 1) == Some(&b'"') {
                 text.push(b'"');
                 i += 2;
                 continue;
             }
-            if c == b'"' {
-                quoted = !quoted;
+            let ends_value = || matches!(bytes.get(i + 1), None | Some(b' ' | b'\t'));
+            if c == b'"' && !literal && !quoted {
+                quoted = true;
+                value = text.last() == Some(&b'=');
+            } else if c == b'"' && quoted && (!value || ends_value()) {
+                quoted = false;
             } else if !quoted && (c == b' ' || c == b'\t') {
                 break;
             } else {
@@ -99,6 +108,20 @@ pub fn split_fields(line: &str) -> Result<Vec<Field>, LineError> {
         });
     }
     Ok(fields)
+}
+
+/// Whether the quoted run starting at `from` ends at its first unescaped quote, with a space
+/// or the line's end after it; a run with no quote left is unclosed, and reads as quoted so
+/// that it fails.
+fn closes_before_space(bytes: &[u8], mut from: usize) -> bool {
+    while let Some(&c) = bytes.get(from) {
+        match c {
+            b'\\' if bytes.get(from + 1) == Some(&b'"') => from += 2,
+            b'"' => return matches!(bytes.get(from + 1), None | Some(b' ' | b'\t')),
+            _ => from += 1,
+        }
+    }
+    true
 }
 
 pub fn texts(fields: &[Field]) -> Vec<&str> {
@@ -127,6 +150,17 @@ mod tests {
         let got: Vec<_> = fields.iter().map(|f| f.text.as_str()).collect();
         assert_eq!(got, ["^https://a", r#"data={"k": 1}"#, "x"]);
         assert!(split_fields("a \"b").is_err());
+    }
+
+    #[test]
+    fn a_quoted_value_keeps_the_quotes_inside_it() {
+        let fields = split_fields(r#"^a data="{"k":"v"}" header="a: b" x"#).unwrap();
+        let got: Vec<_> = fields.iter().map(|f| f.text.as_str()).collect();
+        assert_eq!(got, ["^a", r#"data={"k":"v"}"#, "header=a: b", "x"]);
+        let fields = split_fields(r#"a"b c"d "a b" "k":".+?" "k":\{.+\}"#).unwrap();
+        let got: Vec<_> = fields.iter().map(|f| f.text.as_str()).collect();
+        assert_eq!(got, ["ab cd", "a b", r#""k":".+?""#, r#""k":\{.+\}"#]);
+        assert!(split_fields(r#"data="{"k":1"#).is_err());
     }
 
     #[test]

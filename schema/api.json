@@ -759,6 +759,18 @@
       }
     },
     {
+      "name": "mitm.module.read",
+      "kind": "unary",
+      "exec": "concurrent",
+      "capability": "mitm",
+      "params": {
+        "$ref": "#/$defs/MitmModuleReadParams"
+      },
+      "result": {
+        "$ref": "#/$defs/MitmModuleView"
+      }
+    },
+    {
       "name": "mitm.issueCertificate",
       "kind": "unary",
       "exec": "concurrent",
@@ -5128,6 +5140,797 @@
         "entries"
       ],
       "description": "The entries of a line in force: those before the first that could not be read."
+    },
+    "MitmModuleReadParams": {
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string",
+          "description": "The module as its author wrote it: a Surge module, a Loon plugin, a Quantumult X\nsnippet or a Stash override."
+        },
+        "arguments": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "By argument name, as the user set it; an argument left out takes its default.",
+          "default": {}
+        },
+        "attachments": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "By the relative path the module names, the file in the MITM resources directory.",
+          "default": {}
+        },
+        "language": {
+          "type": "string",
+          "description": "The language requirement expressions read, as `zh-Hans`.",
+          "default": ""
+        }
+      },
+      "required": [
+        "text"
+      ]
+    },
+    "MitmModuleView": {
+      "type": "object",
+      "properties": {
+        "format": {
+          "$ref": "#/$defs/MitmModuleFormat"
+        },
+        "meta": {
+          "$ref": "#/$defs/MitmModuleMeta"
+        },
+        "off": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MitmModuleOff"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Why the module takes no effect as a whole, though its lines still read."
+        },
+        "arguments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/MitmModuleArgument"
+          }
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/MitmModuleResource"
+          },
+          "description": "The remote files its lines read; until stored, the lines name them by URL."
+        },
+        "declaredScripts": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0
+          },
+          "description": "The lines that declare a script, whatever the arguments turn off."
+        },
+        "asksConsent": {
+          "type": "boolean",
+          "description": "Whether it changes what the user set for traffic it does not itself rewrite: DNS,\nhosts, routes, verifying servers or the clients decrypted for."
+        },
+        "issues": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/MitmIssue"
+            }
+          },
+          "description": "As `mitm.validate`'s, plus `force-http-hostname`; an `index` is the module line."
+        },
+        "views": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/MitmLineEntry"
+            }
+          }
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/MitmModuleRule"
+          }
+        },
+        "ruleSets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/MitmModuleRuleSet"
+          }
+        },
+        "network": {
+          "$ref": "#/$defs/MitmModuleNetwork"
+        },
+        "ignored": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/MitmModuleIgnored"
+          }
+        }
+      },
+      "required": [
+        "format",
+        "meta",
+        "arguments",
+        "resources",
+        "declaredScripts",
+        "asksConsent",
+        "issues",
+        "views",
+        "rules",
+        "ruleSets",
+        "network",
+        "ignored"
+      ],
+      "description": "Every line of a module that takes effect is in `views`, `rules`, `ruleSets`,\n`network` or `hostname`-like views; one that cannot be read is in `issues`; one\nConcord does not take is in `ignored`. Lines are counted from 1."
+    },
+    "MitmModuleFormat": {
+      "type": "string",
+      "enum": [
+        "surge",
+        "loon",
+        "quantumult-x",
+        "stash"
+      ]
+    },
+    "MitmModuleMeta": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "desc": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "author": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "icon": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "homepage": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "category": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "system": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Shown only: it names the systems Surge runs the module on, so it never turns it off."
+        },
+        "requirement": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "argumentsDesc": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "MitmModuleOff": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "reason": {
+              "type": "string",
+              "const": "requirement"
+            }
+          },
+          "required": [
+            "reason"
+          ],
+          "description": "`#!requirement` does not hold."
+        },
+        {
+          "type": "object",
+          "properties": {
+            "reason": {
+              "type": "string",
+              "const": "requirementUnreadable"
+            }
+          },
+          "required": [
+            "reason"
+          ],
+          "description": "`#!requirement` cannot be read."
+        }
+      ]
+    },
+    "MitmModuleArgument": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/MitmArgumentKind"
+        },
+        "number": {
+          "type": "boolean",
+          "description": "A number, which a typed use hands over as one."
+        },
+        "default": {
+          "type": "string"
+        },
+        "label": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "desc": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "line": {
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "name",
+        "kind",
+        "number",
+        "default",
+        "line"
+      ]
+    },
+    "MitmArgumentKind": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "text"
+            }
+          },
+          "required": [
+            "type"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "switch"
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "description": "`true` or `false`."
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "select"
+            },
+            "options": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "type",
+            "options"
+          ]
+        }
+      ]
+    },
+    "MitmModuleResource": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/MitmResourceKind"
+        },
+        "lines": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0
+          }
+        }
+      },
+      "required": [
+        "url",
+        "kind",
+        "lines"
+      ]
+    },
+    "MitmResourceKind": {
+      "type": "string",
+      "enum": [
+        "script",
+        "map-local",
+        "jq"
+      ]
+    },
+    "MitmModuleRule": {
+      "type": "object",
+      "properties": {
+        "line": {
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0
+        },
+        "rule": {
+          "type": "string"
+        },
+        "policy": {
+          "$ref": "#/$defs/MitmModulePolicy"
+        },
+        "noResolve": {
+          "type": "boolean"
+        },
+        "extendedMatching": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "line",
+        "rule",
+        "policy",
+        "noResolve",
+        "extendedMatching"
+      ],
+      "description": "`rule` is what goes before the policy in a profile's rule line."
+    },
+    "MitmModulePolicy": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "builtin": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "builtin"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "named": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "named"
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "description": "A built-in policy (`DIRECT`, `REJECT`, `REJECT-DROP`, `REJECT-NO-DROP`,\n`REJECT-TINYGIF`, `REJECT-DICT`, `REJECT-ARRAY`, `REJECT-200`), or a name the host maps to\none of its outbounds."
+    },
+    "MitmModuleRuleSet": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "domain": {
+          "type": "boolean",
+          "description": "One domain per line, as Surge's `DOMAIN-SET`."
+        },
+        "source": {
+          "$ref": "#/$defs/MitmRuleSetSource"
+        }
+      },
+      "required": [
+        "name",
+        "domain",
+        "source"
+      ]
+    },
+    "MitmRuleSetSource": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "url"
+            },
+            "url": {
+              "type": "string"
+            },
+            "interval": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "uint64",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "type",
+            "url"
+          ],
+          "description": "Downloaded every `interval` seconds, 0 for never; absent, the host's default."
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "inline"
+            },
+            "rules": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/MitmModuleInlineRule"
+              }
+            }
+          },
+          "required": [
+            "type",
+            "rules"
+          ],
+          "description": "`[Ruleset <name>]` lines; sets of one name add up across modules."
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "builtin"
+            },
+            "rules": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "type",
+            "rules"
+          ],
+          "description": "Surge's internal `LAN` and `SYSTEM` sets."
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "file"
+            },
+            "file": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "file"
+          ],
+          "description": "An attached file."
+        }
+      ]
+    },
+    "MitmModuleInlineRule": {
+      "type": "object",
+      "properties": {
+        "line": {
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0
+        },
+        "rule": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "line",
+        "rule"
+      ]
+    },
+    "MitmModuleNetwork": {
+      "type": "object",
+      "properties": {
+        "nameserver": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MitmListEdit"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "defaultNameserver": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MitmListEdit"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "fakeIpFilter": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MitmListEdit"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "nameserverPolicy": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/MitmDomainEntry"
+          }
+        },
+        "hosts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/MitmDomainEntry"
+          }
+        },
+        "routeAddress": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "routeExcludeAddress": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MitmListEdit"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "bypassDomain": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MitmListEdit"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "lines": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0
+          }
+        }
+      },
+      "description": "In mihomo's keys; each list edit puts `before` ahead of the profile's list and\n`after` behind it, and with `replace` drops the profile's own entries."
+    },
+    "MitmListEdit": {
+      "type": "object",
+      "properties": {
+        "replace": {
+          "type": "boolean"
+        },
+        "before": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "after": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "replace",
+        "before",
+        "after"
+      ]
+    },
+    "MitmDomainEntry": {
+      "type": "object",
+      "properties": {
+        "domain": {
+          "type": "string"
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "domain",
+        "values"
+      ]
+    },
+    "MitmModuleIgnored": {
+      "type": "object",
+      "properties": {
+        "line": {
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0
+        },
+        "text": {
+          "type": "string"
+        },
+        "reason": {
+          "$ref": "#/$defs/MitmIgnoreReason"
+        },
+        "detail": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "line",
+        "text",
+        "reason"
+      ]
+    },
+    "MitmIgnoreReason": {
+      "oneOf": [
+        {
+          "type": "string",
+          "const": "section",
+          "description": "A section no format has, or one Concord does not read."
+        },
+        {
+          "type": "string",
+          "const": "appOnly",
+          "description": "A section for a feature of the app the module was written for."
+        },
+        {
+          "type": "string",
+          "const": "proxies",
+          "description": "`[Proxy]` and `[Proxy Group]`, which a module may not change."
+        },
+        {
+          "type": "string",
+          "const": "setting",
+          "description": "A key of `[General]` or `[MITM]` Concord does not take from a module."
+        },
+        {
+          "type": "string",
+          "const": "managedCa",
+          "description": "The CA, which the host manages."
+        },
+        {
+          "type": "string",
+          "const": "requirement",
+          "description": "A line requirement that does not hold."
+        },
+        {
+          "type": "string",
+          "const": "requirementUnreadable",
+          "description": "A line requirement that cannot be read."
+        },
+        {
+          "type": "string",
+          "const": "scriptType",
+          "description": "A `dns` or `rule` script."
+        },
+        {
+          "type": "string",
+          "const": "event",
+          "description": "An event script for an event Concord does not raise."
+        },
+        {
+          "type": "string",
+          "const": "disabled",
+          "description": "Turned off on the line itself."
+        },
+        {
+          "type": "string",
+          "const": "finalRule",
+          "description": "`FINAL`: module rules go before the profile's."
+        },
+        {
+          "type": "string",
+          "const": "deviceRule",
+          "description": "A rule on what only an Apple device knows of itself or its network."
+        },
+        {
+          "type": "string",
+          "const": "ruleType",
+          "description": "A rule type Concord has no counterpart for."
+        },
+        {
+          "type": "string",
+          "const": "policy",
+          "description": "A policy that names nothing, as an argument left unexpanded."
+        },
+        {
+          "type": "string",
+          "const": "nestedRuleSet",
+          "description": "`RULE-SET` or `DOMAIN-SET` inside a `[Ruleset]` section."
+        },
+        {
+          "type": "string",
+          "const": "reflect",
+          "description": "`reflect` in `[IP Rewrite]`."
+        },
+        {
+          "type": "string",
+          "const": "skipVerifyAll",
+          "description": "`skip-server-cert-verify` while a hostname entry covers every host."
+        },
+        {
+          "type": "string",
+          "const": "noAttachment",
+          "description": "A relative path no attachment provides."
+        },
+        {
+          "type": "string",
+          "const": "unreadable",
+          "description": "A line of a section Concord reads that does not parse."
+        }
+      ],
+      "description": "Why a line takes no effect; a host shows each in its own words."
     },
     "MitmIssueParams": {
       "type": "object",

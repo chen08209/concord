@@ -409,7 +409,7 @@ fn unwrap_quotes(text: &str) -> &str {
     text
 }
 
-fn mime_by_extension(name: &str) -> Option<&'static str> {
+pub(crate) fn mime_by_extension(name: &str) -> Option<&'static str> {
     let ext = Path::new(name).extension()?.to_str()?.to_ascii_lowercase();
     Some(match ext.as_str() {
         "avif" => "image/avif",

@@ -1,0 +1,53 @@
+{
+  "format": "surge",
+  "meta": {
+    "name": "GroupAuto",
+    "desc": "优选节点: 根据 httpApi 返回的 (速度:持久化缓存) (平均延时:持久化缓存) 优选",
+    "author": null,
+    "icon": null,
+    "homepage": null,
+    "category": null,
+    "system": null,
+    "requirement": null,
+    "argumentsDesc": null
+  },
+  "off": null,
+  "arguments": [],
+  "hostname": [],
+  "force-http-hostname": [],
+  "skip-server-cert-verify": null,
+  "client-source-address": [],
+  "h2": null,
+  "url-rewrite": {},
+  "header-rewrite": {},
+  "body-rewrite": {},
+  "map-local": {},
+  "request-body-mock": {},
+  "script": {
+    "30": "ScriptDef { name: \"GroupAuto\", path: \"https://raw.githubusercontent.com/Keywos/rule/main/JS/ProGroup.js\", kind: Generic, pattern: None, conditions: HeadConditionsDef { request: None, response: None }, requires_body: false, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(15.0), argument: Some(String(\"tolerance=10&timecache=18&color=#6699FF&icon=speedometer&group=Proxy\")) }",
+    "33": "ScriptDef { name: \"Cron_GroupAuto\", path: \"https://raw.githubusercontent.com/Keywos/rule/main/JS/ProGroup.js\", kind: Cron, pattern: None, conditions: HeadConditionsDef { request: None, response: None }, requires_body: false, binary_body: false, max_size: 0, cronexp: \"*/30 0,1,7-23 * * *\", event: \"\", timeout: Some(15.0), argument: Some(String(\"tolerance=10&timecache=18&group=Proxy\")) }"
+  },
+  "rules": {},
+  "rule-sets": [],
+  "resources": [
+    {
+      "url": "https://raw.githubusercontent.com/Keywos/rule/main/JS/ProGroup.js",
+      "kind": "script",
+      "lines": [
+        30,
+        33
+      ]
+    }
+  ],
+  "network": {},
+  "declared-scripts": [
+    30,
+    33
+  ],
+  "ignored": [
+    {
+      "line": 26,
+      "reason": "appOnly"
+    }
+  ]
+}

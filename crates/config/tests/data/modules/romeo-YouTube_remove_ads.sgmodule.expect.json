@@ -1,0 +1,84 @@
+{
+  "format": "surge",
+  "meta": {
+    "name": "YouTube去广告",
+    "desc": "移除YouTube视频、瀑布流、搜索和Shorts中的广告，移除底栏的Shorts按钮和上传按钮，增加画中画及字幕翻译功能。移除YouTube Music底栏的上传、选段和升级按钮，增加歌词翻译，支持二者的后台播放。此插件需要启用MitM over HTTP/2和QUIC回退保护。支持Premium订阅用户使用，不支持tvOS设备。",
+    "author": "Maasea[https://github.com/Maasea], VirgilClyne[https://github.com/VirgilClyne], Choler[https://github.com/Choler], DivineEngine[https://github.com/DivineEngine], app2smile[https://github.com/app2smile]",
+    "icon": "icon not found",
+    "homepage": "https://hub.kelee.one",
+    "category": "Kelee",
+    "system": null,
+    "requirement": null,
+    "argumentsDesc": null
+  },
+  "off": null,
+  "arguments": [
+    {
+      "name": "blockUpload",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "false",
+      "line": 12
+    },
+    {
+      "name": "blockShorts",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "false",
+      "line": 12
+    },
+    {
+      "name": "blockImmersive",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "false",
+      "line": 12
+    },
+    {
+      "name": "captionLang",
+      "kind": {
+        "type": "text"
+      },
+      "number": false,
+      "default": "zh-Hans",
+      "line": 12
+    },
+    {
+      "name": "debug",
+      "kind": {
+        "type": "switch"
+      },
+      "number": false,
+      "default": "false",
+      "line": 12
+    }
+  ],
+  "hostname": [
+    {
+      "line": 15,
+      "items": "*.googlevideo.com, youtubei.googleapis.com"
+    }
+  ],
+  "force-http-hostname": [],
+  "skip-server-cert-verify": null,
+  "client-source-address": [],
+  "h2": null,
+  "url-rewrite": {},
+  "header-rewrite": {},
+  "body-rewrite": {},
+  "map-local": {},
+  "request-body-mock": {},
+  "script": {},
+  "rules": {},
+  "rule-sets": [],
+  "resources": [],
+  "network": {},
+  "declared-scripts": [],
+  "ignored": []
+}

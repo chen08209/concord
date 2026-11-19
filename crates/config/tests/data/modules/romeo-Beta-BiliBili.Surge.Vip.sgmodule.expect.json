@@ -1,0 +1,59 @@
+{
+  "format": "surge",
+  "meta": {
+    "name": "哔哩哔哩VIP",
+    "desc": "严禁分享",
+    "author": "@ddgksf2013",
+    "icon": "icon not found",
+    "homepage": null,
+    "category": "ddgksf2013",
+    "system": null,
+    "requirement": null,
+    "argumentsDesc": null
+  },
+  "off": null,
+  "arguments": [],
+  "hostname": [
+    {
+      "line": 14,
+      "items": "grpc.biliapi.net, app.bilibili.com"
+    }
+  ],
+  "force-http-hostname": [],
+  "skip-server-cert-verify": null,
+  "client-source-address": [],
+  "h2": null,
+  "url-rewrite": {},
+  "header-rewrite": {},
+  "body-rewrite": {},
+  "map-local": {},
+  "request-body-mock": {},
+  "script": {
+    "9": "ScriptDef { name: \"bili.vip1\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/BiliBili.Surge.Vip/ddgksf2013_bilibili.vip.js\", kind: HttpRequest, pattern: Some(\"^https:\\\\/\\\\/(grpc\\\\.biliapi\\\\.net|app\\\\.bilibili\\\\.com)\\\\/bilibili\\\\.app\\\\.playerunite\\\\.v1\\\\.Player\\\\/PlayViewUnite\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: true, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(60.0), argument: None }",
+    "11": "ScriptDef { name: \"bili.vip2\", path: \"https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/BiliBili.Surge.Vip/ddgksf2013_bili_myinfo_vip.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/app\\\\.bilibili\\\\.com\\\\/x\\\\/v2\\\\/account\\\\/\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(60.0), argument: None }"
+  },
+  "rules": {},
+  "rule-sets": [],
+  "resources": [
+    {
+      "url": "https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/BiliBili.Surge.Vip/ddgksf2013_bilibili.vip.js",
+      "kind": "script",
+      "lines": [
+        9
+      ]
+    },
+    {
+      "url": "https://github.com/ifflagged/Romeo/raw/main/Modules/JavaScript/ddgksf2013/BiliBili.Surge.Vip/ddgksf2013_bili_myinfo_vip.js",
+      "kind": "script",
+      "lines": [
+        11
+      ]
+    }
+  ],
+  "network": {},
+  "declared-scripts": [
+    9,
+    11
+  ],
+  "ignored": []
+}

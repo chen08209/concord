@@ -3,6 +3,7 @@
     reason = "the peers here stand for the outside world, not the core's own sockets"
 )]
 
+use std::collections::BTreeMap;
 use std::net::Ipv4Addr;
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -1636,5 +1637,75 @@ async fn mitm_validate_answers_each_line_with_its_view_or_its_issue() {
         view("script", 0),
         Some(MitmLineView::Script(MitmScript { kind: MitmScriptKind::Cron, ref name, .. })) if name == "daily"
     ));
+    rig.finish().await;
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn mitm_module_read_shows_each_module_line_by_its_line() {
+    let rig = Rig::new().await;
+    let text = r#"#!name=Sample
+#!arguments=host:a.test
+[General]
+force-http-engine-hosts = %APPEND% plain.test
+[MITM]
+hostname = %APPEND% {{{host}}}
+[Rule]
+AND,((URL-REGEX,"^https?://a\.test/x{1,2}"),(USER-AGENT,Foo*)),REJECT
+FINAL,DIRECT
+[URL Rewrite]
+^https://a\.test/ad _ reject
+(broken _ reject
+[Script]
+s = type=http-response,pattern=^https://a\.test,script-path=https://cdn.test/s.js
+[Panel]
+p = title=x
+"#;
+    let view = rig
+        .control
+        .mitm_module_read(MitmModuleReadParams {
+            text: text.to_string(),
+            arguments: BTreeMap::from([("host".to_string(), "b.test".to_string())]),
+            attachments: BTreeMap::new(),
+            language: String::new(),
+        })
+        .await
+        .unwrap();
+    assert_eq!(view.format, MitmModuleFormat::Surge);
+    assert_eq!(view.meta.name.as_deref(), Some("Sample"));
+    assert_eq!(view.arguments[0].default, "a.test");
+    assert!(matches!(
+        &view.views["hostname"][0],
+        MitmLineEntry { index: 6, view: MitmLineView::Hosts(MitmHosts { entries }) } if entries[0].host == "b.test"
+    ));
+    assert_eq!(view.views["force-http-hostname"][0].index, 4);
+    assert_eq!(view.rules.len(), 1);
+    assert_eq!(view.rules[0].line, 8);
+    assert_eq!(
+        view.rules[0].rule,
+        r"AND,((URL-REGEX,^https?://a\.test/x{1,2}),(USER-AGENT,Foo*))"
+    );
+    assert_eq!(
+        view.rules[0].policy,
+        MitmModulePolicy::Builtin("REJECT".into())
+    );
+    assert_eq!(view.views["url-rewrite"][0].index, 11);
+    assert_eq!(view.issues["url-rewrite"][0].index, 12);
+    assert_eq!(view.issues["script"][0].kind, MitmIssueKind::Resource);
+    assert_eq!(view.resources[0].url, "https://cdn.test/s.js");
+    assert_eq!(view.resources[0].lines, [14]);
+    assert_eq!(view.declared_scripts, [14]);
+    let ignored: Vec<(u32, MitmIgnoreReason)> = view
+        .ignored
+        .iter()
+        .map(|line| (line.line, line.reason))
+        .collect();
+    assert_eq!(
+        ignored,
+        [
+            (9, MitmIgnoreReason::FinalRule),
+            (16, MitmIgnoreReason::AppOnly)
+        ]
+    );
+    assert_eq!(view.ignored[0].text, "FINAL,DIRECT");
     rig.finish().await;
 }

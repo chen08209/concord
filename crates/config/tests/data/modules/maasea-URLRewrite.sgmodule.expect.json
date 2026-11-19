@@ -1,0 +1,47 @@
+{
+  "format": "surge",
+  "meta": {
+    "name": "URL Rewrite",
+    "desc": "Google 地址重定向",
+    "author": null,
+    "icon": null,
+    "homepage": null,
+    "category": null,
+    "system": null,
+    "requirement": null,
+    "argumentsDesc": null
+  },
+  "off": null,
+  "arguments": [],
+  "hostname": [
+    {
+      "line": 14,
+      "items": "www.google.cn",
+      "insert": true
+    }
+  ],
+  "force-http-hostname": [
+    {
+      "line": 5,
+      "items": "www.google.cn"
+    }
+  ],
+  "skip-server-cert-verify": null,
+  "client-source-address": [],
+  "h2": null,
+  "url-rewrite": {
+    "9": "UrlRewriteDef { pattern: \"^https?:\\\\/\\\\/(www.)?(g|google)\\\\.cn\", head: None, replacement: \"https://www.google.com\", action: Redirect302 }",
+    "11": "UrlRewriteDef { pattern: \"^https?:\\\\/\\\\/(ditu|maps).google\\\\.cn\", head: None, replacement: \"https://maps.google.com\", action: Redirect302 }"
+  },
+  "header-rewrite": {},
+  "body-rewrite": {},
+  "map-local": {},
+  "request-body-mock": {},
+  "script": {},
+  "rules": {},
+  "rule-sets": [],
+  "resources": [],
+  "network": {},
+  "declared-scripts": [],
+  "ignored": []
+}

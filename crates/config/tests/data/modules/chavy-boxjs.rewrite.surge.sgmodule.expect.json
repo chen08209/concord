@@ -1,0 +1,56 @@
+{
+  "format": "surge",
+  "meta": {
+    "name": "BoxJs",
+    "desc": "http://boxjs.com",
+    "author": "ChavyLeung",
+    "icon": "https://raw.githubusercontent.com/chavyleung/scripts/master/box/icons/BoxJs.png",
+    "homepage": "https://docs.boxjs.app/",
+    "category": "BoxJs",
+    "system": null,
+    "requirement": null,
+    "argumentsDesc": null
+  },
+  "off": null,
+  "arguments": [],
+  "hostname": [
+    {
+      "line": 15,
+      "items": "boxjs.com, boxjs.net, *.boxjs.com, *.boxjs.net",
+      "insert": true
+    }
+  ],
+  "force-http-hostname": [
+    {
+      "line": 9,
+      "items": "boxjs.com, boxjs.net, *.boxjs.com, *.boxjs.net"
+    }
+  ],
+  "skip-server-cert-verify": null,
+  "client-source-address": [],
+  "h2": null,
+  "url-rewrite": {},
+  "header-rewrite": {},
+  "body-rewrite": {},
+  "map-local": {},
+  "request-body-mock": {},
+  "script": {
+    "12": "ScriptDef { name: \"Rewrite: BoxJs\", path: \"https://raw.githubusercontent.com/chavyleung/scripts/master/box/chavy.boxjs.js\", kind: HttpRequest, pattern: Some(\"^https?:\\\\/\\\\/(.+\\\\.)?boxjs\\\\.(com|net)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: Some(120.0), argument: None }"
+  },
+  "rules": {},
+  "rule-sets": [],
+  "resources": [
+    {
+      "url": "https://raw.githubusercontent.com/chavyleung/scripts/master/box/chavy.boxjs.js",
+      "kind": "script",
+      "lines": [
+        12
+      ]
+    }
+  ],
+  "network": {},
+  "declared-scripts": [
+    12
+  ],
+  "ignored": []
+}

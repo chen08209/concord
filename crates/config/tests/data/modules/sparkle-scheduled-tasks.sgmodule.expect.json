@@ -1,0 +1,73 @@
+{
+  "format": "surge",
+  "meta": {
+    "name": "定时任务",
+    "desc": "Scheduled tasks",
+    "author": null,
+    "icon": null,
+    "homepage": null,
+    "category": "General",
+    "system": null,
+    "requirement": null,
+    "argumentsDesc": "定时任务执行时间: [Cron表达式, #]\n- #: 停用定时任务"
+  },
+  "off": null,
+  "arguments": [
+    {
+      "name": "SubStore同步",
+      "kind": {
+        "type": "text"
+      },
+      "number": false,
+      "default": "0 5 * * *",
+      "line": 4
+    },
+    {
+      "name": "毛怪俱乐部签到",
+      "kind": {
+        "type": "text"
+      },
+      "number": false,
+      "default": "55 2 * * *",
+      "line": 4
+    }
+  ],
+  "hostname": [],
+  "force-http-hostname": [],
+  "skip-server-cert-verify": null,
+  "client-source-address": [],
+  "h2": null,
+  "url-rewrite": {},
+  "header-rewrite": {},
+  "body-rewrite": {},
+  "map-local": {},
+  "request-body-mock": {},
+  "script": {
+    "8": "ScriptDef { name: \"0 5 * * * substore\", path: \"https://raw.githubusercontent.com/sub-store-org/Sub-Store/release/cron-sync-artifacts.min.js\", kind: Cron, pattern: None, conditions: HeadConditionsDef { request: None, response: None }, requires_body: false, binary_body: false, max_size: 0, cronexp: \"0 5 * * *\", event: \"\", timeout: Some(120.0), argument: None }",
+    "9": "ScriptDef { name: \"55 2 * * * mgclub\", path: \"https://raw.githubusercontent.com/kokoryh/Script/master/js/ihan.js\", kind: Cron, pattern: None, conditions: HeadConditionsDef { request: None, response: None }, requires_body: false, binary_body: false, max_size: 0, cronexp: \"55 2 * * *\", event: \"\", timeout: None, argument: None }"
+  },
+  "rules": {},
+  "rule-sets": [],
+  "resources": [
+    {
+      "url": "https://raw.githubusercontent.com/sub-store-org/Sub-Store/release/cron-sync-artifacts.min.js",
+      "kind": "script",
+      "lines": [
+        8
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/kokoryh/Script/master/js/ihan.js",
+      "kind": "script",
+      "lines": [
+        9
+      ]
+    }
+  ],
+  "network": {},
+  "declared-scripts": [
+    8,
+    9
+  ],
+  "ignored": []
+}

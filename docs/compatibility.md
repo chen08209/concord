@@ -213,6 +213,16 @@ TUN's address, so a list that names only other clients leaves them as they are, 
 `skip-server-cert-verify-hostname`, a list of Concord's own in `hostname`'s syntax, leaves the certificates of the
 servers it names unchecked while `skip-server-cert-verify` is off, so an app can grant a module that asks for it no
 more than its own hostnames.
+MITM lines split on spaces, and a double-quoted run stays one field. As modules written for Surge expect, a quoted
+value after `=` ends only at a quote followed by a space or the end of the line, so `data="{"code":0}"` keeps the
+JSON's own quotes, and a field that starts with a quote not closed that way is taken as written, so a body rewrite's
+`"key":\{.+\}` matches the key with its quotes.
+
+A host reads a module (a Surge `.sgmodule` for now) with `mitm.module.read`, which answers with each line by its line
+number: what goes into the MITM lists, the rules and rule sets with their policies for the host to map, the DNS,
+hosts and route changes in mihomo's keys, the remote files it reads, and every line Concord does not take with the
+reason. A module's `force-http-engine-hosts` comes back as a list of its own, `force-http-hostname`, for the host to
+decide on.
 
 Shadowsocks supports `gost-plugin` in WebSocket mode, including TLS and its default per-connection smux v1 stream.
 Gost relay supports TCP, destination-bound UDP, forward mode, TLS and per-connection smux v1.

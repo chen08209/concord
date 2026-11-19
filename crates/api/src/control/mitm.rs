@@ -60,6 +60,24 @@ impl Control {
         serde_json::from_value(validation).map_err(|err| ApiError::internal(err.to_string()))
     }
 
+    pub(super) async fn mitm_module_read(
+        &self,
+        params: MitmModuleReadParams,
+    ) -> Result<MitmModuleView, ApiError> {
+        self.mitm_enabled()?;
+        let view = self
+            .blocking(move |engine| {
+                engine.mitm().read_module(
+                    &params.text,
+                    &params.arguments,
+                    &params.attachments,
+                    params.language,
+                )
+            })
+            .await?;
+        serde_json::from_value(view).map_err(|err| ApiError::internal(err.to_string()))
+    }
+
     pub(super) async fn mitm_issue_certificate(
         &self,
         params: MitmIssueParams,

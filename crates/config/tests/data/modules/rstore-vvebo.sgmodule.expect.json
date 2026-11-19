@@ -1,0 +1,59 @@
+{
+  "format": "surge",
+  "meta": {
+    "name": "VVebo Repair",
+    "desc": "此远程订阅用于修复用户主页时间线问题",
+    "author": "zirawell[https://github.com/zirawell]",
+    "icon": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Icon/App/vvebo.png",
+    "homepage": "https://github.com/zirawell/R-Store/tree/main/Rule/Surge/README.md",
+    "category": null,
+    "system": null,
+    "requirement": null,
+    "argumentsDesc": null
+  },
+  "off": null,
+  "arguments": [],
+  "hostname": [
+    {
+      "line": 21,
+      "items": "api.weibo.cn"
+    }
+  ],
+  "force-http-hostname": [],
+  "skip-server-cert-verify": null,
+  "client-source-address": [],
+  "h2": null,
+  "url-rewrite": {},
+  "header-rewrite": {},
+  "body-rewrite": {},
+  "map-local": {},
+  "request-body-mock": {},
+  "script": {
+    "14": "ScriptDef { name: \"vvebo\", path: \"https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/Plugins/VVebo_Repair.js\", kind: HttpRequest, pattern: Some(\"^https?:\\\\/\\\\/api\\\\.weibo\\\\.cn\\\\/2\\\\/remind\\\\/unread_count\\\\?\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: false, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "15": "ScriptDef { name: \"vvebo\", path: \"https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/Plugins/VVebo_Repair.js\", kind: HttpRequest, pattern: Some(\"^https?:\\\\/\\\\/api\\\\.weibo\\\\.cn\\\\/2\\\\/statuses\\\\/user_timeline\\\\?\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: false, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "16": "ScriptDef { name: \"vvebo\", path: \"https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/Plugins/VVebo_Repair.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/api\\\\.weibo\\\\.cn\\\\/2\\\\/profile\\\\/statuses\\\\/tab\\\\?\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "18": "ScriptDef { name: \"vvebo\", path: \"https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/Plugins/VVebo_Repair.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/api\\\\.weibo\\\\.cn\\\\/2\\\\/cardlist\\\\?\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }"
+  },
+  "rules": {},
+  "rule-sets": [],
+  "resources": [
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/Plugins/VVebo_Repair.js",
+      "kind": "script",
+      "lines": [
+        14,
+        15,
+        16,
+        18
+      ]
+    }
+  ],
+  "network": {},
+  "declared-scripts": [
+    14,
+    15,
+    16,
+    18
+  ],
+  "ignored": []
+}

@@ -1,0 +1,119 @@
+{
+  "format": "surge",
+  "meta": {
+    "name": "广告联盟 - ADUNION",
+    "desc": "功能类插件",
+    "author": "zirawell[https://github.com/zirawell]",
+    "icon": null,
+    "homepage": "https://github.com/zirawell/R-Store/tree/main/Rule/Surge/README.md",
+    "category": null,
+    "system": null,
+    "requirement": null,
+    "argumentsDesc": null
+  },
+  "off": null,
+  "arguments": [],
+  "hostname": [
+    {
+      "line": 593,
+      "items": "api2.helper.qq.com, imgcache.qq.com, mtteve.beacon.qq.com, vv.video.qq.com, qt.qq.com, y.gtimg.cn, splashqqlive.gtimg.com, qzonestyle.gtimg.cn, discuz.gtimg.cn, bla.gtimg.com, mmgr.gtimg.com, bk.bingo.qq.com, mi.gdt.qq.com, www.baidu.com, api.map.baidu.com, fcvbjbcebos.baidu.com, cover.baidu.com, afd.baidu.com, issuecdn.baidupcs.com, update.pan.baidu.com, video-dsp.pddpic.com, t-dsp.pinduoduo.com, images.pinduoduo.com, amdc.m.taobao.com, gw.alicdn.com, heic.alicdn.com, g.alicdn.com, yixiu-abtest.alicdn.com, img1.126.net, nex.163.com, g1.163.com, c.m.163.com, www.google.com, api*.musical.ly, api-access.pangolin-sdk-toutiao.com, is.snssdk.com, cdn.api.fotoable.com, cloud.bluecardsoft.com"
+    }
+  ],
+  "force-http-hostname": [],
+  "skip-server-cert-verify": null,
+  "client-source-address": [],
+  "h2": null,
+  "url-rewrite": {
+    "543": "UrlRewriteDef { pattern: \"^https?:\\\\/\\\\/fcvbjbcebos\\\\.baidu\\\\.com\\\\/.+.mp4\", head: None, replacement: \"\", action: Reject }",
+    "544": "UrlRewriteDef { pattern: \"^https?:\\\\/\\\\/cover\\\\.baidu\\\\.com\\\\/cover\\\\/page\\\\/dspSwitchAds\\\\/\", head: None, replacement: \"\", action: Reject }",
+    "545": "UrlRewriteDef { pattern: \"^https?:\\\\/\\\\/update\\\\.pan\\\\.baidu\\\\.com\\\\/statistics\", head: None, replacement: \"\", action: Reject }",
+    "546": "UrlRewriteDef { pattern: \"^https?:\\\\/\\\\/log.+?baidu\\\\.com\", head: None, replacement: \"\", action: Reject }",
+    "547": "UrlRewriteDef { pattern: \"^https?:\\\\/\\\\/www.baidu.com\\\\/?action=static&ms=1&version=css_page_2@0.*?\", head: None, replacement: \"\", action: Reject }",
+    "548": "UrlRewriteDef { pattern: \"^https?:\\\\/\\\\/video-dsp\\\\.pddpic\\\\.com\\\\/market-dsp-video\\\\/\", head: None, replacement: \"\", action: Reject }",
+    "549": "UrlRewriteDef { pattern: \"^https?:\\\\/\\\\/t-dsp\\\\.pinduoduo\\\\.com\\\\/dspcb\\\\/i\\\\/mrk_union\", head: None, replacement: \"\", action: Reject }",
+    "550": "UrlRewriteDef { pattern: \"^https?:\\\\/\\\\/images\\\\.pinduoduo\\\\.com\\\\/(mrk|marketing_api)\\\\/\", head: None, replacement: \"\", action: Reject }",
+    "551": "UrlRewriteDef { pattern: \"^https?:\\\\/\\\\/(gw|heic)\\\\.alicdn\\\\.com\\\\/mt\\\\/\", head: None, replacement: \"\", action: Reject }",
+    "552": "UrlRewriteDef { pattern: \"^https?:\\\\/\\\\/(gw|heic)\\\\.alicdn\\\\.com\\\\/t(?>f|p)s\\\\/.+\\\\d{3,4}-\\\\d{4}\", head: None, replacement: \"\", action: Reject }",
+    "553": "UrlRewriteDef { pattern: \"^https?:\\\\/\\\\/(gw|heic)\\\\.alicdn\\\\.com\\\\/imgextra\\\\/\\\\w{2}\\\\/\\\\w+!+(?!600000000(5412|6148|4021|5802))\\\\d*-\\\\d-tps-(?!1035)\\\\d{3,4}-(?!570)\\\\d{3,4}\\\\.(?>jpg|png)_(1\\\\d{3}|9\\\\d{2})x(1\\\\d{3}|9\\\\d{2})q\\\\d0\\\\.jpg_\\\\.(?>heic|webp)\", head: None, replacement: \"\", action: Reject }",
+    "554": "UrlRewriteDef { pattern: \"^https?:\\\\/\\\\/img1.126.net\\\\/.+dpi=\\\\w{7,8}\", head: None, replacement: \"\", action: Reject }",
+    "555": "UrlRewriteDef { pattern: \"^https?:\\\\/\\\\/img1.126.net\\\\/channel14\\\\/\", head: None, replacement: \"\", action: Reject }",
+    "556": "UrlRewriteDef { pattern: \"^https?:\\\\/\\\\/nex.163.com\\\\/q\", head: None, replacement: \"\", action: Reject }",
+    "557": "UrlRewriteDef { pattern: \"^https?:\\\\/\\\\/g1.163.com\\\\/madfeedback\", head: None, replacement: \"\", action: Reject }",
+    "558": "UrlRewriteDef { pattern: \"^https?:\\\\/\\\\/c\\\\.m\\\\.163\\\\.com\\\\/nc\\\\/gl\\\\/\", head: None, replacement: \"\", action: Reject }"
+  },
+  "header-rewrite": {},
+  "body-rewrite": {},
+  "map-local": {
+    "561": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/api2\\\\.helper\\\\.qq\\\\.com\\\\/game\\\\/buttons\", conditions: HeadConditionsDef { request: None, response: None }, body: TinyGif, data: \"\", status: 200, header: {}, content_type: \"image/gif\", request: false }",
+    "562": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/imgcache\\\\.qq\\\\.com\\\\/qqlive\\\\/\", conditions: HeadConditionsDef { request: None, response: None }, body: TinyGif, data: \"\", status: 200, header: {}, content_type: \"image/gif\", request: false }",
+    "563": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/vv\\\\.video\\\\.qq\\\\.com\\\\/getvmind\\\\?\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"\", status: 200, header: {}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "564": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/qt\\\\.qq\\\\.com\\\\/lua\\\\/mengyou\\\\/get_splash_screen_info\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"\", status: 200, header: {}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "565": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/y\\\\.gtimg\\\\.cn\\\\/music\\\\/.*?_Ad/\\\\d+\\\\.png\", conditions: HeadConditionsDef { request: None, response: None }, body: TinyGif, data: \"\", status: 200, header: {}, content_type: \"image/gif\", request: false }",
+    "566": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/splashqqlive\\\\.gtimg\\\\.com\\\\/website\\\\/\\\\d{6}\", conditions: HeadConditionsDef { request: None, response: None }, body: TinyGif, data: \"\", status: 200, header: {}, content_type: \"image/gif\", request: false }",
+    "567": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/qzonestyle\\\\.gtimg\\\\.cn\\\\/qzone\\\\/biz\\\\/gdt\\\\/mob\\\\/sdk\\\\/ios\\\\/v\\\\d\\\\/\", conditions: HeadConditionsDef { request: None, response: None }, body: TinyGif, data: \"\", status: 200, header: {}, content_type: \"image/gif\", request: false }",
+    "568": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/discuz\\\\.gtimg\\\\.cn\\\\/cloud\\\\/scripts\\\\/discuz_tips\", conditions: HeadConditionsDef { request: None, response: None }, body: TinyGif, data: \"\", status: 200, header: {}, content_type: \"image/gif\", request: false }",
+    "569": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/bla\\\\.gtimg\\\\.com\\\\/qqlive\\\\/\\\\d{6}.+?\\\\.png\", conditions: HeadConditionsDef { request: None, response: None }, body: TinyGif, data: \"\", status: 200, header: {}, content_type: \"image/gif\", request: false }",
+    "570": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/mmgr\\\\.gtimg\\\\.com\\\\/gjsmall\\\\/qiantu\\\\/upload\\\\/\", conditions: HeadConditionsDef { request: None, response: None }, body: TinyGif, data: \"\", status: 200, header: {}, content_type: \"image/gif\", request: false }",
+    "571": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/mmgr\\\\.gtimg\\\\.com\\\\/gjsmall\\\\/qqpim\\\\/public\\\\/ios\\\\/splash\\\\/.+?\\\\/\\\\d{4}_\\\\d{4}\", conditions: HeadConditionsDef { request: None, response: None }, body: TinyGif, data: \"\", status: 200, header: {}, content_type: \"image/gif\", request: false }",
+    "572": "error Unknown: unknown data-type \"json\"",
+    "573": "error Unknown: unknown data-type \"json\"",
+    "574": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/afd\\\\.baidu\\\\.com\\\\/afd\\\\/entry\", conditions: HeadConditionsDef { request: None, response: None }, body: TinyGif, data: \"\", status: 200, header: {}, content_type: \"image/gif\", request: false }",
+    "575": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/issuecdn\\\\.baidupcs\\\\.com\\\\/issue\\\\/netdisk\\\\/guanggao\\\\/\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"\", status: 200, header: {}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "576": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/[\\\\s\\\\S]*\\\\.baidu\\\\.com/.*?ad[xs]\\\\.php\", conditions: HeadConditionsDef { request: None, response: None }, body: TinyGif, data: \"\", status: 200, header: {}, content_type: \"image/gif\", request: false }",
+    "577": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/t\\\\d{2}\\\\.baidu\\\\.com\", conditions: HeadConditionsDef { request: None, response: None }, body: TinyGif, data: \"\", status: 200, header: {}, content_type: \"image/gif\", request: false }",
+    "578": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/g\\\\.alicdn\\\\.com\\\\/(?>alilog|trace)\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"\", status: 200, header: {}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "579": "error Unknown: unknown data-type \"json\"",
+    "580": "error Unknown: unknown data-type \"json\"",
+    "581": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/api\\\\d?\\\\.musical\\\\.ly\\\\/api\\\\/ad\\\\/\", conditions: HeadConditionsDef { request: None, response: None }, body: TinyGif, data: \"\", status: 200, header: {}, content_type: \"image/gif\", request: false }",
+    "582": "MapLocalDef { pattern: \"^https?:\\\\/\\\\/cdn\\\\.api\\\\.fotoable\\\\.com\\\\/Advertise\\\\/\", conditions: HeadConditionsDef { request: None, response: None }, body: Text, data: \"\", status: 200, header: {}, content_type: \"text/plain; charset=utf-8\", request: false }",
+    "583": "error Unknown: unknown data-type \"json\""
+  },
+  "request-body-mock": {},
+  "script": {
+    "586": "ScriptDef { name: \"adunion\", path: \"https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/adsense.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/mi\\\\.gdt\\\\.qq\\\\.com\\\\/gdt_mview\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "587": "ScriptDef { name: \"adunion\", path: \"https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/amdc.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/amdc\\\\.m\\\\.taobao\\\\.com\\\\/amdc\\\\/mobileDispatch$\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: false, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "588": "ScriptDef { name: \"adunion\", path: \"https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/alicdn.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/g\\\\.alicdn\\\\.com\\\\/.*o2o-ad\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "589": "ScriptDef { name: \"adunion\", path: \"https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/adsense.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/api-access\\\\.pangolin-sdk-toutiao\\\\.com\\\\/api\\\\/ad\\\\/union\\\\/sdk\\\\/get_ads\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }",
+    "590": "ScriptDef { name: \"adunion\", path: \"https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/adsense.js\", kind: HttpResponse, pattern: Some(\"^https?:\\\\/\\\\/is.snssdk.com/api/ad/union/sdk\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }"
+  },
+  "rules": {
+    "count": 503,
+    "sha256": "347d7e92c575cf7232372bfb41abef665ff93b6e311361e2d75d8b375ddc22ff",
+    "errors": {}
+  },
+  "rule-sets": [],
+  "resources": [
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/adsense.js",
+      "kind": "script",
+      "lines": [
+        586,
+        589,
+        590
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/amdc.js",
+      "kind": "script",
+      "lines": [
+        587
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zirawell/R-Store/main/Res/Scripts/AntiAd/alicdn.js",
+      "kind": "script",
+      "lines": [
+        588
+      ]
+    }
+  ],
+  "network": {},
+  "declared-scripts": [
+    586,
+    587,
+    588,
+    589,
+    590
+  ],
+  "ignored": []
+}

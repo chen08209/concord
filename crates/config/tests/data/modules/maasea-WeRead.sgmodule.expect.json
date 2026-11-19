@@ -1,0 +1,50 @@
+{
+  "format": "surge",
+  "meta": {
+    "name": "微信阅读精简",
+    "desc": "去除微信阅读扰人提示(beta)",
+    "author": null,
+    "icon": null,
+    "homepage": null,
+    "category": null,
+    "system": null,
+    "requirement": null,
+    "argumentsDesc": null
+  },
+  "off": null,
+  "arguments": [],
+  "hostname": [
+    {
+      "line": 10,
+      "items": "i.weread.qq.com"
+    }
+  ],
+  "force-http-hostname": [],
+  "skip-server-cert-verify": null,
+  "client-source-address": [],
+  "h2": null,
+  "url-rewrite": {},
+  "header-rewrite": {},
+  "body-rewrite": {},
+  "map-local": {},
+  "request-body-mock": {},
+  "script": {
+    "7": "ScriptDef { name: \"WeRead\", path: \"https://raw.githubusercontent.com/Maasea/sgmodule/master/Script/WeRead/weread.js\", kind: HttpResponse, pattern: Some(\"https:\\\\/\\\\/i\\\\.weread\\\\.qq\\\\.com\\\\/(book\\\\/(reading[sS]tat|chapterReview)|user\\\\/profile|groups\\\\/readerEntrance|review\\\\/list|mobileSync)\"), conditions: HeadConditionsDef { request: None, response: None }, requires_body: true, binary_body: false, max_size: 0, cronexp: \"\", event: \"\", timeout: None, argument: None }"
+  },
+  "rules": {},
+  "rule-sets": [],
+  "resources": [
+    {
+      "url": "https://raw.githubusercontent.com/Maasea/sgmodule/master/Script/WeRead/weread.js",
+      "kind": "script",
+      "lines": [
+        7
+      ]
+    }
+  ],
+  "network": {},
+  "declared-scripts": [
+    7
+  ],
+  "ignored": []
+}

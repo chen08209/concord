@@ -18,6 +18,7 @@ mod heads;
 mod hostlist;
 mod jq;
 mod limits;
+mod module_view;
 mod pattern;
 #[cfg(feature = "script")]
 mod quickjs;
@@ -46,6 +47,7 @@ pub use facade::{Mitm, MitmEnv};
 pub use limits::{
     PRESSURE_NO_BODIES, PRESSURE_NO_SCRIPTS, PRESSURE_NONE, PRESSURE_RELAY, RawLimits,
 };
+pub use module_view::{IgnoredView, ModuleView, RuleView};
 #[cfg(feature = "script")]
 pub use quickjs::QuickJs;
 pub use script::{

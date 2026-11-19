@@ -1,0 +1,37 @@
+{
+  "format": "surge",
+  "meta": {
+    "name": "广告联盟",
+    "desc": "某些APP要清除缓存或者重新安装拦截广告才会生效！",
+    "author": "奶思",
+    "icon": null,
+    "homepage": "https://github.com/fmz200/wool_scripts",
+    "category": "奶思的模块",
+    "system": null,
+    "requirement": null,
+    "argumentsDesc": null
+  },
+  "off": null,
+  "arguments": [],
+  "hostname": [],
+  "force-http-hostname": [],
+  "skip-server-cert-verify": null,
+  "client-source-address": [],
+  "h2": null,
+  "url-rewrite": {},
+  "header-rewrite": {},
+  "body-rewrite": {},
+  "map-local": {},
+  "request-body-mock": {},
+  "script": {},
+  "rules": {
+    "count": 391,
+    "sha256": "d4583a945de4c4135124bb15040d78e322140ee86103e56daf50fc86d21c6482",
+    "errors": {}
+  },
+  "rule-sets": [],
+  "resources": [],
+  "network": {},
+  "declared-scripts": [],
+  "ignored": []
+}
