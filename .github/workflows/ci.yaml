@@ -140,6 +140,9 @@ jobs:
         uses: ./.github/actions/ca-bundle
 
       - name: Build release core
+        env:
+          CFLAGS: -DNDEBUG
+          CXXFLAGS: -DNDEBUG
         run: cargo build --release --locked -p concord-desktop
 
       - name: Check binary size
@@ -261,6 +264,9 @@ jobs:
 
       - name: Build release libconcord.so
         if: matrix.budget
+        env:
+          CFLAGS: -DNDEBUG
+          CXXFLAGS: -DNDEBUG
         run: cargo build --release --locked --target ${{ matrix.target }} -p concord-android
 
       - name: Check library size

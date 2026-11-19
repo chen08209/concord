@@ -141,6 +141,9 @@ jobs:
         uses: ./.github/actions/ca-bundle
 
       - name: Build release libconcord.so
+        env:
+          CFLAGS: -DNDEBUG
+          CXXFLAGS: -DNDEBUG
         run: cargo build --release --locked --target ${{ matrix.target }} -p concord-android
 
       - name: Check library size

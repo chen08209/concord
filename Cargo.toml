@@ -206,6 +206,10 @@ debug = "line-tables-only"
 opt-level = 1
 debug = false
 
+# cmake-rs builds C at opt-level 1 as CMake Release, which defines NDEBUG; level 0 keeps BoringSSL's asserts in tests.
+[profile.dev.package.boring-sys]
+opt-level = 0
+
 [profile.release]
 opt-level = "z"
 lto = "fat"

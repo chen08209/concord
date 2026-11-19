@@ -107,8 +107,15 @@ events are gone, so the host change lands in the same commit as the core it embe
 | `CONCORD_DEBUG` | Run | Any value also writes errors to standard error |
 | `BORING_BSSL_RUST_CPPLIB=c++_static` | Android build | Links BoringSSL against the NDK's static C++ runtime |
 | `AWS_LC_SYS_NO_JITTER_ENTROPY` | Build | Workspace default `1` disables AWS-LC's optional CPU jitter entropy collector; `0` restores the dependency default |
+| `CFLAGS_<target>`, `CXXFLAGS_<target>` with `-DNDEBUG` | Release build | Compiles the C dependencies without their `assert`s |
 
 An executable that links `c++_static` on Android also needs `-C link-arg=-lc++abi`.
+
+A release build defines `NDEBUG` for the C dependencies, as BoringSSL, AWS-LC and quickjs-ng do in their own release
+builds. Nothing does it for the host: AWS-LC (`aws-lc-sys`'s default cc build) and quickjs (`rquickjs-sys`) never
+define it, and cmake-rs drops CMake's `/DNDEBUG` from BoringSSL under the Visual Studio generator. A live `assert`
+aborts the whole core on a bad certificate, a third-party script or a misused BoringSSL call. Debug and test builds
+keep them, and `boring-sys` builds at `opt-level = 0` there so that BoringSSL's are on too.
 
 Workspace builds use non-FIPS `aws-lc-sys`. Its OS entropy path avoids jitter collector initialization on the
 process's first random request, including the first TLS connection. This setting affects every AWS-LC caller;
