@@ -13,6 +13,13 @@ pub struct HostEntryDef {
     pub port: u16,
 }
 
+/// Surge's names for the kinds of host a hostname entry may stand for instead of a glob.
+pub const IP_ADDRESS: &str = "<ip-address>";
+pub const IPV4_ADDRESS: &str = "<ipv4-address>";
+pub const IPV6_ADDRESS: &str = "<ipv6-address>";
+pub const SIMPLE_HOSTNAME: &str = "<simple-hostname>";
+const HOST_TOKENS: [&str; 4] = [IP_ADDRESS, IPV4_ADDRESS, IPV6_ADDRESS, SIMPLE_HOSTNAME];
+
 /// One error per bad item, naming it; the good items apply all the same.
 pub fn parse_host_line(line: &str) -> (Vec<HostEntryDef>, Vec<LineError>) {
     let mut entries = Vec::new();
@@ -35,6 +42,18 @@ fn parse_host_entry(item: &str) -> Result<HostEntryDef, LineError> {
         Some(rest) => (true, rest),
         None => (false, item),
     };
+    if item.starts_with('<') {
+        let token = HOST_TOKENS
+            .into_iter()
+            .find(|token| item.eq_ignore_ascii_case(token))
+            .ok_or_else(|| LineError::invalid("unknown token"))?;
+        return Ok(HostEntryDef {
+            pattern: token.to_string(),
+            exclude,
+            bare: true,
+            port: 0,
+        });
+    }
     let (host, port) = split_host_pattern(item)?;
     if host.is_empty() {
         return Err(LineError::invalid("empty host"));

@@ -1,4 +1,8 @@
-use concord_config::mitm::{HostEntryDef, LineError};
+use std::net::IpAddr;
+
+use concord_config::mitm::{
+    HostEntryDef, IP_ADDRESS, IPV4_ADDRESS, IPV6_ADDRESS, LineError, SIMPLE_HOSTNAME,
+};
 
 use crate::view::{HostEntryView, HostsView, LineView};
 
@@ -55,7 +59,7 @@ impl HostList {
         }
         self.0
             .iter()
-            .find(|entry| covers(entry, port, sniffed) && glob(&entry.pattern, &host))
+            .find(|entry| covers(entry, port, sniffed) && names(&entry.pattern, &host))
     }
 
     /// `None` while the list has no entry, as a line none of whose items could be read.
@@ -78,6 +82,11 @@ impl HostList {
     pub(crate) fn extend(&mut self, other: HostList) {
         self.0.extend(other.0);
     }
+
+    /// Takes out the entries written exactly as one of `disabled`'s, not those it covers.
+    pub(crate) fn remove(&mut self, disabled: &HostList) {
+        self.0.retain(|entry| !disabled.0.contains(entry));
+    }
 }
 
 fn covers(entry: &HostEntryDef, port: u16, sniffed: bool) -> bool {
@@ -96,6 +105,25 @@ pub(crate) fn parse_host_line(line: &str) -> (HostList, Vec<LineError>) {
 impl From<Vec<HostEntryDef>> for HostList {
     fn from(entries: Vec<HostEntryDef>) -> HostList {
         HostList(entries)
+    }
+}
+
+/// Whether an entry's pattern, a glob or one of Surge's tokens, stands for `host`.
+fn names(pattern: &str, host: &str) -> bool {
+    if !pattern.starts_with('<') {
+        return glob(pattern, host);
+    }
+    let ip = host
+        .trim_start_matches('[')
+        .trim_end_matches(']')
+        .parse::<IpAddr>()
+        .ok();
+    match pattern {
+        IP_ADDRESS => ip.is_some(),
+        IPV4_ADDRESS => ip.is_some_and(|ip| ip.is_ipv4()),
+        IPV6_ADDRESS => ip.is_some_and(|ip| ip.is_ipv6()),
+        SIMPLE_HOSTNAME => ip.is_none() && !host.contains('.'),
+        _ => false,
     }
 }
 
@@ -177,6 +205,31 @@ mod tests {
     }
 
     #[test]
+    fn tokens_stand_for_kinds_of_host() {
+        let (list, errors) = HostList::parse(&lines(&["-<ip-address>, *"]));
+        assert!(errors.is_empty(), "{errors:?}");
+        assert!(!list.matches("203.0.113.9", 443));
+        assert!(!list.matches("2001:db8::1", 443));
+        assert!(list.matches("a.example.com", 443));
+        let cases = [
+            ("<IPv4-Address>", "203.0.113.9", true),
+            ("<ipv4-address>", "2001:db8::1", false),
+            ("<ipv6-address>", "[2001:db8::1]", true),
+            ("<ipv6-address>", "203.0.113.9", false),
+            ("<simple-hostname>", "printer", true),
+            ("<simple-hostname>", "a.example.com", false),
+            ("<simple-hostname>", "203.0.113.9", false),
+        ];
+        for (token, host, want) in cases {
+            let (list, errors) = HostList::parse(&lines(&[token]));
+            assert!(errors.is_empty(), "{errors:?}");
+            assert_eq!(list.matches(host, 443), want, "{token} {host}");
+        }
+        let (_, errors) = HostList::parse(&lines(&["<any-host>"]));
+        assert_eq!(errors.len(), 1, "{errors:?}");
+    }
+
+    #[test]
     fn order_decides() {
         let (list, _) = HostList::parse(&lines(&["*", "-a.com"]));
         assert!(list.matches("a.com", 443));
@@ -195,7 +248,7 @@ mod tests {
             "good.com",
             "bad host.com",
             "x.com:99999",
-            "<ip-address>",
+            "<ip-address>:443",
             "[::1",
         ]));
         assert_eq!(errors.len(), 4, "{errors:?}");

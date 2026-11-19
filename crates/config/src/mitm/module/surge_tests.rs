@@ -169,3 +169,19 @@ fn a_redirect_to_the_gateway_waits_on_a_value_only_the_network_knows() {
     assert_eq!(ignored(&def), [(3, IgnoreReason::RuntimeValue)]);
     assert_eq!(def.lists.url_rewrite.len(), 1);
 }
+
+#[test]
+fn hostname_disabled_reads_as_a_list_of_its_own() {
+    let def = read(
+        "#!name=Off\n[MITM]\nhostname = %APPEND% a.test, b.test\nhostname-disabled = %APPEND% b.test\n",
+    );
+    assert!(ignored(&def).is_empty(), "{:?}", def.ignored);
+    let section = def.section("");
+    let disabled: Vec<&str> = section.hostname_disabled[0]
+        .read
+        .items
+        .iter()
+        .map(|entry| entry.pattern.as_str())
+        .collect();
+    assert_eq!(disabled, ["b.test"]);
+}

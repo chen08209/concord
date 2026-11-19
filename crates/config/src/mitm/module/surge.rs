@@ -363,6 +363,10 @@ impl<'a> Reader<'a> {
                     },
                 });
             }
+            "hostname-disabled" => lists.hostname_disabled.push(ModuleLine {
+                line: number,
+                def: host_items(list_mark(value).1),
+            }),
             "h2" if on => lists.h2 = lists.h2.or(Some(number)),
             "h2" => {}
             "skip-server-cert-verify" if on => self.skip_verify = Some(number),

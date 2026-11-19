@@ -450,6 +450,7 @@ pub fn compose(
                 appended.push(line);
             }
         }
+        section.hostname_disabled.extend(lines.hostname_disabled);
         section.h2 |= lines.h2;
         section
             .skip_server_cert_verify_hostname

@@ -120,6 +120,7 @@ pub struct HostLine {
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct ModuleLists {
     pub hostname: Vec<ModuleLine<HostLine>>,
+    pub hostname_disabled: Vec<ModuleLine<Items<HostEntryDef>>>,
     /// Surge's `force-http-engine-hosts`: plain HTTP these hosts carry goes through the HTTP
     /// engine, and their TLS is never decrypted.
     pub force_http_hostname: Vec<ModuleLine<Items<HostEntryDef>>>,
@@ -270,6 +271,7 @@ impl ModuleDef {
             enable: true,
             h2: lists.h2.is_some(),
             hostname: each(&lists.hostname, &at, |line| line.items.clone()),
+            hostname_disabled: each(&lists.hostname_disabled, &at, Clone::clone),
             skip_server_cert_verify_hostname: skip.into_iter().collect(),
             client_source_address: each(&lists.client_source_address, &at, Clone::clone),
             url_rewrite: each(&lists.url_rewrite, &at, Clone::clone),

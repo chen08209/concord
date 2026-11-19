@@ -133,6 +133,17 @@ impl Config {
             read_hosts(&mut self.hosts, read)
         });
         each(
+            "hostname-disabled",
+            &def.hostname_disabled,
+            visit,
+            |read, _| {
+                let disabled = HostList::from(read.items.clone());
+                let view = disabled.view();
+                self.hosts.remove(&disabled);
+                items(read, view)
+            },
+        );
+        each(
             "skip-server-cert-verify-hostname",
             &def.skip_server_cert_verify_hostname,
             visit,

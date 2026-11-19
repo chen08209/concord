@@ -17,7 +17,10 @@ use std::sync::Arc;
 use serde::{Deserialize, Deserializer, Serialize};
 
 pub use heads::{HeadConditionsDef, REQUEST_HEAD, RESPONSE_HEAD};
-pub use hosts::{HostEntryDef, SourceEntryDef, parse_host_line, parse_source_line};
+pub use hosts::{
+    HostEntryDef, IP_ADDRESS, IPV4_ADDRESS, IPV6_ADDRESS, SIMPLE_HOSTNAME, SourceEntryDef,
+    parse_host_line, parse_source_line,
+};
 pub use issue::{IssueKind, LineError};
 pub use pattern::{MULTILINE, check_multiline, check_pattern, multiline, regex_source};
 pub use rules::{
@@ -50,6 +53,9 @@ pub struct MitmSection {
     pub enable: bool,
     #[serde(deserialize_with = "null_default")]
     pub hostname: Vec<String>,
+    /// Surge's entries taken out of `hostname` once the modules' are in, kept to turn back on.
+    #[serde(deserialize_with = "null_default")]
+    pub hostname_disabled: Vec<String>,
     #[serde(deserialize_with = "null_default")]
     pub skip_server_cert_verify: bool,
     /// Hosts whose servers' certificates go unchecked while the switch above is off, as a
@@ -165,6 +171,7 @@ pub struct MitmDef {
     pub h2: bool,
     pub limits: MitmLimits,
     pub hostname: Vec<MitmLine<Items<HostEntryDef>>>,
+    pub hostname_disabled: Vec<MitmLine<Items<HostEntryDef>>>,
     pub skip_server_cert_verify_hostname: Vec<MitmLine<Items<HostEntryDef>>>,
     pub client_source_address: Vec<MitmLine<Items<SourceEntryDef>>>,
     pub url_rewrite: Vec<MitmLine<Read<UrlRewriteDef>>>,
@@ -186,6 +193,7 @@ impl MitmDef {
             }
         }
         mark(&mut self.hostname, origin);
+        mark(&mut self.hostname_disabled, origin);
         mark(&mut self.skip_server_cert_verify_hostname, origin);
         mark(&mut self.client_source_address, origin);
         mark(&mut self.url_rewrite, origin);
@@ -273,6 +281,7 @@ impl MitmDef {
             h2: section.h2,
             limits: section.limits,
             hostname: each_line(&section.hostname, host_items),
+            hostname_disabled: each_line(&section.hostname_disabled, host_items),
             skip_server_cert_verify_hostname: each_line(
                 &section.skip_server_cert_verify_hostname,
                 host_items,
@@ -302,6 +311,7 @@ impl MitmDef {
             h2,
             limits,
             hostname,
+            hostname_disabled,
             skip_server_cert_verify_hostname,
             client_source_address,
             url_rewrite,
@@ -320,6 +330,7 @@ impl MitmDef {
             && *h2 == other.h2
             && *limits == other.limits
             && same_reads(hostname, &other.hostname)
+            && same_reads(hostname_disabled, &other.hostname_disabled)
             && same_reads(
                 skip_server_cert_verify_hostname,
                 &other.skip_server_cert_verify_hostname,
@@ -336,6 +347,7 @@ impl MitmDef {
     /// The lines that cannot be read, list by list in the order the engine reads them.
     pub fn bad_lines(&self) -> impl Iterator<Item = BadLine<'_>> {
         bad("hostname", &self.hostname, unread)
+            .chain(bad("hostname-disabled", &self.hostname_disabled, unread))
             .chain(bad(
                 "skip-server-cert-verify-hostname",
                 &self.skip_server_cert_verify_hostname,

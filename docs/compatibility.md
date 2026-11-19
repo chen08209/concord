@@ -235,6 +235,11 @@ A script reads a body up to `limits.max-body-size` unless its line sets `max-siz
 over its script's limit passes on as it came, the script unrun. `$notification.post` goes out on `events.watch` as a
 `scriptNotification` as soon as it is posted, with the URL its fourth argument names as `url`, `open-url`, `openUrl`
 or a bare string; none is kept for an app that is not watching.
+A `hostname` entry may be one of Surge's tokens instead of a glob, `-` before it to exclude: `<ip-address>`,
+`<ipv4-address>` and `<ipv6-address>` stand for a server reached by its address with no name in its TLS hello, and
+`<simple-hostname>` for a name without a dot. A token takes no port. `hostname-disabled`, in the profile's `mitm` and
+in a module's `[MITM]`, takes out of the `hostname` list the modules and the profile make the entries written the same,
+exclusion and port included; an entry that only covers one stays.
 `client-source-address` takes Surge's comma-separated addresses and CIDRs, `-` before one left out, and decrypts
 only for the clients it names, all of them while it is empty. Under a TUN the device's own apps reach Concord from the
 TUN's address, so a list that names only other clients leaves them as they are, as Surge does on a Mac.

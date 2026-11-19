@@ -1822,3 +1822,37 @@ async fn a_websocket_keeps_its_replaced_engine_until_it_closes() {
     drop(tls);
     eventually(|| old.upgrade().is_none()).await;
 }
+
+#[tokio::test]
+async fn an_address_token_leaves_a_connection_with_no_name_but_its_address() {
+    let (_server, rig) = rig(echo(), true, &["http/1.1"]).await;
+    rig.config(
+        json!({"enable": true, "hostname": ["-<ip-address>, *"], "skip-server-cert-verify": true}),
+    );
+    let bare = flow_of(InboundKind::Tun, Address::new("203.0.113.9", 443));
+    let wire = hello("203.0.113.9", &["http/1.1"]);
+    assert_eq!(declined(&rig, bare.clone(), &wire).await, wire);
+
+    let mut client = Client::tls_flow(&rig, bare, "example.test", &["http/1.1"])
+        .await
+        .unwrap();
+    assert_eq!(client.get("/p").await.text(), "example.test|/p||");
+}
+
+#[tokio::test]
+async fn a_disabled_hostname_is_taken_out_of_the_list_as_written() {
+    let (_server, rig) = rig(echo(), true, &["http/1.1"]).await;
+    let errors = rig.config(json!({
+        "enable": true,
+        "hostname": ["a.test, b.test, *.c.test"],
+        "hostname-disabled": ["b.test, x.c.test"],
+    }));
+    assert!(errors.is_empty(), "{errors:?}");
+    let engine = rig.mitm.engine().unwrap();
+    assert!(engine.match_tcp(&flow("a.test", 443)));
+    assert!(!engine.match_tcp(&flow("b.test", 443)));
+    assert!(
+        engine.match_tcp(&flow("x.c.test", 443)),
+        "only an entry written the same is taken out"
+    );
+}
