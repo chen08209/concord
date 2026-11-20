@@ -189,6 +189,21 @@ fall to exactly 1000 per second, `wait_share` rises above 10, the ACKs it sends 
 `env.keep_awake` with their pids and how many were still running when the harness stopped them; a loop also dies with
 the harness.
 
+The same accounting shows on the other VMs and in any lightly loaded reading, and it reaches the peer server's CPU as
+much as the core's. Over `--link lossy` and `--link wan` on the Linux VM the loops cut the server's CPU per GB about
+fourfold in both arms, and Concord's excess over Go on TUIC and ShadowQUIC Brutal from 10-12% to 2-6%; they also raised
+both arms' packets to the server per MB by about half, so by the rule above that pass does not judge, and the VM cannot
+settle such a gap within 5%. On the macOS VM at `--origin-rate 1000`, one lowest-priority loop cut both arms' server
+CPU per GB by 70% and moved ss-aes128 from 9% above Go to 2% below. macOS has no affinity and no idle class, so the
+loop there is `nice -n 20 perl -e 'while (1) { select(undef, undef, undef, 0) }'`, which enters the kernel on every
+pass. For Windows see Windows.
+
+The loops are not a control everywhere. They leave connection-rate and request-response gaps standing: TUN
+single-queue `tcp-rr` cost 47% more CPU per transaction than sing-box without them and 56% with them, while both arms'
+transactions per second tripled. At full speed on macOS, where nothing is pinned, the loop takes CPU from the measured
+processes: beside it Concord's ss-aes128 download fell 19% and the server's CPU per GB rose 64%. Use them for capped
+and paced runs, run both passes, and report both.
+
 ### The 1 Gbit/s group
 
 CPU efficiency against Go is read with both cores held to the same rate (`performance.md`): `--link rate=1000mbit`
@@ -404,6 +419,11 @@ showed up in the server's per-chunk sleep and pacer queue, not in the core:
 ```bat
 start /low /affinity 1 powershell -NoProfile -Command "while ($true) {}"
 ```
+
+One busy vCPU matters beyond timer-paced servers. With such a loop pinned to vCPU 5 instead, `vmess-grpc-tls`
+`tcp-up`, whose plain non-blocking writer stalls for a timer tick against Concord, read 26% below Go instead of 79%.
+`tcp-crr` did not move toward Go: ss-aes128 and trojan-tls tied without the loop and trailed by 13% with it, and tuic
+trailed by 22% either way.
 
 Connection-rate cases exhaust the VM's ephemeral ports on Windows defaults: 16 384 dynamic ports from 49152, TIME_WAIT
 held 120 s, and no loopback reuse such as Linux's `tcp_tw_reuse=2` (the Linux VM has 28 232 ports, 32768-60999, and a

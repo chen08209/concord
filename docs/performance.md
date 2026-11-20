@@ -23,6 +23,9 @@ sends, receives and echoes.
   latency windows last 3 s after 0.7 s of warm-up.
 - CPU per GB, per transaction and per connection is the core's own CPU time, each core at its own top speed. Server
   CPU is the mihomo server's, the same binary in both arms, so it shows what the client's framing costs the server.
+- No workload here is rate-capped. Under a cap a VM charges each process several times more CPU per byte for the
+  vCPUs that sleep between bursts, which can make either arm look the more expensive one, so capped readings are taken
+  with and without a loop that keeps the CPUs awake, and none appear on this page.
 - Linux: the figure is the ratio of the medians over rounds, with a 95% bootstrap interval. It counts as a lead or a
   deficit only when the interval excludes no change and a Mann-Whitney test gives p < 0.05; otherwise it is a tie.
 - macOS: there is no CPU pinning, so all four processes share the VM's CPUs and whole rounds move together. The ratio
@@ -71,7 +74,8 @@ Higher is better for rates, lower for CPU, latency and memory. "tie" means no si
 The last column is the resolution for `direct` and for the proxied cases (measured on `ss-aes128`). "not judged"
 marks a metric whose run of Concord against itself varied too much between rounds to decide anything (12% for
 `direct` new connections, 31% for download server CPU). The server spent more CPU per GB on Concord's `ss-aes128` and
-`trojan-tls` downloads, but within that variation. Peak memory is the ratio of the medians.
+`trojan-tls` downloads, but within that variation, and a later run of the same builds on 8 vCPUs did not repeat it
+(-15% and +4%). Peak memory is the ratio of the medians.
 
 | Metric | `direct` | `ss-aes128` | `trojan-tls` | `vmess-grpc-tls` | `hysteria2` | Resolution |
 |---|---|---|---|---|---|---|
