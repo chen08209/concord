@@ -35,6 +35,7 @@ crate's directory, its `[patch.crates-io]` entry and its lines in `UPSTREAM.sha2
 | quinn | `MAX_TRANSMIT_DATAGRAMS` 80 (`MAX_TRANSMIT_SEGMENTS` back to upstream's 10) | n0-computer/noq#636 (noq) | The segment cap is upstream's again; propose only the datagram limit to quinn-rs/quinn |
 | quinn | Stamp each received batch with its own read time | None; quinn `main` `8fe66c3` passes one `now` | PR with `crates/proxy/tests/quinn_recv_time.rs` as the regression |
 | quinn | Lease receive scratch for a socket poll instead of an endpoint lifetime | None | Propose to quinn-rs/quinn with the endpoint sharing regression and receive-buffer lease contracts |
+| quinn | Hold one UDP_GRO socket for the process so per-connection sockets do not flip the kernel's encapsulation static keys | None | Propose to quinn-rs/quinn, or to quinn-udp where `UdpSocketState::new` sets UDP_GRO |
 | quinn-proto | `send_quantum`, `on_packet_lost`, `min_pacing_delay` and explicit-rate pacing | quinn-rs/quinn#2481; merged as noq#611 | Follow #2481. `min_pacing_delay` is Concord's own addition and needs its own proposal; the pacer changes cannot move into `quic/src/congestion.rs` while the controller API lacks these hooks |
 | quinn-proto | Requeue unacknowledged STREAM data on a PTO; withdraw acknowledged copies | None; quinn `main` `765abecf` requeues only control frames | PR with the recovery contracts of `crates/proxy/tests/quinn_pto.rs` |
 | quinn-proto | A DATAGRAM-only packet does not bundle a pending ACK | None | PR citing quic-go's default path and the `quinn_pto.rs` ACK contracts |
@@ -119,6 +120,18 @@ The package archive checksum is `7d29020232d6aa3fb1daca64c1127cf662cf97f254ae16c
   quic-go stamps every packet as it reads it (sing-box quic-go `v0.61.0-sing-box-mod.12` `sys_conn.go:154`,
   `:194`, `sys_conn_oob.go:406`); a batch here comes from one `recvmmsg` or `WSARecvMsg` call, so stamping per
   batch is the same up to the call's own duration. Contract: `crates/proxy/tests/quinn_recv_time.rs`.
+- `src/runtime/tokio.rs`: on Linux and Android, the first `wrap_udp_socket` opens one loopback UDP socket, connected
+  to itself so nothing else reaches it, runs `UdpSocketState::new` on it and keeps it for the process. quinn-udp turns
+  on UDP_GRO for every socket, and the kernel counts each such socket in the UDP encapsulation static keys
+  (`udp_tunnel_encap_enable`; `udpv6_destroy_sock` releases them); a count moving between zero and one patches kernel
+  text (`jump_label_update`) and synchronises every CPU. A client that opens a socket per QUIC connection, as XHTTP
+  over HTTP/3 and the QUIC proxies do, paid that on open and close of every connection when no other GRO socket was
+  open: 11.4% of the core's CPU samples in stream-one CRR on Linux arm64 (`clqrb_crr_profile_1`), with the IPIs
+  landing on the peer's and origin's CPUs too. quic-go never sets UDP_GRO (metacubex quic-go
+  `v0.61.1-0.20260727080200-2548683b76f4` `sys_conn_oob.go:80-143`), so its clients never touch the keys. While one
+  GRO socket is open the count stays above zero and the per-connection change is an atomic increment. The keys gate
+  a per-packet encapsulation check that any open QUIC socket already enables. Contract:
+  `crates/proxy/tests/quinn_gro_key.rs`.
 - `Cargo.toml`, `benches/`, `examples/`, `tests/`: the `[[example]]`, `[[test]]` and `[[bench]]` targets are removed
   with their sources.
 - `.cargo_vcs_info.json`, `Cargo.lock`, `Cargo.toml.orig`: crates.io packaging metadata, omitted.

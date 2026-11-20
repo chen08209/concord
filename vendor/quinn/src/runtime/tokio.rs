@@ -28,6 +28,8 @@ impl Runtime for TokioRuntime {
     }
 
     fn wrap_udp_socket(&self, sock: std::net::UdpSocket) -> io::Result<Arc<dyn AsyncUdpSocket>> {
+        #[cfg(any(target_os = "linux", target_os = "android"))]
+        gro_key::hold();
         Ok(Arc::new(UdpSocket {
             inner: udp::UdpSocketState::new((&sock).into())?,
             io: tokio::net::UdpSocket::from_std(sock)?,
@@ -36,6 +38,32 @@ impl Runtime for TokioRuntime {
 
     fn now(&self) -> Instant {
         tokio::time::Instant::now().into_std()
+    }
+}
+
+// Concord: `UdpSocketState::new` turns on UDP_GRO, and Linux counts every such socket in its UDP
+// encapsulation static keys (`udp_tunnel_encap_enable`, released in `udp(v6)_destroy_sock`). A key's
+// count moving between zero and one rewrites kernel text and interrupts every CPU, so one short-lived
+// socket per connection paid that twice per connection. A GRO socket held for the process keeps the
+// count above zero; it is connected to itself, so nothing else can reach it.
+#[cfg(any(target_os = "linux", target_os = "android"))]
+mod gro_key {
+    use std::net::{Ipv4Addr, Ipv6Addr, UdpSocket};
+    use std::sync::OnceLock;
+
+    static HELD: OnceLock<Option<UdpSocket>> = OnceLock::new();
+
+    pub(super) fn hold() {
+        HELD.get_or_init(open);
+    }
+
+    fn open() -> Option<UdpSocket> {
+        let sock = UdpSocket::bind((Ipv6Addr::LOCALHOST, 0))
+            .or_else(|_| UdpSocket::bind((Ipv4Addr::LOCALHOST, 0)))
+            .ok()?;
+        sock.connect(sock.local_addr().ok()?).ok()?;
+        udp::UdpSocketState::new((&sock).into()).ok()?;
+        Some(sock)
     }
 }
 
