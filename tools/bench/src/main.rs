@@ -131,6 +131,11 @@ struct RunArgs {
     #[arg(long)]
     mitm_rules: Option<usize>,
     #[arg(
+        help = "Bytes of each remote file a mitm-modules module reads from the origin; 0 leaves them to fail. Default 16384."
+    )]
+    #[arg(long)]
+    mitm_resource_bytes: Option<usize>,
+    #[arg(
         help = "Linux: `core=0-1,server=2-3,origin=4,client=5-7`, or `off`. By default the CPUs this process may use are split between the four."
     )]
     #[arg(long)]
@@ -435,6 +440,9 @@ fn run(args: RunArgs) -> Result<bool, String> {
     }
     if let Some(count) = args.mitm_rules {
         plan.mitm_rules = count;
+    }
+    if let Some(bytes) = args.mitm_resource_bytes {
+        plan.mitm_resource_bytes = bytes;
     }
     plan.tun = args.tun;
     plan.tun_stack = args.tun_stack.clone();

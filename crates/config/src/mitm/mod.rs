@@ -7,6 +7,7 @@ mod issue;
 pub mod module;
 pub mod modules;
 mod pattern;
+mod relax;
 mod rules;
 mod script;
 pub mod text;
@@ -22,7 +23,8 @@ pub use hosts::{
     parse_host_line, parse_source_line,
 };
 pub use issue::{IssueKind, LineError};
-pub use pattern::{MULTILINE, check_multiline, check_pattern, multiline, regex_source};
+pub use pattern::{MULTILINE, check_multiline, check_pattern, multiline, parses, regex_source};
+pub use relax::relax;
 pub use rules::{
     BodyActionDef, BodyRewriteDef, HeaderEditDef, HeaderRewriteDef, MapLocalBody, MapLocalDef,
     UrlAction, UrlRewriteDef, parse_body_rewrite, parse_header_rewrite, parse_map_local,

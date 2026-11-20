@@ -1,7 +1,7 @@
 use super::*;
 use crate::rules::parse_url_rewrite;
 
-const PATTERNS: [&str; 14] = [
+const PATTERNS: [&str; 17] = [
     r"^http:\/\/apicloud\.zol\.com\.cn\/Article\/WapLaunchLogo",
     r"^https?:\/\/(h3\.)?open\.taou\.com\/maimai\/adshow\?",
     r"^https:\/\/api\.weibo\.cn\/2\/statuses\/(container_timeline(?>_hot|_topic)?|unread_hot_timeline)\?",
@@ -16,9 +16,12 @@ const PATTERNS: [&str; 14] = [
     r"^https?://(www\.)?video\.test/(ad|pre)roll",
     r"^https://API\.Mixed\.test/v1",
     r"^",
+    r"^https?:\/\/[\w-]+\.amap\.com\/ws\/(boss|shield)\/",
+    r"^https?://[^/]+/(api|v2)/promo(tion)?s?/",
+    r"(?i)/ADS/",
 ];
 
-const URLS: [&str; 22] = [
+const URLS: [&str; 27] = [
     "http://apicloud.zol.com.cn/Article/WapLaunchLogo?x=1",
     "https://apicloud.zol.com.cn/Article/WapLaunchLogo",
     "https://h3.open.taou.com/maimai/adshow?a=1",
@@ -41,6 +44,11 @@ const URLS: [&str; 22] = [
     "https://API.Mixed.test/v1/list",
     "https://www.unrelated.test/index.html",
     "",
+    "https://m5.amap.com/ws/boss/order",
+    "https://m5.amap.com/ws/other/x",
+    "https://shop.test/api/promotions/1",
+    "https://shop.test/v2/promo/1?x=/ads/",
+    "https://cdn.test/Ads/x.png",
 ];
 
 fn rules_of(patterns: &[&str]) -> Rules {
@@ -100,16 +108,53 @@ fn a_prefix_only_makes_a_candidate_and_the_pattern_decides() {
 }
 
 #[test]
-fn patterns_without_a_finite_anchored_prefix_are_always_tried() {
+fn patterns_without_a_literal_to_look_up_are_always_tried() {
     let cases = [
-        (r"^\w+://tracker\.test/", "an unbounded prefix"),
-        (r"^https://a\.com/(?=x)", "fancy syntax"),
-        (r"/collect\?", "no anchor"),
         (r"^", "an empty prefix"),
+        (r"^.+", "no literal at all"),
+        (r"^\w+\d*$", "only classes"),
     ];
     for (pattern, why) in cases {
         let rules = rules_of(&[pattern]);
         assert_eq!(rules.index_of_url_rewrites().always(), [0], "{why}");
+    }
+}
+
+#[test]
+fn a_literal_anywhere_in_the_pattern_looks_it_up() {
+    let cases = [
+        (
+            r"^\w+://tracker\.test/",
+            "ws://tracker.test/x",
+            "wss://other.test/",
+        ),
+        (
+            r"/collect\?",
+            "https://site.test/collect?v=1",
+            "https://site.test/collect",
+        ),
+        (
+            r"^https?:\/\/[\w-]+\.amap\.com\/ws\/",
+            "https://m5.amap.com/ws/x",
+            "https://www.example.com/ws/x",
+        ),
+    ];
+    for (pattern, hit, miss) in cases {
+        let rules = rules_of(&[pattern]);
+        assert!(
+            rules.index_of_url_rewrites().always().is_empty(),
+            "{pattern}"
+        );
+        assert_eq!(
+            rules.url_rewrite_candidates(hit).count(),
+            1,
+            "{pattern} {hit}"
+        );
+        assert_eq!(
+            rules.url_rewrite_candidates(miss).count(),
+            0,
+            "{pattern} {miss}"
+        );
     }
 }
 
@@ -160,4 +205,20 @@ fn a_url_builds_only_the_patterns_it_may_match() {
             .is_some()
     );
     assert_eq!(built(&rules), 1);
+}
+
+#[test]
+fn relaxing_a_pattern_keeps_every_match() {
+    let cases = [
+        (r"^a(?>b|c)d", r"^a(?:b|c)d"),
+        (r"^a(?!x|y\))b", r"^ab"),
+        (r"^a(?<=a)b(?<!c)", r"^ab"),
+        (r"^(\w)x\1", r"^(\w)x(?s:.*)"),
+        (r"^(?<n>\w)\k<n>", r"^(?<n>\w)(?s:.*)"),
+        (r"^[(?!]x", r"^[(?!]x"),
+        (r"^a\(?!b", r"^a\(?!b"),
+    ];
+    for (source, relaxed) in cases {
+        assert_eq!(super::relax(source), relaxed, "{source}");
+    }
 }

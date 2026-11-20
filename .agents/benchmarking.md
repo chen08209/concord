@@ -263,8 +263,9 @@ The `mitm-*` cases are tiers of Concord's MITM, all DIRECT, for Concord cores on
 (no section), `mitm-pass` (on, the origin not listed), `mitm` (the origin decrypted, no rule acting on requests),
 `mitm-route` and `mitm-rewrite` (`--mitm-rules N`, default 100, URL-REGEX routing rules or url-rewrite lines that never
 match), `mitm-script` (an http-request script that changes nothing on every request) and `mitm-modules` (every module
-in `crates/config/tests/data/modules` on; every connection but the origin's is rejected, so their resources fail at once
-instead of leaving the machine). The origin makes a CA per run and signs its own certificate with it; the core reads it
+in `crates/config/tests/data/modules` on, the remote files each reads served by the origin, `--mitm-resource-bytes N`
+each, default 16384, as scripts and jq filters the core compiles; every other connection is rejected, so nothing leaves
+the machine, and with 0 the files fail at once). The origin makes a CA per run and signs its own certificate with it; the core reads it
 from `<home>/mitm`, and the client trusts only it. On these cases `idle` holds HTTPS connections after one exchange.
 Neither tier lists them; name them with `--cases`.
 

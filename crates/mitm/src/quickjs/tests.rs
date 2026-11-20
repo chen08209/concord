@@ -781,3 +781,121 @@ async fn web_globals_follow_the_whatwg_rules() {
     .unwrap();
     assert_eq!(result.url, "https://example.test/1111111111");
 }
+
+#[tokio::test]
+async fn a_run_sees_nothing_an_earlier_run_of_the_same_script_left() {
+    let rig = rig();
+    let source = br#"
+        const seen = [typeof globalThis.mark, typeof Array.prototype.leak, typeof globalThis.later].join(",");
+        globalThis.mark = 1;
+        Array.prototype.leak = () => 1;
+        setTimeout(() => { globalThis.later = 1; }, 1);
+        new Promise(() => {});
+        $done({ body: seen });
+    "#;
+    let program = rig.runtime.compile("t", source).unwrap();
+    for _ in 0..3 {
+        let result = program.run(request_invocation()).await.unwrap();
+        assert_eq!(
+            result.body.as_deref(),
+            Some(&b"undefined,undefined,undefined"[..])
+        );
+    }
+}
+
+/// Where one script run's time goes, phase by phase, run by hand on the Linux VM:
+/// `cargo test -p concord-mitm --release --lib run_phases -- --ignored --nocapture`.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+#[ignore = "a measurement, run by hand on the Linux VM"]
+async fn run_phases() {
+    use rquickjs::{Context, Runtime};
+    use std::time::Instant;
+    let rounds: usize = std::env::var("MM_ROUNDS").map_or(500, |n| n.parse().unwrap());
+    fn median(mut values: Vec<f64>) -> f64 {
+        values.sort_by(f64::total_cmp);
+        values[values.len() / 2]
+    }
+    fn timed(rounds: usize, mut step: impl FnMut()) -> f64 {
+        median(
+            (0..rounds)
+                .map(|_| {
+                    let started = Instant::now();
+                    step();
+                    started.elapsed().as_secs_f64() * 1e6
+                })
+                .collect(),
+        )
+    }
+    let eval = |ctx: &rquickjs::Ctx<'_>, source: &str| {
+        ctx.eval::<rquickjs::Value<'_>, _>(source).unwrap();
+    };
+    let input = serde_json::to_string(&super::run::build_input(&request_invocation())).unwrap();
+    let natives = format!("globalThis.__native = {{ input: () => {input} }};");
+    let shared = Runtime::new().unwrap();
+    let phases = [
+        (
+            "thread spawn and join",
+            timed(rounds, || std::thread::spawn(|| ()).join().unwrap()),
+        ),
+        (
+            "Runtime::new and drop",
+            timed(rounds, || drop(Runtime::new().unwrap())),
+        ),
+        (
+            "Context::full and drop, runtime reused",
+            timed(rounds, || drop(Context::full(&shared).unwrap())),
+        ),
+        (
+            "polyfill",
+            timed(rounds, || {
+                let context = Context::full(&shared).unwrap();
+                context.with(|ctx| eval(&ctx, super::run::POLYFILL));
+            }),
+        ),
+        (
+            "polyfill and prelude",
+            timed(rounds, || {
+                let context = Context::full(&shared).unwrap();
+                context.with(|ctx| {
+                    eval(&ctx, &natives);
+                    eval(&ctx, super::run::POLYFILL);
+                    eval(&ctx, super::run::PRELUDE);
+                });
+            }),
+        ),
+    ];
+    let compiled = super::bytecode::prelude(false);
+    let from_bytecode = timed(rounds, || {
+        let context = Context::full(&shared).unwrap();
+        context.with(|ctx| {
+            eval(&ctx, &natives);
+            super::bytecode::run(&ctx, compiled).unwrap();
+        });
+    });
+    let fresh_runtime_bytecode = timed(rounds, || {
+        let runtime = Runtime::new().unwrap();
+        let context = Context::full(&runtime).unwrap();
+        context.with(|ctx| {
+            eval(&ctx, &natives);
+            super::bytecode::run(&ctx, compiled).unwrap();
+        });
+    });
+    println!("MM-PHASE bytecode size: {} bytes", compiled.len());
+    println!("MM-PHASE polyfill and prelude from bytecode, runtime reused: {from_bytecode:.1} us");
+    println!("MM-PHASE the same in a fresh runtime: {fresh_runtime_bytecode:.1} us");
+    let rig = rig();
+    let program = rig.runtime.compile("t", b"$done({})").unwrap();
+    let mut whole = Vec::new();
+    for _ in 0..rounds {
+        let started = Instant::now();
+        program.run(request_invocation()).await.unwrap();
+        whole.push(started.elapsed().as_secs_f64() * 1e6);
+    }
+    for (name, us) in phases {
+        println!("MM-PHASE {name}: {us:.1} us");
+    }
+    println!(
+        "MM-PHASE a whole run of $done({{}}): {:.1} us",
+        median(whole)
+    );
+}

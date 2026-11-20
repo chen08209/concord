@@ -28,7 +28,7 @@ fn-lines crates/tun/src/route/linux.rs::rules_for 177
 fn-lines crates/tunnel/src/sniff/http.rs::sniff_http2 122
 string-errors bins/desktop 3
 string-errors crates/group 5
-string-errors crates/mitm 9
+string-errors crates/mitm 8
 string-errors crates/proxy 15
 string-errors crates/rpc 1
 string-errors crates/rules 11

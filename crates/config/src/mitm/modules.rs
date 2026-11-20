@@ -29,7 +29,12 @@ pub const RESOURCES_DIR: &str = "mitm/resources";
 /// SHA-256, then the extension the URL's path ends in when it is 1 to 8 letters or digits, so a
 /// script keeps the type its loader goes by.
 pub fn stored_name(url: &str, bytes: &[u8]) -> String {
-    let digest = hex::encode(Sha256::digest(bytes));
+    stored_name_of(url, &Sha256::digest(bytes))
+}
+
+/// [stored_name] by the content's SHA-256.
+pub fn stored_name_of(url: &str, sha256: &[u8]) -> String {
+    let digest = hex::encode(sha256);
     let hash = digest.get(..32).unwrap_or(&digest);
     let path = url.split(['?', '#']).next().unwrap_or_default();
     let last = path.rsplit('/').next().unwrap_or_default();

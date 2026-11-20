@@ -16,7 +16,7 @@ const ALLOWED: &[&str] = &[
     "tools/",
 ];
 /// Files outside `ALLOWED` that may lift `unsafe_code`, each named in `.agents/rules.md`.
-const EXEMPT: &[&str] = &[];
+const EXEMPT: &[&str] = &["crates/mitm/src/quickjs/bytecode.rs"];
 
 /// The workspace's `unsafe_code = "deny"` reaches a member only through `[lints] workspace = true`;
 /// a member that drops it can allow `unsafe` without any attribute this check would see.

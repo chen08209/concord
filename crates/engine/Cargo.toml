@@ -51,11 +51,12 @@ http-body-util = { workspace = true }
 hyper = { workspace = true }
 hyper-util = { workspace = true }
 regex = { workspace = true }
+sha2 = { workspace = true }
+tempfile = { workspace = true }
 
 [dev-dependencies]
 concord-test-support = { workspace = true }
 tokio = { workspace = true, features = ["full", "test-util"] }
-tempfile = { workspace = true }
 rcgen = { workspace = true }
 rustls = { workspace = true }
 rustls-pki-types = { workspace = true }

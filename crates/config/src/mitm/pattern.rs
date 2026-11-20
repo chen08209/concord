@@ -1,7 +1,7 @@
 use std::borrow::Cow;
 use std::fmt::Write as _;
 
-use fancy_regex::Regex;
+use fancy_regex::{Expr, Regex};
 
 use super::issue::{IssueKind, LineError};
 
@@ -35,7 +35,8 @@ pub fn regex_source(pattern: &str) -> Cow<'_, str> {
     Cow::Owned(out)
 }
 
-/// Compiles a line's regex to check it and drops it: the rule that runs it compiles its own.
+/// Checks a line's regex, building it only when [parses] refuses it, for fancy-regex's own
+/// message: the rule that runs it builds its own on first use.
 pub fn check_pattern(pattern: &str) -> Result<(), LineError> {
     compile(pattern)
 }
@@ -53,9 +54,20 @@ pub fn check_multiline(pattern: &str) -> Result<(), LineError> {
 }
 
 fn compile(source: &str) -> Result<(), LineError> {
-    Regex::new(&regex_source(source))
+    let source = regex_source(source);
+    if parses(&source) {
+        return Ok(());
+    }
+    Regex::new(&source)
         .map(drop)
         .map_err(|err| LineError::new(IssueKind::Pattern, err.to_string()))
+}
+
+/// Whether both parsers take a regex, as fancy-regex's source: parsing is a small part of
+/// building one, and a module lists thousands. One they pass whose build still fails, past a
+/// size limit, matches nothing.
+pub fn parses(source: &str) -> bool {
+    Expr::parse_tree(source).is_ok() && regex_syntax::parse(&super::relax(source)).is_ok()
 }
 
 #[cfg(test)]

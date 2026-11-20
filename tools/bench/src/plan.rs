@@ -38,6 +38,9 @@ pub struct Plan {
     pub large_rules: usize,
     /// Non-matching rules in `mitm-route` and `mitm-rewrite`.
     pub mitm_rules: usize,
+    /// The size of each remote file a `mitm-modules` module reads from the origin; 0 leaves
+    /// them to fail.
+    pub mitm_resource_bytes: usize,
     pub tun: bool,
     pub tun_stack: String,
     pub tun_mtu: u32,
@@ -75,6 +78,7 @@ impl Plan {
                 large_proxies: 5_000,
                 large_rules: 50_000,
                 mitm_rules: 100,
+                mitm_resource_bytes: 16 << 10,
                 tun: false,
                 tun_stack: "system".into(),
                 tun_mtu: 1500,
@@ -110,6 +114,7 @@ impl Plan {
                 large_proxies: 20_000,
                 large_rules: 200_000,
                 mitm_rules: 100,
+                mitm_resource_bytes: 16 << 10,
                 tun: false,
                 tun_stack: "system".into(),
                 tun_mtu: 1500,

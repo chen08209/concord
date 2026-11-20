@@ -40,6 +40,12 @@ pub trait ScriptHooks: Send + Sync {
     async fn rule(&self, name: &str, request: &RuleScriptRequest) -> bool;
 
     async fn dns(&self, name: &str, domain: &str) -> DnsScriptAnswer;
+
+    /// Changes whenever the scripts in force change, so an answer kept under one value is not
+    /// given under another.
+    fn generation(&self) -> u64 {
+        0
+    }
 }
 
 /// The hooks the MITM engine set last, for runtimes built before it started and after; with
@@ -71,5 +77,9 @@ impl ScriptHooks for ScriptSlot {
             Some(hooks) => hooks.dns(name, domain).await,
             None => DnsScriptAnswer::Resolve,
         }
+    }
+
+    fn generation(&self) -> u64 {
+        self.get().map_or(0, |hooks| hooks.generation())
     }
 }

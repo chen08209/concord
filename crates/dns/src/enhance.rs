@@ -157,6 +157,12 @@ impl Resolver {
         let host = query_host(&req);
         let qtype = query.query_type;
         if let Some(script) = self.hosts.script_for(&host) {
+            if let Some(mut resp) = self.scripts.kept_reply(&script, &host, qtype) {
+                resp.metadata.id = req.metadata.id;
+                resp.queries = req.queries.clone();
+                return Ok(resp);
+            }
+            let generation = self.scripts.generation();
             let mut resp = msg::empty_answer(&req);
             match self.scripts.answer(&script, &host).await {
                 DnsScriptAnswer::Addresses { ips, ttl } => {
@@ -166,7 +172,9 @@ impl Resolver {
                     self.push_ips(&mut resp, &query, &host, &ips, ttl);
                 }
                 DnsScriptAnswer::Servers(servers) => {
-                    resp = self.ask_servers(&servers, &req, initiator).await?;
+                    resp = self
+                        .ask_script_servers(&script, &host, generation, &servers, &req, initiator)
+                        .await?;
                 }
                 DnsScriptAnswer::Resolve => {
                     return self.next_stage(Stage::Hosts, req, initiator).await;

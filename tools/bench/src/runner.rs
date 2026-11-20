@@ -538,7 +538,15 @@ impl Rig {
             proxy: case.proxy.clone(),
             tun: tun.cloned(),
             mitm: cases::is_mitm(case.spec)
-                .then(|| mitm::section(case.name(), far.ip, far.ports, self.plan.mitm_rules))
+                .then(|| {
+                    mitm::section(
+                        case.name(),
+                        far.ip,
+                        far.ports,
+                        self.plan.mitm_rules,
+                        self.plan.mitm_resource_bytes,
+                    )
+                })
                 .flatten(),
             mixed,
             placement: self.placement(Role::Core),

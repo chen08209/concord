@@ -1,3 +1,5 @@
+use std::sync::OnceLock;
+
 use concord_config::mitm::text::quote;
 use concord_config::mitm::{IssueKind, LineError};
 use jaq_core::compile;
@@ -8,8 +10,10 @@ use jaq_json::{Val, read};
 type Filter = jaq_core::Filter<data::JustLut<Val>>;
 
 /// A jq filter over a JSON body, as Surge's `http-request-jq` and `http-response-jq` run it.
+/// Checked when read, built on first run: each built filter carries its own compiled copy of
+/// the jq standard library, near a megabyte, and most of a module's filters never run.
 pub(crate) struct Jq {
-    filter: Filter,
+    filter: OnceLock<Option<Filter>>,
     code: String,
 }
 
@@ -40,23 +44,9 @@ pub(crate) enum JqOutcome {
 
 impl Jq {
     pub(crate) fn compile(code: &str) -> Result<Jq, JqError> {
-        let defs = jaq_core::defs()
-            .chain(jaq_std::defs())
-            .chain(jaq_json::defs())
-            .chain(jq_defs());
-        let funs = jaq_core::funs()
-            .chain(jaq_std::funs())
-            .chain(jaq_json::funs());
-        let arena = Arena::default();
-        let modules = Loader::new(defs)
-            .load(&arena, File { code, path: () })
-            .map_err(|errors| load_error(code, errors))?;
-        let filter = Compiler::default()
-            .with_funs(funs)
-            .compile(modules)
-            .map_err(compile_error)?;
+        build(code)?;
         Ok(Jq {
-            filter,
+            filter: OnceLock::new(),
             code: code.to_string(),
         })
     }
@@ -65,18 +55,44 @@ impl Jq {
         &self.code
     }
 
+    #[cfg(test)]
+    pub(crate) fn is_built(&self) -> bool {
+        self.filter.get().is_some()
+    }
+
     /// Runs on `body` and keeps the first value it gives, as the body that replaces it.
     pub(crate) fn run(&self, body: &str) -> JqOutcome {
+        let Some(filter) = self.filter.get_or_init(|| build(&self.code).ok()) else {
+            return JqOutcome::Failed("the filter no longer compiles".to_string());
+        };
         let Ok(input) = read::parse_single(body.as_bytes()) else {
             return JqOutcome::NotJson;
         };
-        let ctx = Ctx::<data::JustLut<Val>>::new(&self.filter.lut, Vars::new([]));
-        match self.filter.id.run((ctx, input)).map(unwrap_valr).next() {
+        let ctx = Ctx::<data::JustLut<Val>>::new(&filter.lut, Vars::new([]));
+        match filter.id.run((ctx, input)).map(unwrap_valr).next() {
             None => JqOutcome::Empty,
             Some(Ok(value)) => JqOutcome::Rewritten(value.to_string()),
             Some(Err(err)) => JqOutcome::Failed(err.to_string()),
         }
     }
+}
+
+fn build(code: &str) -> Result<Filter, JqError> {
+    let defs = jaq_core::defs()
+        .chain(jaq_std::defs())
+        .chain(jaq_json::defs())
+        .chain(jq_defs());
+    let funs = jaq_core::funs()
+        .chain(jaq_std::funs())
+        .chain(jaq_json::funs());
+    let arena = Arena::default();
+    let modules = Loader::new(defs)
+        .load(&arena, File { code, path: () })
+        .map_err(|errors| load_error(code, errors))?;
+    Compiler::default()
+        .with_funs(funs)
+        .compile(modules)
+        .map_err(compile_error)
 }
 
 /// jq 1.7 builtins that jaq leaves out: the SQL-style operators, the stream conversions and
@@ -139,6 +155,15 @@ fn compile_error(errors: compile::Errors<&str, ()>) -> JqError {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn a_filter_is_checked_when_read_and_built_on_its_first_run() {
+        assert!(Jq::compile("nosuchfunction(1)").is_err());
+        let jq = Jq::compile(".a").unwrap();
+        assert!(!jq.is_built());
+        assert_eq!(jq.run(r#"{"a":1}"#), JqOutcome::Rewritten("1".to_string()));
+        assert!(jq.is_built());
+    }
 
     fn rewrite(code: &str, body: &str) -> JqOutcome {
         Jq::compile(code)

@@ -35,6 +35,9 @@ mod modules;
 mod scripts;
 
 #[cfg(feature = "mitm")]
+#[path = "e2e/download_peak.rs"]
+mod download_peak;
+#[cfg(feature = "mitm")]
 #[path = "e2e/script_cost.rs"]
 mod script_cost;
 

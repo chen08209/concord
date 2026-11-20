@@ -117,3 +117,21 @@ async fn a_dns_script_answers_or_leaves_the_domain_to_the_resolver() {
     rig.config(json!({"enable": false}));
     assert_eq!(hooks.dns("dns", "one.test").await, DnsScriptAnswer::Resolve);
 }
+
+#[tokio::test]
+async fn the_generation_changes_with_the_scripts_in_force_and_only_then() {
+    let lines = ["pick = type=dns,script-path=pick.js"];
+    let (_server, rig, hooks) = scripts(&[("pick.js", "$done({})")], &lines).await;
+    let first = hooks.generation();
+    assert!(
+        rig.config(json!({"enable": true, "script": lines}))
+            .is_empty()
+    );
+    assert_eq!(hooks.generation(), first);
+    let other = ["pick = type=dns,script-path=pick.js,timeout=3"];
+    assert!(
+        rig.config(json!({"enable": true, "script": other}))
+            .is_empty()
+    );
+    assert_ne!(hooks.generation(), first);
+}

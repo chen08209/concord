@@ -3,7 +3,7 @@ use std::sync::Mutex;
 
 use async_trait::async_trait;
 use concord_config::mitm::module::{InlineFile, ResourceDef, ResourceKind};
-use concord_config::mitm::modules::{AppliedModule, ModuleProblem, ModuleSpec};
+use concord_config::mitm::modules::{AppliedModule, ModuleProblem, ModuleSpec, stored_name};
 use concord_group::{FetchError, FetchErrorKind, FetchRequest, FetchResponse, Fetcher};
 
 use super::*;

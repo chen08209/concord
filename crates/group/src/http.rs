@@ -5,6 +5,7 @@ use concord_common::{Address, BoxStream, Tasks};
 use concord_tls::{TlsConnector, TlsOptions, TrustStore};
 use http::{HeaderMap, Method};
 use http_body_util::{BodyExt, Full, Limited};
+use hyper::body::Incoming;
 use hyper::client::conn::{http1, http2};
 use hyper_util::rt::TokioIo;
 
@@ -80,6 +81,26 @@ pub struct Response {
     pub status: u16,
     pub headers: HeaderMap,
     pub body: Bytes,
+}
+
+/// A response whose body is read as it arrives.
+pub struct Streaming {
+    pub status: u16,
+    pub headers: HeaderMap,
+    body: Limited<Incoming>,
+}
+
+impl Streaming {
+    /// The next piece of the body, `None` past its end. A body longer than the limit
+    /// `open` was given is an error.
+    pub async fn chunk(&mut self) -> Result<Option<Bytes>, HttpError> {
+        while let Some(frame) = self.body.frame().await {
+            if let Ok(data) = frame.map_err(protocol)?.into_data() {
+                return Ok(Some(data));
+            }
+        }
+        Ok(None)
+    }
 }
 
 enum Sender {
@@ -175,6 +196,22 @@ impl Connection {
         body: Bytes,
         limit: usize,
     ) -> Result<Response, HttpError> {
+        let response = self.open(method, headers, body, limit).await?;
+        Ok(Response {
+            status: response.status,
+            headers: response.headers,
+            body: response.body.collect().await.map_err(protocol)?.to_bytes(),
+        })
+    }
+
+    /// As [send](Self::send), handing the body over unread.
+    pub async fn open(
+        &mut self,
+        method: Method,
+        headers: &[(String, String)],
+        body: Bytes,
+        limit: usize,
+    ) -> Result<Streaming, HttpError> {
         let target = &self.target;
         let h2 = self.is_h2();
         let uri = if h2 {
@@ -201,15 +238,10 @@ impl Connection {
         }
         .map_err(protocol)?;
         let (parts, body) = response.into_parts();
-        let body = Limited::new(body, limit)
-            .collect()
-            .await
-            .map_err(protocol)?
-            .to_bytes();
-        Ok(Response {
+        Ok(Streaming {
             status: parts.status.as_u16(),
             headers: parts.headers,
-            body,
+            body: Limited::new(body, limit),
         })
     }
 }
@@ -265,5 +297,39 @@ mod tests {
                 .unwrap();
             assert_eq!(response.status, 204);
         }
+    }
+
+    #[tokio::test]
+    async fn an_opened_body_is_read_in_pieces_up_to_the_limit() {
+        let (client, mut server) = duplex(4096);
+        tokio::spawn(async move {
+            let mut buf = vec![0u8; 1024];
+            for body in ["0123456789", "0123456789"] {
+                let mut seen = Vec::new();
+                while !seen.windows(4).any(|w| w == b"\r\n\r\n") {
+                    let n = server.read(&mut buf).await.unwrap();
+                    seen.extend_from_slice(&buf[..n]);
+                }
+                let head = format!("HTTP/1.1 200 OK\r\nContent-Length: {}\r\n\r\n", body.len());
+                server.write_all(head.as_bytes()).await.unwrap();
+                server.write_all(body.as_bytes()).await.unwrap();
+            }
+        });
+        let target = Target::parse("http://files.test/big").unwrap();
+        let mut conn = handshake(TokioIo::new(client), &target, false, &Default::default())
+            .await
+            .unwrap();
+        let mut whole = conn.open(Method::GET, &[], Bytes::new(), 10).await.unwrap();
+        let mut read = Vec::new();
+        while let Some(chunk) = whole.chunk().await.unwrap() {
+            read.extend_from_slice(&chunk);
+        }
+        assert_eq!(read, b"0123456789");
+        let mut cut = conn.open(Method::GET, &[], Bytes::new(), 4).await.unwrap();
+        let mut outcome = cut.chunk().await;
+        while let Ok(Some(_)) = outcome {
+            outcome = cut.chunk().await;
+        }
+        assert!(outcome.is_err());
     }
 }

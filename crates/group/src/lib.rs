@@ -29,7 +29,7 @@ pub use deps::{
     NoDefaults, NodeFactory, RouteMoved, TestDefaults,
 };
 pub use error::{FetchError, FetchErrorKind, GroupError, ProviderError};
-pub use fetch::{FetchRequest, FetchResponse, Fetcher};
+pub use fetch::{FetchHead, FetchRequest, FetchResponse, Fetcher};
 pub use group::{Emptiness, Group, Members, Pick, Policy, Touch};
 pub use health::{DelayRecord, HealthSnapshot, NodeHealth, Outcome, StatusRanges, UrlHealth};
 pub use node::{Ghost, Item, Leaf, Node};

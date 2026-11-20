@@ -137,12 +137,26 @@ pub fn profile(base: String, case: &str, origin: IpAddr, rules: usize) -> String
     base.replacen("rules:\n", &format!("rules:\n{routing}"), 1)
 }
 
+/// A module of the corpus, and the URL and kind of each remote file it reads.
+pub struct Module {
+    name: &'static str,
+    text: &'static str,
+    resources: &'static [(&'static str, &'static str)],
+}
+
 include!(concat!(env!("OUT_DIR"), "/corpus.rs"));
 
 /// The case's mitm section. Concord takes it from the overlay, as the app sets it, not
 /// from the profile. Hostname entries carry the origin's ports, so the echo port the
-/// readiness probe uses is not intercepted.
-pub fn section(case: &str, origin: IpAddr, ports: Ports, rules: usize) -> Option<Value> {
+/// readiness probe uses is not intercepted. `mitm-modules` reads each module's remote files
+/// from the origin, `resource_bytes` each, or with 0 leaves their URLs to fail.
+pub fn section(
+    case: &str,
+    origin: IpAddr,
+    ports: Ports,
+    rules: usize,
+    resource_bytes: usize,
+) -> Option<Value> {
     let hostname = match case {
         "mitm-off" => return None,
         "mitm-pass" => vec!["other.bench".to_string()],
@@ -170,9 +184,11 @@ pub fn section(case: &str, origin: IpAddr, ports: Ports, rules: usize) -> Option
                 json!(["bench = type=http-request,pattern=^https?://,script-path=bench.js"]);
         }
         "mitm-modules" => {
-            let modules = CORPUS
-                .iter()
-                .map(|(name, text)| json!({"name": name, "text": text, "enabled": true}));
+            let base = format!("http://{origin}:{}", ports.http);
+            let modules = CORPUS.iter().map(|module| {
+                let text = local_resources(module.text, module.resources, &base, resource_bytes);
+                json!({"name": module.name, "text": text, "enabled": true})
+            });
             section["modules"] = Value::Array(modules.collect());
         }
         _ => {}
@@ -207,8 +223,57 @@ where
 async fn answer(
     request: Request<hyper::body::Incoming>,
 ) -> Result<Response<Full<Bytes>>, hyper::Error> {
+    let body = resource(request.uri().path()).map_or(Bytes::from_static(&BODY), Bytes::from);
     request.into_body().collect().await?;
-    Ok(Response::new(Full::new(Bytes::from_static(&BODY))))
+    Ok(Response::new(Full::new(body)))
+}
+
+/// `text` with each remote file it reads served by the origin as `/res/<kind>/<bytes>/<id>`,
+/// `id` naming the original URL, so modules that read one URL still share it.
+fn local_resources(text: &str, resources: &[(&str, &str)], base: &str, bytes: usize) -> String {
+    if bytes == 0 {
+        return text.to_string();
+    }
+    let mut resources = resources.to_vec();
+    resources.sort_by_key(|(url, _)| std::cmp::Reverse(url.len()));
+    let mut text = text.to_string();
+    for (url, kind) in resources {
+        let id = url.bytes().fold(0xcbf2_9ce4_8422_2325_u64, |hash, byte| {
+            (hash ^ u64::from(byte)).wrapping_mul(0x0100_0000_01b3)
+        });
+        text = text.replace(url, &format!("{base}/res/{kind}/{bytes}/{id:016x}"));
+    }
+    text
+}
+
+/// The body of a module's remote file, as `local_resources` names it: a script or jq filter
+/// the core compiles, or a map-local file, distinct per `id`.
+fn resource(path: &str) -> Option<Vec<u8>> {
+    let mut parts = path.strip_prefix("/res/")?.split('/');
+    let (kind, bytes, n) = (
+        parts.next()?,
+        parts.next()?.parse::<usize>().ok()?,
+        parts.next()?,
+    );
+    let mut body = String::with_capacity(bytes + 128);
+    let mut i = 0;
+    while body.len() < bytes {
+        let _ = match kind {
+            "script" => writeln!(
+                body,
+                "function f{n}_{i}(o) {{ if (o && o.a{i}) {{ o.b{i} = o.a{i}.map((x) => x + {i}); }} return o; }}"
+            ),
+            "jq" => writeln!(body, "# {n} {i} {}", "x".repeat(64)),
+            _ => writeln!(body, "{n} {i} {}", "x".repeat(64)),
+        };
+        i += 1;
+    }
+    body.push_str(match kind {
+        "script" => "$done({});\n",
+        "jq" => ".\n",
+        _ => "",
+    });
+    Some(body.into_bytes())
 }
 
 #[derive(Clone, Copy)]

@@ -1,5 +1,5 @@
 //! Embeds the config crate's module corpus, so `mitm-modules` runs from a harness copied to
-//! another machine.
+//! another machine, with the remote files each module reads as its `.expect.json` lists them.
 
 use std::error::Error;
 use std::fmt::Write as _;
@@ -19,16 +19,28 @@ fn main() -> Result<(), Box<dyn Error>> {
         }
     }
     paths.sort();
-    let mut out = String::from("pub const CORPUS: &[(&str, &str)] = &[\n");
+    let mut out = String::from("pub const CORPUS: &[Module] = &[\n");
     for path in paths {
         let name = path
             .file_name()
             .unwrap_or_default()
             .to_string_lossy()
             .into_owned();
+        let mut resources = String::new();
+        let expect = dir.join(format!("{name}.expect.json"));
+        if let Ok(text) = std::fs::read_to_string(&expect) {
+            let parsed: serde_json::Value = serde_json::from_str(&text)?;
+            for resource in parsed["resources"].as_array().into_iter().flatten() {
+                let (Some(url), Some(kind)) = (resource["url"].as_str(), resource["kind"].as_str())
+                else {
+                    continue;
+                };
+                write!(resources, "({url:?}, {kind:?}), ")?;
+            }
+        }
         writeln!(
             out,
-            "    ({name:?}, include_str!({:?})),",
+            "    Module {{ name: {name:?}, text: include_str!({:?}), resources: &[{resources}] }},",
             path.display().to_string()
         )?;
     }

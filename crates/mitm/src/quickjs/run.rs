@@ -2,9 +2,9 @@ use std::cell::{Cell, RefCell};
 use std::collections::HashMap;
 use std::io::Read;
 use std::rc::Rc;
-use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::mpsc::{self, RecvTimeoutError};
+use std::sync::{Arc, OnceLock};
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
 use base64::Engine as _;
@@ -13,7 +13,8 @@ use concord_common::ScriptNotification;
 use concord_config::mitm::text::canonical_header;
 use concord_tls::TrustStore;
 use rand::RngCore;
-use rquickjs::context::EvalOptions;
+
+use super::bytecode::Thrown;
 use rquickjs::{
     CatchResultExt, CaughtError, Context, Ctx, Exception, Function, Object, Runtime, Value,
 };
@@ -29,9 +30,9 @@ use crate::script::{
     ScriptResult,
 };
 
-const POLYFILL: &str = include_str!("polyfill.js");
-const PRELUDE: &str = include_str!("prelude.js");
-const QUANTUMULT: &str = include_str!("quantumult.js");
+pub(super) const POLYFILL: &str = include_str!("polyfill.js");
+pub(super) const PRELUDE: &str = include_str!("prelude.js");
+pub(super) const QUANTUMULT: &str = include_str!("quantumult.js");
 const DEFAULT_REQUEST_TIMEOUT_MS: f64 = 5000.0;
 const NO_DONE: &str = "the script ended without calling $done";
 const CANCELLED: &str = "the script was cancelled";
@@ -59,8 +60,7 @@ impl Drop for Cancel {
 }
 
 struct Setup {
-    source: String,
-    quantumult: bool,
+    program: Arc<Compiled>,
     input: String,
     store: Arc<Store>,
     name: String,
@@ -73,7 +73,7 @@ struct Setup {
     cancel: Arc<AtomicBool>,
 }
 
-fn describe_exception(exception: &Exception<'_>) -> String {
+pub(super) fn describe_exception(exception: &Exception<'_>) -> String {
     let message = exception.message().unwrap_or_default();
     let name = exception
         .as_object()
@@ -118,7 +118,7 @@ fn header_json(header: &HeaderList) -> serde_json::Value {
     serde_json::to_value(header).unwrap_or_default()
 }
 
-fn build_input(invocation: &ScriptInvocation) -> String {
+pub(super) fn build_input(invocation: &ScriptInvocation) -> String {
     let mut session = [0u8; 4];
     rand::rng().fill_bytes(&mut session);
     let started = SystemTime::now()
@@ -182,9 +182,30 @@ fn build_input(invocation: &ScriptInvocation) -> String {
     input.to_string()
 }
 
+/// A script's source and, once a run has compiled it, its bytecode.
+pub(super) struct Compiled {
+    source: String,
+    pub(super) quantumult: bool,
+    bytecode: OnceLock<Result<Vec<u8>, Thrown>>,
+}
+
+impl Compiled {
+    pub(super) fn new(quantumult: bool, source: String) -> Compiled {
+        Compiled {
+            source,
+            quantumult,
+            bytecode: OnceLock::new(),
+        }
+    }
+
+    fn bytecode(&self) -> &Result<Vec<u8>, Thrown> {
+        self.bytecode
+            .get_or_init(|| super::bytecode::compile(&self.source))
+    }
+}
+
 pub(super) async fn execute(
-    source: &str,
-    quantumult: bool,
+    program: Arc<Compiled>,
     store: Arc<Store>,
     trust: Arc<TrustStore>,
     invocation: ScriptInvocation,
@@ -199,8 +220,7 @@ pub(super) async fn execute(
         wake: wake.clone(),
     };
     let setup = Setup {
-        source: source.to_string(),
-        quantumult,
+        program,
         input: build_input(&invocation),
         store,
         name: invocation.name.clone(),
@@ -430,15 +450,6 @@ fn ungzip(encoded: &str, limit: i64) -> Option<String> {
     (out.len() as u64 <= cap).then(|| STANDARD.encode(out))
 }
 
-fn eval(ctx: &Ctx<'_>, source: &str) -> Result<(), String> {
-    let mut options = EvalOptions::default();
-    options.strict = false;
-    ctx.eval_with_options::<Value<'_>, _>(source, options)
-        .catch(ctx)
-        .map(|_| ())
-        .map_err(|err| describe(&err))
-}
-
 fn call(ctx: &Ctx<'_>, name: &str, id: u32, json: Option<&str>) -> Result<(), String> {
     let function: Function<'_> = ctx.globals().get(name).map_err(|err| err.to_string())?;
     let result = match json {
@@ -468,13 +479,10 @@ fn run_thread(setup: Setup) -> Result<ScriptResult, ScriptError> {
 
     let started = context.with(|ctx| -> Result<(), String> {
         install(&ctx, &state, &setup).map_err(|err| err.to_string())?;
-        eval(&ctx, POLYFILL)?;
-        eval(&ctx, PRELUDE)?;
-        if setup.quantumult {
-            eval(&ctx, QUANTUMULT)?;
-        }
-        match eval(&ctx, &setup.source) {
-            Err(message) if state.done.borrow().is_none() => Err(message),
+        super::bytecode::run(&ctx, super::bytecode::prelude(setup.program.quantumult))?;
+        let program = setup.program.bytecode().as_ref().map_err(Clone::clone)?;
+        match super::bytecode::run(&ctx, program) {
+            Err(thrown) if state.done.borrow().is_none() => Err(thrown.into()),
             _ => Ok(()),
         }
     });

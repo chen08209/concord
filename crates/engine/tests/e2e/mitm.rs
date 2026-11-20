@@ -856,3 +856,105 @@ async fn mitm_tasks_follow_the_core_and_reach_the_network() {
     );
     rig.engine.shutdown().await;
 }
+
+/// Resident memory of the whole test process, client and origin included, in MiB.
+fn resident_mib() -> f64 {
+    let out = std::process::Command::new("ps")
+        .args(["-o", "rss=", "-p", &std::process::id().to_string()])
+        .output()
+        .unwrap();
+    String::from_utf8_lossy(&out.stdout)
+        .trim()
+        .parse::<f64>()
+        .unwrap()
+        / 1024.0
+}
+
+/// What `leaks` counts as allocated and not freed, which RSS on macOS does not show: its
+/// allocator keeps freed pages resident.
+fn live_heap() -> Option<String> {
+    let out = std::process::Command::new("leaks")
+        .args([std::process::id().to_string(), "-quiet".to_string()])
+        .output()
+        .ok()?;
+    let text = String::from_utf8_lossy(&out.stdout);
+    let line = text.lines().find(|line| line.contains("nodes malloced"))?;
+    Some(
+        line.split_once(": ")
+            .map_or(line, |(_, rest)| rest)
+            .to_string(),
+    )
+}
+
+/// Whether held decrypted sessions grow as they carry requests, and whether memory comes
+/// back to a level when they close: `MM_ROUNDS` rounds of opening `MM_SESSIONS` sessions, one
+/// request on each `MM_REQUESTS` times over, then closing them all. Run by hand:
+/// `cargo test -p concord-engine --release --test e2e held_sessions -- --ignored --nocapture`.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+#[ignore = "a measurement, run by hand"]
+async fn held_sessions_neither_grow_nor_stay_once_closed() {
+    let env = |name: &str, default: usize| {
+        std::env::var(name)
+            .ok()
+            .and_then(|value| value.parse().ok())
+            .unwrap_or(default)
+    };
+    let (sessions, requests, rounds) = (
+        env("MM_SESSIONS", 300),
+        env("MM_REQUESTS", 20),
+        env("MM_ROUNDS", 4),
+    );
+    let (rig, server, ca) = decrypting_rig("  - MATCH,DIRECT\n", "", false).await;
+    let port = server.port();
+    let mut warm = tls_through(rig.mixed, "mitm.test", port, &ca)
+        .await
+        .unwrap();
+    assert_eq!(exchange(&mut warm, "mitm.test", port, "/").await.0, 200);
+    drop(warm);
+    tokio::time::sleep(Duration::from_secs(1)).await;
+    // The rig keeps every event it is sent, records of closed connections included.
+    lock(&rig.events.seen).clear();
+    let start = resident_mib();
+    let mut closed = Vec::new();
+    for round in 0..rounds {
+        let mut held = Vec::with_capacity(sessions);
+        for _ in 0..sessions {
+            held.push(
+                tls_through(rig.mixed, "mitm.test", port, &ca)
+                    .await
+                    .unwrap(),
+            );
+        }
+        let opened = resident_mib();
+        let mut after = Vec::new();
+        for _ in 0..requests {
+            for stream in &mut held {
+                assert_eq!(exchange(stream, "mitm.test", port, "/x").await.0, 200);
+            }
+            after.push(resident_mib());
+        }
+        drop(held);
+        tokio::time::sleep(Duration::from_secs(2)).await;
+        lock(&rig.events.seen).clear();
+        let now = resident_mib();
+        closed.push(now);
+        if let Some(live) = live_heap() {
+            println!("MM-SESSIONS round {round} live heap after closing: {live}");
+        }
+        println!(
+            "MM-SESSIONS round {round}: {sessions} open +{:.1} MiB over the start, after 1 and {requests} requests each +{:.1} / +{:.1}, closed +{:.1}",
+            opened - start,
+            after[0] - start,
+            after[after.len() - 1] - start,
+            now - start,
+        );
+    }
+    println!(
+        "MM-SESSIONS start {start:.1} MiB, closed after each round {:?}",
+        closed
+            .iter()
+            .map(|mib| format!("{:.1}", mib - start))
+            .collect::<Vec<_>>()
+    );
+    rig.engine.shutdown().await;
+}

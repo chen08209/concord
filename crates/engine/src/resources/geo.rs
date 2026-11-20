@@ -16,7 +16,7 @@ use tokio::time::sleep;
 use tokio_util::sync::CancellationToken;
 use tokio_util::task::TaskTracker;
 
-use super::fetch::{download, touch};
+use super::fetch::{download, download_spilled, touch};
 use crate::error::{GeoUpdateError, WriteError};
 use crate::route::RouteCounters;
 
@@ -215,13 +215,16 @@ impl GeoUpdater {
         let name = geo_file_name(file);
         tracing::info!("Can't find {name}, start download");
         let urls = self.urls.load_full();
-        let bytes = download(fetcher, geo_request(urls.url(file)))
+        let home = self.home()?;
+        let spilled = download_spilled(fetcher, geo_request(urls.url(file)), home.root())
             .await
             .map_err(|source| GeoUpdateError::Download {
                 what: name.to_string(),
                 source,
             })?;
-        self.write(file, &bytes)?;
+        spilled
+            .store(&home, self.store.path(file))
+            .map_err(WriteError::from)?;
         Ok(self.store.ensure(file)?)
     }
 
@@ -283,19 +286,25 @@ impl GeoUpdater {
         let name = geo_file_name(file);
         tracing::warn!("{name} invalid, remove and download");
         let urls = self.urls.load_full();
-        let bytes = download(fetcher, geo_request(urls.url(file)))
+        let home = self.home()?;
+        let spilled = download_spilled(fetcher, geo_request(urls.url(file)), home.root())
             .await
             .map_err(|source| GeoUpdateError::Download {
                 what: name.to_string(),
                 source,
             })?;
-        self.write(file, &bytes)?;
+        spilled
+            .store(&home, self.store.path(file))
+            .map_err(WriteError::from)?;
         Ok(self.store.reload(file)?)
     }
 
+    fn home(&self) -> Result<Arc<HomeDir>, WriteError> {
+        lock(&self.home).clone().ok_or(WriteError::NotInitialized)
+    }
+
     fn write(&self, file: GeoFile, bytes: &[u8]) -> Result<(), WriteError> {
-        let home = lock(&self.home).clone().ok_or(WriteError::NotInitialized)?;
-        Ok(home.write_atomic(self.store.path(file), bytes)?)
+        Ok(self.home()?.write_atomic(self.store.path(file), bytes)?)
     }
 
     pub fn spawn_update(

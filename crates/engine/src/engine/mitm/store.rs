@@ -6,13 +6,13 @@ use std::sync::{Arc, Mutex};
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use concord_common::sync::lock;
-use concord_config::mitm::modules::{AppliedModule, MITM_DIR, RESOURCES_DIR, stored_name};
+use concord_config::mitm::modules::{AppliedModule, MITM_DIR, RESOURCES_DIR, stored_name_of};
 use concord_group::{FetchErrorKind, Fetcher};
 use concord_platform::HomeDir;
 use serde::{Deserialize, Serialize};
 
 use crate::error::ResourceError;
-use crate::resources::{download, rule_set_request};
+use crate::resources::{download_spilled, rule_set_request};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -341,14 +341,18 @@ impl ModuleResources {
     }
 
     async fn fetch_and_store(&self, url: &str) -> Result<String, FetchFailure> {
-        let bytes = download(&*self.fetcher, rule_set_request(url))
+        let dir = self.home.join(RESOURCES_DIR);
+        self.home
+            .create_dir_all(RESOURCES_DIR)
+            .map_err(|err| FetchFailure::local(&err))?;
+        let spilled = download_spilled(&*self.fetcher, rule_set_request(url), &dir)
             .await
             .map_err(|err| FetchFailure::of(&err))?;
-        let file = stored_name(url, &bytes);
+        let file = stored_name_of(url, &spilled.digest);
         let path = resource_path(&file);
         if !self.home.join(&path).is_file() {
-            self.home
-                .write_atomic(&path, &bytes)
+            spilled
+                .store(&self.home, &path)
                 .map_err(|err| FetchFailure::local(&err))?;
         }
         Ok(file)

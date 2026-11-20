@@ -1,3 +1,4 @@
+mod bytecode;
 mod fetch;
 mod run;
 mod store;
@@ -49,8 +50,7 @@ impl ScriptRuntime for QuickJs {
             .to_string();
         check_syntax(&text)?;
         Ok(Arc::new(Program {
-            quantumult: quantumult_only(&text),
-            source: text,
+            compiled: Arc::new(run::Compiled::new(quantumult_only(&text), text)),
             store: self.store.clone(),
             trust: self.trust.clone(),
         }))
@@ -71,8 +71,7 @@ fn check_syntax(source: &str) -> Result<(), CompileError> {
 }
 
 struct Program {
-    source: String,
-    quantumult: bool,
+    compiled: Arc<run::Compiled>,
     store: Arc<Store>,
     trust: Arc<ArcSwap<TrustStore>>,
 }
@@ -81,8 +80,7 @@ struct Program {
 impl ScriptProgram for Program {
     async fn run(&self, invocation: ScriptInvocation) -> Result<ScriptResult, ScriptError> {
         run::execute(
-            &self.source,
-            self.quantumult,
+            self.compiled.clone(),
             self.store.clone(),
             self.trust.load_full(),
             invocation,

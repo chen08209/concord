@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::io;
 use std::net::IpAddr;
-use std::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 use std::sync::{Arc, Mutex, OnceLock};
 use std::time::{Duration, Instant};
 
@@ -329,6 +329,8 @@ impl Core {
 pub struct MitmEngine {
     pub(crate) core: Arc<Core>,
     pub(crate) tasks: Arc<Tasks>,
+    /// Tells this engine's scripts from those of every engine before it.
+    pub(crate) generation: u64,
 }
 
 impl MitmEngine {
@@ -375,9 +377,11 @@ impl MitmEngine {
             unverified_h2: OnceLock::new(),
             unverified_h1: OnceLock::new(),
         });
+        static ENGINES: AtomicU64 = AtomicU64::new(0);
         MitmEngine {
             core,
             tasks: Arc::default(),
+            generation: ENGINES.fetch_add(1, Ordering::Relaxed) + 1,
         }
     }
 

@@ -81,6 +81,13 @@ impl ScriptHooks for Hooks {
             DnsScriptAnswer::Resolve
         })
     }
+
+    fn generation(&self) -> u64 {
+        self.current
+            .load()
+            .as_ref()
+            .map_or(0, |engine| engine.generation)
+    }
 }
 
 fn rule_input(request: &RuleScriptRequest) -> Value {

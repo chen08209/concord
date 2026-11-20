@@ -1,6 +1,6 @@
 use std::sync::OnceLock;
 
-use concord_config::mitm::{IssueKind, LineError, regex_source};
+use concord_config::mitm::{IssueKind, LineError, parses, regex_source};
 use fancy_regex::{Captures, Regex};
 
 /// A backtracking regex, as Surge's and Loon's patterns need. fancy-regex's default step
@@ -38,7 +38,7 @@ impl Pattern {
         } else {
             pattern.to_string()
         };
-        Regex::new(&regex_source(&source)).map_err(|err| PatternError(err.to_string()))?;
+        check(&regex_source(&source))?;
         Ok(Pattern {
             source,
             regex: OnceLock::new(),
@@ -52,7 +52,13 @@ impl Pattern {
 
     fn regex(&self) -> Option<&Regex> {
         self.regex
-            .get_or_init(|| Regex::new(&regex_source(&self.source)).ok())
+            .get_or_init(|| {
+                Regex::new(&regex_source(&self.source))
+                    .inspect_err(|err| {
+                        tracing::warn!("[MITM] {} matches nothing: {err}", self.source);
+                    })
+                    .ok()
+            })
             .as_ref()
     }
 
@@ -206,9 +212,30 @@ fn push_group(caps: &Captures<'_, str>, n: usize, out: &mut String) {
     }
 }
 
+/// Built here only when [parses] refuses it, for fancy-regex's own message.
+fn check(source: &str) -> Result<(), PatternError> {
+    if parses(source) {
+        return Ok(());
+    }
+    Regex::new(source)
+        .map(drop)
+        .map_err(|err| PatternError(err.to_string()))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn a_pattern_is_checked_when_read_and_built_on_first_use() {
+        for bad in ["(a", r"\p{Nope}", "[z-a]", r"(?<n>a)\k<m>"] {
+            assert!(Pattern::new(bad).is_err(), "{bad}");
+        }
+        let p = Pattern::new(r"^https://(?>a|b)(?=\.)\.c/(\w+)\1").unwrap();
+        assert!(!p.is_built());
+        assert!(p.is_match("https://a.c/xx"));
+        assert!(p.is_built());
+    }
 
     #[test]
     fn replaces_with_dotnet_templates() {
