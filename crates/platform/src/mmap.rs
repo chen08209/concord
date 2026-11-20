@@ -29,16 +29,27 @@ unsafe impl Sync for MappedFile {}
 
 impl MappedFile {
     pub fn open(path: &Path) -> io::Result<MappedFile> {
-        let file = std::fs::File::open(path)?;
+        MappedFile::from_file(&std::fs::File::open(path)?)
+    }
+
+    /// [`MappedFile::open`] for a file already open, which is left at its start.
+    pub fn from_file(file: &std::fs::File) -> io::Result<MappedFile> {
+        use std::io::{Read as _, Seek as _};
+
         let len = file.metadata()?.len();
         if len == 0 {
             return Ok(MappedFile(Inner::Empty));
         }
         #[cfg(unix)]
-        if let Some(inner) = map(&file, len) {
+        if let Some(inner) = map(file, len) {
             return Ok(MappedFile(inner));
         }
-        std::fs::read(path).map(|bytes| MappedFile(Inner::Heap(bytes)))
+        let mut reader = file;
+        reader.rewind()?;
+        let mut bytes = Vec::new();
+        reader.read_to_end(&mut bytes)?;
+        reader.rewind()?;
+        Ok(MappedFile(Inner::Heap(bytes)))
     }
 
     /// Whether the bytes are a file mapping rather than a heap copy.

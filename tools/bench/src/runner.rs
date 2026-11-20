@@ -813,11 +813,20 @@ fn check_far(far: &mut Far) -> Result<(), String> {
     Ok(())
 }
 
+/// A port free for TCP and for UDP, as a mixed port binds both: a core whose UDP half fails to
+/// bind drops the TCP half too and starts without the port.
 fn free_port(ip: IpAddr) -> u16 {
-    std::net::TcpListener::bind((ip, 0))
-        .and_then(|l| l.local_addr())
-        .map(|a| a.port())
-        .unwrap_or(0)
+    let mut port = 0;
+    for _ in 0..64 {
+        port = std::net::TcpListener::bind((ip, 0))
+            .and_then(|l| l.local_addr())
+            .map(|a| a.port())
+            .unwrap_or(0);
+        if port != 0 && std::net::UdpSocket::bind((ip, port)).is_ok() {
+            break;
+        }
+    }
+    port
 }
 
 /// Server ports in the far namespace cannot be probed from here, so they come
@@ -833,6 +842,22 @@ fn free_port_from(next: &mut u16, ip: IpAddr) -> u16 {
         let udp = std::net::UdpSocket::bind((ip, port)).is_ok();
         if tcp && udp {
             return port;
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn a_mixed_port_is_free_for_tcp_and_udp() {
+        let ip = IpAddr::V4(Ipv4Addr::LOCALHOST);
+        for _ in 0..20 {
+            let port = free_port(ip);
+            assert_ne!(port, 0);
+            std::net::TcpListener::bind((ip, port)).unwrap();
+            std::net::UdpSocket::bind((ip, port)).unwrap();
         }
     }
 }

@@ -202,6 +202,39 @@ async fn a_download_equal_to_the_file_on_disk_is_skipped_and_does_not_move_the_r
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn an_invalid_download_leaves_the_file_on_disk() {
+    let server = serve(Some(b"not a database")).await;
+    let rig = Rig::new();
+    std::fs::write(rig.home.path().join("geoip.metadb"), b"old bytes").unwrap();
+    rig.apply(&format!(
+        "geox-url:\n  mmdb: http://{server}/m\nrules:\n  - MATCH,DIRECT\n"
+    ))
+    .await;
+
+    rig.engine.geo_update("MMDB").unwrap();
+
+    assert!(
+        eventually(|| rig.geo_events("MMDB").iter().any(
+            |phase| matches!(phase, ResourcePhase::Failed(error) if error.contains("invalid MMDB"))
+        ))
+        .await,
+        "{:?}",
+        rig.geo_events("MMDB")
+    );
+    assert_eq!(
+        std::fs::read(rig.home.path().join("geoip.metadb")).unwrap(),
+        b"old bytes"
+    );
+    let leftovers = std::fs::read_dir(rig.home.path())
+        .unwrap()
+        .filter_map(|entry| entry.ok())
+        .filter(|entry| entry.file_name().to_string_lossy().starts_with(".tmp"))
+        .count();
+    assert_eq!(leftovers, 0);
+    rig.engine.shutdown().await;
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn a_database_the_profile_needs_and_lacks_is_fetched_and_reported() {
     let server = serve(Some(b"not a database")).await;
     let rig = Rig::new();
@@ -294,4 +327,90 @@ async fn a_database_dns_needs_and_lacks_is_fetched_and_reported() {
         "{seen:?}"
     );
     rig.engine.shutdown().await;
+}
+
+/// VmHWM and VmRSS in MiB.
+fn memory() -> Option<(f64, f64)> {
+    let text = std::fs::read_to_string("/proc/self/status").ok()?;
+    let field = |key: &str| -> Option<f64> {
+        text.lines()
+            .find_map(|line| line.strip_prefix(key))?
+            .split_whitespace()
+            .next()?
+            .parse::<f64>()
+            .ok()
+            .map(|kib| kib / 1024.0)
+    };
+    Some((field("VmHWM:")?, field("VmRSS:")?))
+}
+
+/// The memory an update takes above the core's resident set before it, for a download equal
+/// to the file on disk and for one that differs by a byte.
+async fn update_peak(kind: &str, key: &str, name: &str, rule: &str, body: &'static [u8]) {
+    let server = serve(Some(body)).await;
+    for changed in [false, true] {
+        let rig = Rig::new();
+        let mut old = body.to_vec();
+        if changed {
+            let letter = (old.len() / 2..old.len())
+                .find(|&at| old[at].is_ascii_lowercase() && old[at] != b'z')
+                .unwrap();
+            old[letter] += 1;
+        }
+        std::fs::write(rig.home.path().join(name), old).unwrap();
+        rig.apply(&format!(
+            "geox-url:\n  {key}: http://{server}/f\nrules:\n  - {rule}\n  - MATCH,DIRECT\n"
+        ))
+        .await;
+        tokio::time::sleep(Duration::from_millis(300)).await;
+        std::fs::write("/proc/self/clear_refs", "5").unwrap();
+        let (_, before) = memory().unwrap();
+        rig.engine.geo_update(kind).unwrap();
+        let done = if changed {
+            ResourcePhase::Updated
+        } else {
+            ResourcePhase::Unchanged
+        };
+        assert!(
+            eventually(|| rig.geo_events(kind).contains(&done)).await,
+            "{:?}",
+            rig.geo_events(kind)
+        );
+        let (peak, after) = memory().unwrap();
+        println!(
+            "MM-GEO {kind} file_mib {:.1} changed {changed} before_mib {before:.1} peak_mib {peak:.1} \
+             peak_over_mib {:.1} after_mib {after:.1}",
+            body.len() as f64 / 1048576.0,
+            peak - before
+        );
+        rig.engine.shutdown().await;
+    }
+}
+
+/// The peak memory of a geo update, run by hand on Linux with real databases:
+/// `MM_GEO_MMDB=<geoip.metadb> MM_GEO_SITE=<GeoSite.dat> cargo test -p concord-engine --release
+/// --test geo_update update_peak -- --ignored --nocapture`.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+#[ignore = "a measurement, run by hand on Linux"]
+async fn geo_update_peak() {
+    if memory().is_none() {
+        println!("MM-GEO needs /proc");
+        return;
+    }
+    let read = |var: &str| -> Option<&'static [u8]> {
+        Some(std::fs::read(std::env::var_os(var)?).unwrap().leak())
+    };
+    if let Some(body) = read("MM_GEO_MMDB") {
+        update_peak("MMDB", "mmdb", "geoip.metadb", "GEOIP,CN,DIRECT", body).await;
+    }
+    if let Some(body) = read("MM_GEO_SITE") {
+        update_peak(
+            "GEOSITE",
+            "geosite",
+            "GeoSite.dat",
+            "GEOSITE,cn,DIRECT",
+            body,
+        )
+        .await;
+    }
 }

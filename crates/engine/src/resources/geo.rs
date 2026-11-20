@@ -16,7 +16,7 @@ use tokio::time::sleep;
 use tokio_util::sync::CancellationToken;
 use tokio_util::task::TaskTracker;
 
-use super::fetch::{download, download_spilled, touch};
+use super::fetch::{download_spilled, file_digest, touch};
 use crate::error::{GeoUpdateError, WriteError};
 use crate::route::RouteCounters;
 
@@ -303,10 +303,6 @@ impl GeoUpdater {
         lock(&self.home).clone().ok_or(WriteError::NotInitialized)
     }
 
-    fn write(&self, file: GeoFile, bytes: &[u8]) -> Result<(), WriteError> {
-        Ok(self.home()?.write_atomic(self.store.path(file), bytes)?)
-    }
-
     pub fn spawn_update(
         self: &Arc<Self>,
         claim: Claim,
@@ -345,26 +341,40 @@ impl GeoUpdater {
         let label = geo_label(file);
         let path = self.store.path(file);
         let urls = self.urls.load_full();
-        let bytes = download(fetcher, geo_request(urls.url(file)))
+        let home = self.home()?;
+        let spilled = download_spilled(fetcher, geo_request(urls.url(file)), home.root())
             .await
             .map_err(|source| GeoUpdateError::Download {
                 what: format!("{label} database file"),
                 source,
             })?;
-        let same = tokio::fs::read(&path).await.is_ok_and(|old| old == bytes);
+        let old = path.clone();
+        let same = tokio::task::spawn_blocking(move || file_digest(&old))
+            .await?
+            .is_some_and(|digest| digest == spilled.digest);
         if same {
             let _ = tokio::task::spawn_blocking(move || touch(&path)).await;
             return Ok(Refresh::Unchanged);
         }
-        if bytes.is_empty() {
-            return Err(GeoUpdateError::NoData { label });
-        }
-        let bytes =
-            tokio::task::spawn_blocking(move || GeoStore::validate(file, &bytes).map(|()| bytes))
-                .await?
+        let spilled = tokio::task::spawn_blocking(move || {
+            let bytes = spilled.bytes().map_err(|err| GeoUpdateError::Invalid {
+                label,
+                message: err.to_string(),
+            })?;
+            if bytes.as_ref().is_empty() {
+                return Err(GeoUpdateError::NoData { label });
+            }
+            GeoStore::validate(file, bytes.as_ref())
                 .map_err(|message| GeoUpdateError::Invalid { label, message })?;
-        self.write(file, &bytes)
-            .map_err(|source| GeoUpdateError::Save { label, source })?;
+            Ok(spilled)
+        })
+        .await??;
+        spilled
+            .store(&home, &path)
+            .map_err(|err| GeoUpdateError::Save {
+                label,
+                source: err.into(),
+            })?;
         self.store.reload(file)?;
         Ok(Refresh::Updated)
     }
@@ -478,6 +488,7 @@ mod tests {
             sink.clone(),
             Arc::new(RouteCounters::new(sink)),
         );
+        geo.set_home(Arc::new(HomeDir::new(dir.path())));
         std::fs::write(geo.store.path(GeoFile::Mmdb), b"fresh").unwrap();
         let tasks = TaskTracker::new();
         let fetcher: Arc<dyn Fetcher> = Arc::new(Unanswered);
@@ -513,7 +524,10 @@ mod tests {
         );
         concord_test_support::poison(&geo.home);
         geo.set_home(Arc::new(HomeDir::new(dir.path())));
-        geo.write(GeoFile::Mmdb, b"written").unwrap();
+        geo.home()
+            .unwrap()
+            .write_atomic(geo.store.path(GeoFile::Mmdb), b"written")
+            .unwrap();
         assert_eq!(
             std::fs::read(geo.store.path(GeoFile::Mmdb)).unwrap(),
             b"written"

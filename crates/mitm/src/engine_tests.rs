@@ -345,6 +345,44 @@ async fn map_local_and_request_body_mocks_read_the_request_head() {
 }
 
 #[tokio::test]
+async fn a_map_local_file_larger_than_a_piece_is_read_from_disk_at_each_answer() {
+    let (_server, rig) = rig(echo(), true, &["http/1.1"]).await;
+    let resources = rig.resources();
+    std::fs::create_dir_all(&resources).unwrap();
+    let large: Vec<u8> = (0..crate::rules::LOCAL_PIECE * 3 + 7)
+        .map(|i| b'a' + (i % 26) as u8)
+        .collect();
+    std::fs::write(resources.join("large.txt"), &large).unwrap();
+    let errors = rig.config(json!({
+        "enable": true,
+        "hostname": ["example.test"],
+        "skip-server-cert-verify": true,
+        "map-local": [r#"^https://example\.test/large data="large.txt""#],
+        "request-body-mock": [r#"^https://example\.test/mock data="large.txt""#],
+    }));
+    assert!(errors.is_empty(), "{errors:?}");
+    let mut client = Client::tls(&rig, "example.test", 443, &["http/1.1"])
+        .await
+        .unwrap();
+
+    let answer = client.get("/large").await;
+    assert_eq!(answer.status.as_u16(), 200);
+    assert_eq!(answer.header("content-length"), large.len().to_string());
+    assert!(answer.body == large);
+    let request = client.request("POST", "/mock", &[], "original");
+    let echoed = client.send(request).await.unwrap().text();
+    assert_eq!(
+        echoed
+            .strip_prefix("example.test|/mock||")
+            .map(str::as_bytes),
+        Some(large.as_slice())
+    );
+
+    std::fs::remove_file(resources.join("large.txt")).unwrap();
+    assert_eq!(client.get("/large").await.status.as_u16(), 502);
+}
+
+#[tokio::test]
 async fn skips_verifying_only_the_hosts_listed_for_it() {
     let wire = hello("example.test", &["http/1.1"]);
     for (listed, decrypted) in [("example.test", true), ("other.test", false)] {

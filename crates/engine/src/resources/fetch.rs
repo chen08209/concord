@@ -12,6 +12,7 @@ use concord_common::{CoreError, CoreOptions};
 use concord_group::http::{HttpError, Streaming, Target, TlsSettings, connect};
 use concord_group::{FetchError, FetchErrorKind, FetchHead, FetchRequest, FetchResponse, Fetcher};
 use concord_platform::HomeDir;
+use concord_platform::mmap::MappedFile;
 use concord_tls::TrustStore;
 use concord_tunnel::Tunnel;
 use sha2::{Digest as _, Sha256};
@@ -192,6 +193,11 @@ pub(crate) struct Spilled {
 }
 
 impl Spilled {
+    /// The body, mapped where the platform allows rather than read onto the heap.
+    pub(crate) fn bytes(&self) -> std::io::Result<MappedFile> {
+        MappedFile::from_file(&self.file)
+    }
+
     /// Copies the body to `path` as [HomeDir::write_atomic] writes a file.
     pub(crate) fn store(mut self, home: &HomeDir, path: impl AsRef<Path>) -> std::io::Result<()> {
         home.write_atomic_with(path, |out| std::io::copy(&mut self.file, out).map(drop))
@@ -225,6 +231,23 @@ impl AsyncWrite for Hashing {
 }
 
 /// As [download], into an unnamed file in `dir` rather than memory.
+/// The SHA-256 of the file at `path`, read in pieces; none when it cannot be read.
+pub(crate) fn file_digest(path: &Path) -> Option<[u8; 32]> {
+    use std::io::Read as _;
+
+    let mut file = std::fs::File::open(path).ok()?;
+    let mut hasher = Sha256::new();
+    let mut piece = vec![0; 32 << 10];
+    loop {
+        match file.read(&mut piece) {
+            Ok(0) => return Some(hasher.finalize().into()),
+            Ok(read) => hasher.update(piece.get(..read)?),
+            Err(err) if err.kind() == std::io::ErrorKind::Interrupted => {}
+            Err(_) => return None,
+        }
+    }
+}
+
 pub(crate) async fn download_spilled(
     fetcher: &dyn Fetcher,
     request: FetchRequest,

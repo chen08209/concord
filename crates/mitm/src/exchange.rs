@@ -1,5 +1,6 @@
 use std::sync::Arc;
 
+use bytes::Bytes;
 use concord_common::HttpFacts;
 use concord_common::intercept::{Reject, Route, RuleLabel, UpstreamRequest};
 use http::header::{CONTENT_LENGTH, CONTENT_TYPE, HOST, LOCATION, UPGRADE, USER_AGENT};
@@ -11,12 +12,12 @@ use hyper_util::rt::TokioIo;
 use rand::RngCore;
 use tokio::sync::OwnedSemaphorePermit;
 
-use crate::body::{Body, Tap, empty, from_incoming, full};
+use crate::body::{Body, Tap, empty, file_body, from_incoming, full};
 use crate::capture::Cap;
 use crate::forward::request_text;
 use crate::headers::{remove_hop_by_hop, text, to_list, version_text, with_host};
 use crate::heads::Heads;
-use crate::rules::{UrlAction, tiny_gif};
+use crate::rules::{LocalBody, UrlAction, tiny_gif};
 use crate::session::{ActivityGuard, Routed, Session};
 use crate::target::{TargetUrl, default_port};
 
@@ -144,13 +145,62 @@ fn request_host(parts: &http::request::Parts) -> String {
         .unwrap_or_default()
 }
 
+/// A local answer whose body may be a file, sent as it is read.
+async fn answer_local(
+    cap: &Cap,
+    status: StatusCode,
+    mut headers: HeaderMap,
+    body: LocalBody,
+    guard: ActivityGuard,
+) -> Response<Body> {
+    let path = match body {
+        LocalBody::Bytes(bytes) => return local(cap, status, headers, bytes, guard),
+        LocalBody::File(path) => path,
+    };
+    let (body, len) = match file_body(&path).await {
+        Ok(opened) => opened,
+        Err(err) => {
+            let message = format!("map-local {} cannot be read: {err}", path.display());
+            tracing::warn!("[MITM] {message}");
+            cap.fail(&message);
+            return local(
+                cap,
+                StatusCode::BAD_GATEWAY,
+                HeaderMap::new(),
+                Bytes::new(),
+                guard,
+            );
+        }
+    };
+    headers.insert(CONTENT_LENGTH, HeaderValue::from(len));
+    cap.responded(status.as_u16(), to_list(&headers));
+    let counter = cap.clone();
+    let finisher = cap.clone();
+    let tapped = Tap::new(
+        body,
+        Some(Box::new(move |data| {
+            counter.add_response_size(data.len());
+            counter.keep_response(data);
+        })),
+        Some(Box::new(move || {
+            finisher.finish();
+            drop(guard);
+        })),
+    );
+    let mut response = Response::new(tapped.boxed_unsync());
+    *response.status_mut() = status;
+    *response.headers_mut() = headers;
+    response
+}
+
 fn local(
     cap: &Cap,
     status: StatusCode,
     mut headers: HeaderMap,
-    body: Vec<u8>,
+    body: impl Into<Bytes>,
     guard: ActivityGuard,
 ) -> Response<Body> {
+    let body = body.into();
     headers.insert(CONTENT_LENGTH, HeaderValue::from(body.len()));
     cap.responded(status.as_u16(), to_list(&headers));
     cap.add_response_size(body.len());
@@ -343,7 +393,7 @@ impl Session {
         &self,
         out: &mut OutRequest,
         target: &mut Target,
-    ) -> Option<(StatusCode, HeaderMap, Vec<u8>)> {
+    ) -> Option<(StatusCode, HeaderMap, LocalBody)> {
         self.rewrite_request_headers(out, target);
         target.url = out.url.clone();
         let answer = {
@@ -364,7 +414,7 @@ impl Session {
         &self,
         heads: &Heads<'_>,
         target: &mut Target,
-    ) -> Option<(StatusCode, HeaderMap, Vec<u8>)> {
+    ) -> Option<(StatusCode, HeaderMap, LocalBody)> {
         let rules = &self.core.config.rules;
         if let Some((rule, replaced)) = rules.rewrite_url(&target.url.raw, heads) {
             match rule.action {
@@ -390,7 +440,7 @@ impl Session {
                     } else {
                         StatusCode::FOUND
                     };
-                    return Some((status, headers, Vec::new()));
+                    return Some((status, headers, LocalBody::Bytes(Bytes::new())));
                 }
                 UrlAction::Header => match TargetUrl::parse_http(&replaced) {
                     Some(rewritten) => {
@@ -420,7 +470,7 @@ impl Session {
                     if let Some(content_type) = content_type {
                         headers.insert(CONTENT_TYPE, HeaderValue::from_static(content_type));
                     }
-                    return Some((status, headers, data));
+                    return Some((status, headers, LocalBody::Bytes(data.into())));
                 }
             }
         }
@@ -490,7 +540,7 @@ impl Session {
             length,
         };
         if let Some((status, headers, data)) = self.rewrite_head(&mut out, &mut target) {
-            return Ok(local(&cap, status, headers, data, guard));
+            return Ok(answer_local(&cap, status, headers, data, guard).await);
         }
         if !self.core.config.rules.scripts.is_empty() {
             target.id = new_request_id();

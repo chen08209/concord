@@ -8,7 +8,19 @@ use http_body_util::combinators::UnsyncBoxBody;
 use http_body_util::{BodyExt, Full};
 use hyper::body::{Body as HttpBody, Frame, Incoming, SizeHint};
 
+use crate::rules::LOCAL_PIECE;
+
 pub(crate) type Body = UnsyncBoxBody<Bytes, io::Error>;
+
+/// The file at `path` read in [LOCAL_PIECE] pieces as it is sent, and its length.
+pub(crate) async fn file_body(path: &std::path::Path) -> io::Result<(Body, u64)> {
+    use futures_util::TryStreamExt;
+
+    let file = tokio::fs::File::open(path).await?;
+    let len = file.metadata().await?.len();
+    let pieces = tokio_util::io::ReaderStream::with_capacity(file, LOCAL_PIECE).map_ok(Frame::data);
+    Ok((http_body_util::StreamBody::new(pieces).boxed_unsync(), len))
+}
 
 pub(crate) fn empty() -> Body {
     full(Bytes::new())

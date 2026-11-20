@@ -280,6 +280,7 @@ impl Running {
         std::fs::write(&profile, &launch.profile).map_err(|e| e.to_string())?;
         let log = std::fs::File::create(&launch.log).map_err(|e| e.to_string())?;
         let started = Instant::now();
+        let mut setup = None;
         let (child, control) = match launch.spec.kind {
             Kind::Ssrust => {
                 if launch.tun.is_some() {
@@ -343,8 +344,11 @@ impl Running {
                 let endpoint = Endpoint::bind()?;
                 let text = control::token();
                 let mut command = isolate::command(&launch.spec.binary, &launch.placement);
+                // Without it an embedded core keeps its error log, such as a listener that failed
+                // to bind, on the control connection, and a startup error has nothing to quote.
                 command
                     .arg(&endpoint.address)
+                    .env("CONCORD_DEBUG", "1")
                     .stdin(Stdio::piped())
                     .stdout(Stdio::null())
                     .stderr(log);
@@ -380,6 +384,7 @@ impl Running {
                     )
                     .await?;
                 control.call("engine.start", json!({})).await?;
+                setup = Some(started.elapsed());
                 (child, Some(control))
             }
         };
@@ -400,14 +405,21 @@ impl Running {
                 .map_err(|e| with_output(e, &launch.log))?;
         }
         running
-            .wait_ready(launch.probe, started)
+            .wait_ready(launch.probe, started, setup)
             .await
             .map_err(|e| with_output(e, &launch.log))?;
         running.ready = started.elapsed();
         Ok(running)
     }
 
-    async fn wait_ready(&mut self, probe: SocketAddr, started: Instant) -> Result<(), String> {
+    /// `setup` is how long a Concord core took to answer its config and start, which tells a
+    /// slow start from a port that never opened.
+    async fn wait_ready(
+        &mut self,
+        probe: SocketAddr,
+        started: Instant,
+        setup: Option<Duration>,
+    ) -> Result<(), String> {
         let mut last = String::new();
         while started.elapsed() < READY_TIMEOUT {
             if let Ok(Some(status)) = self.child.try_wait() {
@@ -419,8 +431,14 @@ impl Running {
             }
             tokio::time::sleep(Duration::from_millis(10)).await;
         }
+        let setup = setup.map_or(String::new(), |took| {
+            format!(
+                " ({} ms of it before engine.start returned)",
+                took.as_millis()
+            )
+        });
         Err(format!(
-            "{} not ready after {READY_TIMEOUT:?}: {last}",
+            "{} not ready after {READY_TIMEOUT:?}{setup}: {last}",
             self.name
         ))
     }

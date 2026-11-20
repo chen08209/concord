@@ -20,8 +20,8 @@ concord-common = { workspace = true, features = ["io", "hyper"] }
 concord-config = { workspace = true }
 concord-platform = { workspace = true }
 concord-tls = { workspace = true }
-tokio = { workspace = true, features = ["net", "time", "io-util", "macros", "rt", "sync"] }
-tokio-util = { workspace = true }
+tokio = { workspace = true, features = ["fs", "net", "time", "io-util", "macros", "rt", "sync"] }
+tokio-util = { workspace = true, features = ["io"] }
 tokio-rustls = { workspace = true }
 rustls = { workspace = true }
 rustls-pki-types = { workspace = true }

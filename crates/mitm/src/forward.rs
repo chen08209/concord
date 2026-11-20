@@ -10,7 +10,7 @@ use http::{HeaderMap, HeaderValue, Method, Request, Response, StatusCode, Uri, V
 use hyper::body::Incoming;
 use hyper::upgrade::OnUpgrade;
 
-use crate::body::{Body, Buffered, Tap, buffer_body, empty, failing, full, full_with};
+use crate::body::{Body, Buffered, Tap, buffer_body, empty, failing, file_body, full, full_with};
 use crate::capture::{PHASE_REQUEST, PHASE_RESPONSE};
 use crate::exchange::{
     OutRequest, ReplyError, Sent, Target, Unsent, has_response_body, set_length,
@@ -21,7 +21,7 @@ use crate::headers::{
 use crate::heads::Heads;
 use crate::limits::{BODY_WAIT, PRESSURE_NO_BODIES};
 use crate::pattern::Pattern;
-use crate::rules::BodyRewrite;
+use crate::rules::{BodyRewrite, LocalBody};
 use crate::script::DEFAULT_SCRIPT_TIMEOUT;
 use crate::session::{PoolKey, Routed, Sender, Session};
 use crate::target::TargetUrl;
@@ -98,7 +98,7 @@ impl Session {
             )
         };
         if let Some(mock) = mock {
-            mock_body(out, &mock.header, &mock.body);
+            mock_body(out, &mock.header, &mock.body).await;
             target.cap.note(
                 "request-body-mock",
                 PHASE_REQUEST,
@@ -333,7 +333,20 @@ impl Session {
 }
 
 /// Sends `body` in place of the request's own, a request that had none included.
-fn mock_body(out: &mut OutRequest, header: &HeaderMap, body: &[u8]) {
+async fn mock_body(out: &mut OutRequest, header: &HeaderMap, body: &LocalBody) {
+    let (body, len) = match body {
+        LocalBody::Bytes(bytes) => (full(bytes.clone()), bytes.len() as u64),
+        LocalBody::File(path) => match file_body(path).await {
+            Ok(opened) => opened,
+            Err(err) => {
+                tracing::warn!(
+                    "[MITM] request-body-mock {} cannot be read: {err}",
+                    path.display()
+                );
+                return;
+            }
+        },
+    };
     for name in header.keys() {
         out.headers.remove(name);
     }
@@ -342,10 +355,7 @@ fn mock_body(out: &mut OutRequest, header: &HeaderMap, body: &[u8]) {
     }
     out.headers.remove(CONTENT_ENCODING);
     out.headers.remove(TRANSFER_ENCODING);
-    out.set_body(
-        full(Bytes::copy_from_slice(body)),
-        u64::try_from(body.len()).ok(),
-    );
+    out.set_body(body, Some(len));
     out.has_body = true;
 }
 
