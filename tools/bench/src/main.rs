@@ -160,6 +160,11 @@ struct RunArgs {
     #[arg(long, default_value_t = 1500)]
     tun_mtu: u32,
     #[arg(
+        help = "With --tun, the `tun.congestion-controller` the Concord cores run (cubic, reno, bbr); the sing-box cores keep their default."
+    )]
+    #[arg(long, default_value = "")]
+    tun_congestion: String,
+    #[arg(
         help = "Start every core afresh for each round of the workloads that otherwise share one core process per case (tcp, udp), so the interval covers process starts. Each new process gets its own warmup trial."
     )]
     #[arg(long)]
@@ -447,6 +452,7 @@ fn run(args: RunArgs) -> Result<bool, String> {
     plan.tun = args.tun;
     plan.tun_stack = args.tun_stack.clone();
     plan.tun_mtu = args.tun_mtu;
+    plan.tun_congestion = args.tun_congestion.clone();
     plan.fresh_cores = args.fresh_cores;
     if args.count_syscalls {
         syscalls::enable()?;

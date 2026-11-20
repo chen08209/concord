@@ -15,7 +15,7 @@ fn-lines crates/dns/src/build.rs::Resolver::new 149
 fn-lines crates/mitm/src/exchange.rs::Session::handle 138
 fn-lines crates/net/src/relay.rs::Half::poll 175
 fn-lines crates/netstack/src/engine.rs::TcpStack::poll 129 raised from 123: a connection whose turn found no transmit room keeps its queue place, which needs whether its output sent anything
-fn-lines crates/netstack/src/tcp/recovery.rs::Tcb::process_ack 126
+fn-lines crates/netstack/src/tcp/recovery.rs::Tcb::process_ack 123
 fn-lines crates/proxy/src/link.rs::build_link 150
 fn-lines crates/rules/src/compile.rs::node_for_cond 171 raised from 158: deferred ASN rules, REMATCH-NAME, and URL-REGEX and USER-AGENT compilation; back down when metadata predicates leave node_for_cond
 fn-lines crates/rules/src/eval.rs::Ev::eval 151 raised from 132: deferred ASN negation, REMATCH-NAME evaluation, and the dispatch to the HTTP rules; back down when metadata predicates leave eval

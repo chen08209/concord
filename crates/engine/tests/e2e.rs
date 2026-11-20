@@ -1641,7 +1641,7 @@ async fn capabilities_report_ss_plugins_and_congestion_controllers() {
     );
     assert_eq!(
         value["congestion-controllers"],
-        serde_json::json!(["cubic", "reno"])
+        serde_json::json!(["cubic", "reno", "bbr"])
     );
     rig.engine.shutdown().await;
 }

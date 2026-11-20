@@ -171,8 +171,8 @@ paths, fields, status codes, `Authorization: Bearer` secret and CORS. The differ
   Local loopback tests cover both IP families, TCP half-close, UDP, remote DNS, reconnect and rejection;
   a live WARP enrollment is not part of those tests. `remote-dns-resolve` currently accepts literal UDP/TCP
   nameservers (L4 requires `tcp://`); encrypted or hostname nameservers are rejected when building the node.
-  The native IP stack implements Cubic/Reno; `bbr`/`bbr3` select Cubic with a warning, and stack mode names use
-  the same native stack. The IP stack keeps the configured MTU; each H3 packet is checked against the current
+  The native IP stack implements Cubic, Reno and BBR (BBR v1 with pacing, as in the TUN); `bbr3` selects Cubic
+  with a warning, and stack mode names use the same native stack. The IP stack keeps the configured MTU; each H3 packet is checked against the current
   QUIC datagram capacity and oversized packets are dropped without retiring the tunnel or returning PMTU ICMP.
   H2 drops received capsules larger than the configured MTU. The `masque-l4` benchmark uses a local H3
   CONNECT peer and covers TCP.
@@ -201,7 +201,9 @@ paths, fields, status codes, `Authorization: Bearer` secret and CORS. The differ
 - **TUN:** ICMP echo is forwarded from an unprivileged ICMP socket on Unix and a raw ICMP socket on Windows; only echo
   replies come back, so `traceroute` through the TUN shows no hops. On Linux the TUN uses offload whenever
   the device supports it, whatever `tun.gso` says (mihomo uses it only with `gso: true`); `gso: false` gets a warning
-  that offload stays on. Other platforms have no offload in either core. On Windows
+  that offload stays on. Other platforms have no offload in either core. `tun.congestion-controller` takes `cubic`
+  (the default), `reno` and `bbr`; `bbr` is BBR v1 with pacing, ported from sing-tun's Go stack as that ports Linux
+  `tcp_bbr.c`. `bbr3` runs as CUBIC with a warning. On Windows
   the interface's forwarding, router-discovery, DAD and DNS-registration options are not set. `tun.dns-mode` is not
   read: with `auto-route` the TUN becomes the system resolver on every desktop platform, macOS included, where mihomo
   leaves it off unless `dns-mode` asks; the macOS entry lives in the dynamic store and goes away with the process.

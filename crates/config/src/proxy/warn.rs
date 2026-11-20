@@ -84,10 +84,7 @@ fn unavailable_congestion(kind: &ProxyKind) -> Option<&str> {
         ProxyKind::Masque(o) => &o.ip_stack_congestion_controller,
         _ => return None,
     };
-    ["bbr", "bbr3"]
-        .iter()
-        .any(|bbr| name.eq_ignore_ascii_case(bbr))
-        .then_some(name.as_str())
+    name.eq_ignore_ascii_case("bbr3").then_some(name.as_str())
 }
 
 /// What the node's options say that the app should show, beyond what makes it unsupported.
@@ -267,7 +264,7 @@ mod tests {
     }
 
     #[test]
-    fn an_ip_stack_bbr_that_runs_as_cubic_is_named() {
+    fn an_ip_stack_bbr3_that_runs_as_cubic_is_named() {
         let node = |kind: &str, congestion: &str| {
             warnings(json!({
                 "name": "n", "type": kind, "server": "h.test", "port": 443,
@@ -276,7 +273,7 @@ mod tests {
             }))
         };
         for kind in ["wireguard", "masque"] {
-            for name in ["bbr", "BBR3"] {
+            for name in ["bbr3", "BBR3"] {
                 assert_eq!(
                     node(kind, name),
                     [format!(
@@ -285,7 +282,7 @@ mod tests {
                     "{kind}"
                 );
             }
-            for name in ["", "cubic", "reno"] {
+            for name in ["", "cubic", "reno", "bbr", "BBR"] {
                 assert!(node(kind, name).is_empty(), "{kind} {name}");
             }
         }

@@ -175,6 +175,24 @@ async fn masque_h3_and_h2_carry_tcp_udp_ipv4_ipv6_and_remote_dns() {
 }
 
 #[tokio::test]
+async fn masque_h3_and_h2_carry_tcp_through_a_bbr_ip_stack() {
+    for network in ["h3", "h2"] {
+        let server = if network == "h2" {
+            fixture::h2_server(200).await
+        } else {
+            fixture::h3_server(false, 200).await
+        };
+        let node = client(
+            &server,
+            network,
+            json!({"ip-stack":{"congestion-controller":"bbr"}}),
+        );
+        tcp_echo(&*node, &Address::new("10.8.0.1", 7), b"").await;
+        tcp_echo(&*node, &Address::new("fd08::1", 7), b"").await;
+    }
+}
+
+#[tokio::test]
 async fn masque_l4_reuses_h3_streams_and_preserves_half_close_but_rejects_udp() {
     let server = fixture::h3_server(true, 200).await;
     let node = client(&server, "h3-l4proxy", json!({"ip":"", "ipv6":""}));

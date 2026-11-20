@@ -1,3 +1,4 @@
+mod rate;
 mod recovery;
 mod recv;
 mod send;
@@ -17,6 +18,7 @@ use crate::wire::{
     FLAG_ACK, FLAG_RST, FLAG_SYN, IPV4_HEADER, IPV6_HEADER, L4Checksum, MAX_SACK_BLOCKS,
     TCP_HEADER, TcpOptions, TcpSegment,
 };
+use rate::{Delivery, Stamp};
 
 /// Where the stack writes the packets it sends.
 pub trait Egress {
@@ -80,6 +82,7 @@ struct Sent {
     sacked: bool,
     lost: bool,
     retrans: bool,
+    stamp: Stamp,
 }
 
 impl Sent {
@@ -220,6 +223,11 @@ pub(crate) struct Tcb {
     cwnd_blocked: bool,
     max_inflight: u32,
     last_send: u64,
+    delivery: Delivery,
+    /// Nanoseconds, on the same clock as `now`.
+    pace_next: u64,
+    pace_at: Option<u64>,
+    segs_out: u64,
 
     rto_at: Option<u64>,
     probe_at: Option<u64>,
@@ -310,7 +318,7 @@ impl Tcb {
                 ..Rack::default()
             },
             probe: None,
-            cc: Controller::new(config.congestion, mss),
+            cc: Controller::new(config.congestion, mss, iss.0, now),
             phase: Phase::Open,
             recover: iss,
             prr_delivered: 0,
@@ -320,6 +328,10 @@ impl Tcb {
             cwnd_blocked: false,
             max_inflight: 0,
             last_send: now,
+            delivery: Delivery::default(),
+            pace_next: now * 1000,
+            pace_at: None,
+            segs_out: 0,
             rto_at: None,
             probe_at: None,
             reorder_at: None,

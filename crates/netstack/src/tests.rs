@@ -330,6 +330,7 @@ struct Link {
     delivered: Vec<(bool, Vec<u8>)>,
     /// Hands the server each step's segments as one batch, as the TUN driver does.
     batched: bool,
+    congestion: Congestion,
 }
 
 impl Link {
@@ -346,6 +347,22 @@ impl Link {
             accepted: Vec::new(),
             delivered: Vec::new(),
             batched: false,
+            congestion: Congestion::Cubic,
+        }
+    }
+
+    /// Both ends run `congestion`, the server as the TUN's stack does from its configuration.
+    fn with_congestion(
+        loss_per_mille: u64,
+        reorder_per_mille: u64,
+        congestion: Congestion,
+    ) -> Link {
+        let mut config = StackConfig::default();
+        config.tcp.congestion = congestion;
+        Link {
+            server: TcpStack::new(config),
+            congestion,
+            ..Link::new(loss_per_mille, reorder_per_mille)
         }
     }
 
@@ -487,7 +504,7 @@ async fn transfer_with(mut link: Link, len: usize) -> Link {
     let (client_addr, server_addr) = addrs();
     let client = link
         .client
-        .connect(client_addr, server_addr, Congestion::Cubic)
+        .connect(client_addr, server_addr, link.congestion)
         .unwrap();
     drive(&mut link, |l| !l.accepted.is_empty(), 10).await;
     let server = link.accepted.pop().unwrap();
@@ -592,6 +609,29 @@ async fn a_lost_segment_resent_while_its_sender_holds_out_of_order_data_fits_the
 #[tokio::test(flavor = "current_thread")]
 async fn transfer_survives_heavy_loss() {
     transfer(100, 0, 256 << 10).await;
+}
+
+#[tokio::test(flavor = "current_thread")]
+async fn bbr_moves_bulk_both_ways_and_closes() {
+    transfer_with(Link::with_congestion(0, 0, Congestion::Bbr), 3 << 20).await;
+}
+
+#[tokio::test(flavor = "current_thread")]
+async fn bbr_survives_loss_and_reordering() {
+    transfer_with(Link::with_congestion(20, 20, Congestion::Bbr), 1 << 20).await;
+}
+
+#[tokio::test(flavor = "current_thread")]
+async fn bbr_survives_heavy_loss() {
+    transfer_with(Link::with_congestion(100, 0, Congestion::Bbr), 256 << 10).await;
+}
+
+#[tokio::test(flavor = "current_thread")]
+async fn bbr_paces_frames_the_device_segments_through_loss() {
+    let mut link = Link::with_congestion(20, 20, Congestion::Bbr);
+    link.to_server.segment_limit = 64 << 10;
+    link.to_client.segment_limit = 64 << 10;
+    transfer_with(link, 2 << 20).await;
 }
 
 #[tokio::test(flavor = "current_thread")]

@@ -180,7 +180,8 @@ pub(super) fn parse(opts: &WireGuardOpts) -> Result<WgConfig, BuildError> {
     {
         "reno" => Congestion::Reno,
         "" | "cubic" => Congestion::Cubic,
-        other @ ("bbr" | "bbr3") => {
+        "bbr" => Congestion::Bbr,
+        other @ "bbr3" => {
             tracing::warn!("wireguard congestion-controller {other} is not available, using cubic");
             Congestion::Cubic
         }

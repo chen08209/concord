@@ -1,18 +1,22 @@
+use crate::bbr::{Bbr, Flow, RateSample, Window};
+
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub enum Congestion {
     #[default]
     Cubic,
     Reno,
+    Bbr,
 }
 
 impl Congestion {
-    pub const NAMES: &'static [&'static str] = &["cubic", "reno"];
+    pub const NAMES: &'static [&'static str] = &["cubic", "reno", "bbr"];
 
-    /// `bbr` and `bbr3` are not implemented; they run as CUBIC and report `false`.
+    /// `bbr3` is not implemented; it runs as CUBIC and reports `false`, as any unknown name does.
     pub fn parse(name: &str) -> (Self, bool) {
         match name.trim().to_ascii_lowercase().as_str() {
             "" | "cubic" => (Congestion::Cubic, true),
             "reno" => (Congestion::Reno, true),
+            "bbr" => (Congestion::Bbr, true),
             _ => (Congestion::Cubic, false),
         }
     }
@@ -36,8 +40,9 @@ struct Cubic {
     w_est: f64,
 }
 
-/// Window growth and reduction. Loss detection and the window during recovery live in the
-/// connection; this only answers how much to grow on delivery and where to cut on loss.
+/// Window growth and reduction. For CUBIC and Reno, loss detection and the window during
+/// recovery live in the connection, and this only answers how much to grow on delivery and where
+/// to cut on loss. BBR sets the window and the pacing rate itself on every ACK.
 pub(crate) struct Controller {
     kind: Congestion,
     pub cwnd: u32,
@@ -45,17 +50,71 @@ pub(crate) struct Controller {
     mss: u32,
     carry: u64,
     cubic: Cubic,
+    bbr: Option<Box<Bbr>>,
 }
 
 impl Controller {
-    pub fn new(kind: Congestion, mss: u32) -> Self {
+    pub fn new(kind: Congestion, mss: u32, seed: u32, now: u64) -> Self {
+        let cwnd = initial_window(mss);
         Controller {
             kind,
-            cwnd: initial_window(mss),
+            cwnd,
             ssthresh: u32::MAX,
             mss,
             carry: 0,
             cubic: Cubic::default(),
+            bbr: (kind == Congestion::Bbr).then(|| Box::new(Bbr::new(cwnd, seed, now))),
+        }
+    }
+
+    /// Whether the controller owns the window and paces the sends: BBR.
+    pub fn paced(&self) -> bool {
+        self.bbr.is_some()
+    }
+
+    /// Bytes per second, under BBR.
+    pub fn pacing_rate(&self) -> Option<u64> {
+        self.bbr.as_deref().map(Bbr::pacing_rate)
+    }
+
+    pub fn min_tso_segments(&self) -> u32 {
+        self.bbr.as_deref().map_or(1, Bbr::min_tso_segments)
+    }
+
+    fn with_bbr<R>(&mut self, run: impl FnOnce(&mut Bbr, &mut Window) -> R) -> Option<R> {
+        let bbr = self.bbr.as_deref_mut()?;
+        let mut window = Window {
+            cwnd: self.cwnd,
+            ssthresh: self.ssthresh,
+        };
+        let result = run(bbr, &mut window);
+        self.cwnd = window.cwnd.min(MAX_CWND);
+        self.ssthresh = window.ssthresh;
+        Some(result)
+    }
+
+    /// BBR's model update on an ACK. Returns the delivered count to mark application-limited.
+    pub fn on_rate_sample(&mut self, flow: &Flow, sample: &RateSample) -> Option<u64> {
+        self.with_bbr(|bbr, window| bbr.on_ack(flow, window, sample))
+            .flatten()
+    }
+
+    pub fn on_tx_start(&mut self, flow: &Flow) {
+        self.with_bbr(|bbr, window| bbr.on_tx_start(flow, window));
+    }
+
+    /// The window on leaving fast recovery; BBR restores its own on the next ACK.
+    pub fn end_recovery(&mut self) {
+        if self.bbr.is_none() {
+            self.cwnd = self.ssthresh.max(self.mss);
+        }
+    }
+
+    /// A tail-loss probe repaired a real loss: reduce once, as on entering CWR.
+    pub fn on_probe_loss(&mut self) {
+        let ssthresh = self.on_loss();
+        if self.bbr.is_none() {
+            self.cwnd = ssthresh;
         }
     }
 
@@ -86,7 +145,7 @@ impl Controller {
         }
         match self.kind {
             Congestion::Reno => self.reno(acked),
-            Congestion::Cubic => self.cubic(acked, now, srtt),
+            Congestion::Cubic | Congestion::Bbr => self.cubic(acked, now, srtt),
         }
         self.cwnd = self.cwnd.min(MAX_CWND);
     }
@@ -139,13 +198,17 @@ impl Controller {
             .saturating_add(whole.min(u64::from(u32::MAX)) as u32);
     }
 
-    /// Sets `ssthresh` for a loss in the current window and returns it.
+    /// Sets `ssthresh` for a loss in the current window and returns it. BBR keeps `ssthresh` and
+    /// notes the window to restore after recovery.
     pub fn on_loss(&mut self) -> u32 {
+        if let Some(ssthresh) = self.with_bbr(|bbr, window| bbr.on_loss(window)) {
+            return ssthresh;
+        }
         let floor = 2 * self.mss;
         self.carry = 0;
         let ssthresh = match self.kind {
             Congestion::Reno => self.cwnd / 2,
-            Congestion::Cubic => {
+            Congestion::Cubic | Congestion::Bbr => {
                 let cwnd = f64::from(self.cwnd) / f64::from(self.mss);
                 let state = &mut self.cubic;
                 state.w_max = if cwnd < state.w_max {
@@ -161,9 +224,15 @@ impl Controller {
         self.ssthresh
     }
 
-    pub fn on_rto(&mut self) {
-        self.on_loss();
+    /// A retransmission timeout; `first` when it starts the loss episode.
+    pub fn on_rto(&mut self, first: bool, flow: &Flow) {
+        if first {
+            self.on_loss();
+        }
         self.cwnd = self.mss;
+        if let Some(bbr) = self.bbr.as_deref_mut() {
+            bbr.on_rto(flow);
+        }
     }
 
     /// Restarts the cubic epoch after the sender was idle, so time spent idle is not
@@ -234,7 +303,7 @@ mod tests {
 
     #[test]
     fn slow_start_doubles_then_loss_cuts_by_beta() {
-        let mut cc = Controller::new(Congestion::Cubic, 1000);
+        let mut cc = Controller::new(Congestion::Cubic, 1000, 1, 0);
         assert_eq!(cc.cwnd, 10_000);
         cc.on_ack(10_000, 0, 1000);
         assert_eq!(cc.cwnd, 20_000);
@@ -251,7 +320,7 @@ mod tests {
 
     #[test]
     fn reno_adds_one_segment_per_window() {
-        let mut cc = Controller::new(Congestion::Reno, 1000);
+        let mut cc = Controller::new(Congestion::Reno, 1000, 1, 0);
         cc.ssthresh = 10_000;
         for _ in 0..10 {
             cc.on_ack(1000, 0, 1000);

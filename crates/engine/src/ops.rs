@@ -251,7 +251,7 @@ mod tests {
         let path = dir.path().join("config.yaml");
         std::fs::write(
             &path,
-            "geodata-mode: true\ntun: {enable: true, congestion-controller: bbr}\n",
+            "geodata-mode: true\ntun: {enable: true, congestion-controller: bbr3}\n",
         )
         .unwrap();
         let path = path.to_string_lossy().into_owned();

@@ -44,6 +44,8 @@ pub struct Plan {
     pub tun: bool,
     pub tun_stack: String,
     pub tun_mtu: u32,
+    /// The Concord TUN's `congestion-controller`; empty leaves the core's default.
+    pub tun_congestion: String,
     /// Start every core afresh for each round of the shared workloads, so the interval covers process starts.
     pub fresh_cores: bool,
     pub count_syscalls: bool,
@@ -82,6 +84,7 @@ impl Plan {
                 tun: false,
                 tun_stack: "system".into(),
                 tun_mtu: 1500,
+                tun_congestion: String::new(),
                 fresh_cores: false,
                 count_syscalls: false,
                 net_counters: false,
@@ -118,6 +121,7 @@ impl Plan {
                 tun: false,
                 tun_stack: "system".into(),
                 tun_mtu: 1500,
+                tun_congestion: String::new(),
                 fresh_cores: false,
                 count_syscalls: false,
                 net_counters: false,

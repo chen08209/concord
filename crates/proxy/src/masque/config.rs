@@ -130,8 +130,9 @@ fn stack_congestion(opts: &MasqueOpts) -> Result<Congestion, BuildError> {
     {
         "" | "cubic" => Congestion::Cubic,
         "reno" => Congestion::Reno,
-        "bbr" | "bbr3" => {
-            tracing::warn!("MASQUE IP stack BBR is unavailable; using cubic");
+        "bbr" => Congestion::Bbr,
+        "bbr3" => {
+            tracing::warn!("MASQUE IP stack bbr3 is unavailable; using cubic");
             Congestion::Cubic
         }
         _ => {

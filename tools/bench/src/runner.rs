@@ -446,7 +446,7 @@ impl Rig {
     }
 
     fn tun_section(&self) -> Value {
-        json!({
+        let mut tun = json!({
             "enable": true,
             "device": "cbtun0",
             "stack": self.plan.tun_stack,
@@ -454,7 +454,11 @@ impl Rig {
             "auto-detect-interface": true,
             "strict-route": false,
             "mtu": self.plan.tun_mtu,
-        })
+        });
+        if !self.plan.tun_congestion.is_empty() {
+            tun["congestion-controller"] = json!(self.plan.tun_congestion);
+        }
+        tun
     }
 
     fn ctx(&self, far: &Far, case: &Case, entry: Entry, core: u32) -> Ctx {

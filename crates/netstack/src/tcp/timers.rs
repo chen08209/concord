@@ -22,6 +22,7 @@ impl Tcb {
             self.close_at,
             self.keepalive_at,
             self.ack_at,
+            self.pace_at,
         ]
         .into_iter()
         .flatten()
@@ -73,6 +74,9 @@ impl Tcb {
             }
             event.closed = true;
             return event;
+        }
+        if self.pace_at.is_some_and(|at| at <= now) {
+            self.pace_at = None;
         }
         if self.ack_at.is_some_and(|at| at <= now) {
             self.ack_at = None;
@@ -134,6 +138,8 @@ impl Tcb {
             let len = unsent.min(room).min(by_window);
             let start = self.snd_nxt;
             if self.emit(egress, state, start, len as usize, FLAG_ACK, now) {
+                self.advance_pacing(now, len, 1);
+                let stamp = self.stamp(now);
                 self.sent.push_back(Sent {
                     start,
                     end: start + len,
@@ -142,6 +148,7 @@ impl Tcb {
                     sacked: false,
                     lost: false,
                     retrans: false,
+                    stamp,
                 });
                 self.snd_nxt = start + len;
                 self.sync_sent(state);
@@ -189,19 +196,17 @@ impl Tcb {
             event.closed = true;
             return;
         }
-        if self.phase != Phase::Loss {
-            self.cc.on_rto();
-        } else {
-            self.cc.cwnd = self.mss;
+        let first = self.phase != Phase::Loss;
+        for i in 0..self.sent.len() {
+            self.mark_lost_at(i);
         }
         self.phase = Phase::Loss;
+        let flow = self.flow(now);
+        self.cc.on_rto(first, &flow);
         self.recover = self.snd_nxt;
         self.probe = None;
         self.probe_at = None;
         self.reorder_at = None;
-        for i in 0..self.sent.len() {
-            self.mark_lost_at(i);
-        }
         self.rto_at = Some(now + self.rto());
     }
 }

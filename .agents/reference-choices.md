@@ -456,6 +456,34 @@ MiB, GiB, ns, µs, ms, s, min, h), or as the source text in backticks; `cfg` var
 | `net::relay::ATTACHED_REPORT` | 1 s | B | mihomo's statistic manager samples traffic once a second (`tunnel/statistic/manager.go:116`); a report more often than the consumer's sample adds nothing. Same period. |
 | `net::relay::TCP_BATCH_BUFFERS` | 8 | C | Linux UIO_FASTIOV = 8 (`include/uapi/linux/uio.h`, read as NDK sysroot `usr/include/linux/uio.h:26`): sendmsg/writev keep up to 8 imported iovecs on the stack, so 8 owned reads per write avoid a per-call iovec allocation. |
 | `net::sockets::DEFAULT_KEEP_ALIVE` | 15 s | B | Go net defaultTCPKeepAliveIdle = 15 * time.Second (`net/dial.go:20`), which mihomo gets when keep-alive-idle is unset (`component/keepalive/tcp_keepalive.go:12`, default 0); same value. |
+| `netstack::bbr::ACK_EPOCH_RESET_THRESH` | 1048576 | B | sing-tun goBBRAckEpochResetThresh = 1 << 20 (`stack_go_tcp_bbr.go:46`), Linux `tcp_bbr.c` bbr_ack_epoch_acked_reset_thresh; counted in packets there, so Concord multiplies it by the MSS. Same value. |
+| `netstack::bbr::BW_RTTS` | 10 | B | sing-tun goBBRBandwidthRounds = goBBRCycleLength + 2 (`stack_go_tcp_bbr.go:27`), Linux bbr_bw_rtts. Same value. |
+| `netstack::bbr::CWND_GAIN` | 512 | B | sing-tun goBBRWindowGain = goBBRUnit * 2 (`stack_go_tcp_bbr.go:34`), Linux bbr_cwnd_gain. Same value. |
+| `netstack::bbr::CWND_MIN_TARGET` | 4 | B | sing-tun goBBRWindowMinTarget = 4 packets (`stack_go_tcp_bbr.go:36`), Linux bbr_cwnd_min_target; Concord multiplies it by the MSS. Same value. |
+| `netstack::bbr::CYCLE_LEN` | 8 | B | sing-tun goBBRCycleLength = 8 (`stack_go_tcp_bbr.go:16`), Linux CYCLE_LEN. Same value. |
+| `netstack::bbr::CYCLE_RAND` | 7 | B | sing-tun goBBRCycleRandom = 7 (`stack_go_tcp_bbr.go:35`), Linux bbr_cycle_rand. Same value. |
+| `netstack::bbr::DRAIN_GAIN` | 88 | B | sing-tun goBBRDrainGain = goBBRUnit * 1000 / 2885 (`stack_go_tcp_bbr.go:33`), Linux bbr_drain_gain. Same value. |
+| `netstack::bbr::EXTRA_ACKED_MAX_US` | 100000 | B | sing-tun goBBRExtraAckedMaxMicros = 100 * 1000 (`stack_go_tcp_bbr.go:47`), Linux bbr_extra_acked_max_us. Same value. |
+| `netstack::bbr::EXTRA_ACKED_WIN_RTTS` | 5 | B | sing-tun goBBRExtraAckedWindowRounds = 5 (`stack_go_tcp_bbr.go:45`), Linux bbr_extra_acked_win_rtts. Same value. |
+| `netstack::bbr::FULL_BW_COUNT` | 3 | B | sing-tun goBBRFullBandwidthCount = 3 (`stack_go_tcp_bbr.go:38`), Linux bbr_full_bw_cnt. Same value. |
+| `netstack::bbr::FULL_BW_THRESH` | 320 | B | sing-tun goBBRFullBandwidthThresh = goBBRUnit * 5 / 4 (`stack_go_tcp_bbr.go:37`), Linux bbr_full_bw_thresh. Same value. |
+| `netstack::bbr::GSO_MAX_BYTES` | 65406 | B | sing-tun 0xffff - 1 - goHeaderScratchSize 128 in goBBRTSOSegmentsGoal (`stack_go_tcp_bbr.go:148`, `stack_go_tcp_output.go:19`). Same value. |
+| `netstack::bbr::HIGH_GAIN` | 739 | B | sing-tun goBBRHighGain = goBBRUnit*2885/1000 + 1 (`stack_go_tcp_bbr.go:32`), Linux bbr_high_gain. Same value. |
+| `netstack::bbr::LT_BW_DIFF` | 500 | B | sing-tun goBBRLongTermBandwidthDiff = 4000 / 8 bytes per second (`stack_go_tcp_bbr.go:42`), Linux bbr_lt_bw_diff. Same value. |
+| `netstack::bbr::LT_BW_MAX_RTTS` | 48 | B | sing-tun goBBRLongTermMaxRounds = 48 (`stack_go_tcp_bbr.go:43`), Linux bbr_lt_bw_max_rtts. Same value. |
+| `netstack::bbr::LT_BW_RATIO` | 32 | B | sing-tun goBBRLongTermBandwidthRatio = goBBRUnit / 8 (`stack_go_tcp_bbr.go:41`), Linux bbr_lt_bw_ratio. Same value. |
+| `netstack::bbr::LT_INTERVAL_MIN_RTTS` | 4 | B | sing-tun goBBRLongTermMinRounds = 4 (`stack_go_tcp_bbr.go:39`), Linux bbr_lt_intvl_min_rtts. Same value. |
+| `netstack::bbr::LT_LOSS_THRESH` | 50 | B | sing-tun goBBRLongTermLossThresh = 50 (`stack_go_tcp_bbr.go:40`), Linux bbr_lt_loss_thresh. Same value. |
+| `netstack::bbr::MIN_RTT_WINDOW_MS` | 10000 | B | sing-tun goBBRMinRoundTripWindowMs = 10 * 1000 (`stack_go_tcp_bbr.go:28`), Linux bbr_min_rtt_win_sec 10 s. Same value. |
+| `netstack::bbr::MIN_TSO_RATE` | 1200000 | B | sing-tun goBBRMinTSORate = 1200000 bits per second (`stack_go_tcp_bbr.go:30`), Linux bbr_min_tso_rate. Same value. |
+| `netstack::bbr::PACING_GAINS` | `[320, 192, 256, 256, 256, 256, 256, 256]` | B | sing-tun goBBRPacingGains [5/4, 3/4, 1 x6] of goBBRUnit (`stack_go_tcp_bbr.go:50-55`), Linux bbr_pacing_gain. Same values. |
+| `netstack::bbr::PACING_MARGIN_PERCENT` | 1 | B | sing-tun goBBRPacingMarginPercent = 1 (`stack_go_tcp_bbr.go:31`), Linux bbr_pacing_margin_percent. Same value. |
+| `netstack::bbr::PACING_SHIFT` | 10 | B | sing-tun goPacingShift = 10 (`stack_go_tcp_cong.go:34`), used for the TSO goal (`stack_go_tcp_bbr.go:148`) and the frame limit (`stack_go_tcp_ack.go:1022`); Linux sk_pacing_shift. Same value. |
+| `netstack::bbr::PROBE_RTT_MODE_MS` | 200 | B | sing-tun goBBRProbeRoundTripModeMs = 200 (`stack_go_tcp_bbr.go:29`), Linux bbr_probe_rtt_mode_ms. Same value. |
+| `netstack::bbr::TSO_MAX_SEGMENTS` | 127 | B | sing-tun goBBRTSOSegmentsGoal caps the goal at 0x7f segments (`stack_go_tcp_bbr.go:150`), Linux bbr_tso_segs_goal. Same value. |
+| `netstack::tcp::rate::PACING_TICK` | 1000 | B | sing-tun goWheelTick = 1 ms (`stack_go_wheel.go:9`): a paced send waits while its stamp is more than one tick ahead (`stack_go_tcp_output.go:558-560`); Concord counts µs. Same value. |
+| `netstack::tcp::rate::PACING_UNPACED_SEGMENTS` | 10 | B | sing-tun goPacingUnpacedSegments = 10 (`stack_go_tcp_cong.go:35`), the segments sent before pacing applies (`stack_go_tcp_output.go:558`, `:704`). Same value. |
+| `netstack::tcp::rate::TSO_RTT_SHIFT` | 9 | B | sing-tun goTSORoundTripShift = 9 (`stack_go_tcp_cong.go:33`, used at `stack_go_tcp_ack.go:1023`), Linux tcp_tso_rtt_log. Same value. |
 | `netstack::cc::CUBIC_BETA` | 0.7 | B | sing-tun mirrors Linux tcp_cubic: goCubicBeta = 717 / goCubicBetaScale 1024 = 0.7 (`stack_go_tcp_cubic.go:11-13`); RFC 9438 beta_cubic 0.7. Same value. |
 | `netstack::cc::CUBIC_C` | 0.4 | B | sing-tun mirrors Linux tcp_cubic: goCubicScale = 41, round-trip scale 41*10/1024 = 0.4 (`stack_go_tcp_cubic.go:14`, `:29`); RFC 9438 C = 0.4. Same value. |
 | `netstack::cc::INITIAL_RTO` | 1000000 | B | sing-tun goRTOInitialMicros = 1000000 (`stack_go_tcp_input.go:21`, set at `:181`), the RFC 6298 §2.1 initial RTO of 1 s. Same value. |
@@ -708,6 +736,7 @@ tunables. `module::*` covers every constant in that module and its submodules th
 | `mitm::hostlist::*` | IANA well-known port for https, 443 (RFC 9110 §4.2.2); IANA well-known port for http, 80 (RFC 9110 §4.2.1) |
 | `mitm::target::*` | IANA well-known port for https, 443 (RFC 9110 §4.2.2); IANA well-known port for http, 80 (RFC 9110 §4.2.1) |
 | `proxy::masque::datagram::HEADER_MAX` | 9 bytes: RFC 9000 §16 maximum QUIC variable integer width (8), plus the zero Context ID (1) of RFC 9484 §4.4; Quarter Stream ID is defined in RFC 9297 §2.1 |
+| `netstack::bbr::BW_SCALE`, `netstack::bbr::BW_UNIT`, `netstack::bbr::SCALE`, `netstack::bbr::UNIT` | Fixed-point formats of Linux `tcp_bbr.c` as sing-tun keeps them (`stack_go_tcp_bbr.go:12-15`): bandwidth in units of 2^-24 byte per µs (BW_SCALE 24) and gains in units of 1/256 (BBR_SCALE 8); a representation, no tuning. |
 | `netstack::readiness::*` | In-memory readiness bit flags READ=1, WRITE=2, FLAGS=READ or WRITE of Concord's own atomic state word; bit layout, no tuning. |
 | `netstack::wire::*` | IP/TCP/UDP header lengths (RFC 791, 8200, 9293, 768), TCP flag bits (RFC 9293 §3.1), IANA protocol numbers, IPv4 MF bit and IPv6 fragment header (RFC 8200 §4.5), 4 SACK blocks fit 40-byte options (RFC 2018 §3), default TTL 64 (RFC 1700). |
 | `platform::clock::*` | Windows API GetTimeZoneInformation return code TIME_ZONE_ID_DAYLIGHT = 2 (timezoneapi.h); Unit conversion: seconds from the Windows FILETIME epoch 1601-01-01 to the Unix epoch |

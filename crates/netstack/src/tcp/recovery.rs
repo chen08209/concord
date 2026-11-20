@@ -3,6 +3,7 @@ use crate::seq::Seq;
 use crate::stream::SharedState;
 use crate::wire::{FLAG_FIN, TcpSegment};
 
+use super::rate::Acked;
 use super::{Event, ORPHAN_TIMEOUT, Phase, Sent, State, TIME_WAIT, Tcb, Wakes};
 
 const REO_PERSIST: u32 = 16;
@@ -41,7 +42,7 @@ impl Tcb {
         let prior_inflight = self.inflight();
         let prior_fack = self.high_sacked.max(self.snd_una);
         let mut delivered = 0u32;
-        let mut sample: Option<(u64, u64)> = None;
+        let mut acked = self.acked();
         let mut dsack = false;
         if self.sack_ok {
             let blocks = seg.options.sack_blocks();
@@ -64,7 +65,7 @@ impl Tcb {
                 }
                 let left = left.max(ack);
                 if left.lt(right) {
-                    delivered += self.mark_sacked(left, right, now, prior_fack, &mut sample);
+                    delivered += self.mark_sacked(left, right, now, prior_fack, &mut acked);
                 }
             }
         }
@@ -73,7 +74,7 @@ impl Tcb {
         }
         let advanced = ack.gt(self.snd_una);
         if advanced {
-            delivered += self.cumulative_ack(ack, now, prior_fack, &mut sample);
+            delivered += self.cumulative_ack(ack, now, prior_fack, &mut acked);
             self.drop_acked(ack, state, pool, wakes);
             self.snd_una = ack;
             self.backoff = 0;
@@ -86,7 +87,7 @@ impl Tcb {
         {
             self.dupacks += 1;
         }
-        if let Some((rtt, _)) = sample {
+        if let Some((rtt, _)) = acked.rtt {
             self.rtt.sample(rtt, now);
         }
         if let Some(probe) = self.probe
@@ -94,8 +95,7 @@ impl Tcb {
         {
             self.probe = None;
             if probe.retrans && !dsack && self.phase == Phase::Open {
-                let ssthresh = self.cc.on_loss();
-                self.cc.cwnd = ssthresh;
+                self.cc.on_probe_loss();
             }
         }
         self.detect_losses(now, advanced);
@@ -105,7 +105,7 @@ impl Tcb {
         match self.phase {
             Phase::Recovery | Phase::Loss if self.snd_una.ge(self.recover) => {
                 if self.phase == Phase::Recovery {
-                    self.cc.cwnd = self.cc.ssthresh.max(self.mss);
+                    self.cc.end_recovery();
                     self.rack.reo_persist = self.rack.reo_persist.saturating_sub(1);
                     if self.rack.reo_persist == 0 {
                         self.rack.reo_mult = 1;
@@ -116,9 +116,7 @@ impl Tcb {
             Phase::Recovery => self.prr_update(delivered),
             _ => {}
         }
-        if self.phase != Phase::Recovery && delivered > 0 && self.cwnd_limited() {
-            self.cc.on_ack(delivered, now, self.rtt.smoothed());
-        }
+        self.on_delivery(delivered, prior_inflight, &acked, now);
         self.cwnd_blocked = false;
         self.max_inflight = self.inflight();
         if advanced || delivered > 0 {
@@ -168,6 +166,24 @@ impl Tcb {
         }
     }
 
+    fn on_delivery(&mut self, delivered: u32, prior_inflight: u32, acked: &Acked, now: u64) {
+        if !self.cc.paced() {
+            if self.phase != Phase::Recovery && delivered > 0 && self.cwnd_limited() {
+                self.cc.on_ack(delivered, now, self.rtt.smoothed());
+            }
+            return;
+        }
+        self.count_delivered(delivered, now);
+        if !acked.outstanding {
+            return;
+        }
+        let sample = self.rate_sample(delivered, prior_inflight, acked, now);
+        let flow = self.flow(now);
+        if let Some(mark) = self.cc.on_rate_sample(&flow, &sample) {
+            self.mark_app_limited(mark);
+        }
+    }
+
     fn cwnd_limited(&self) -> bool {
         if self.cwnd_blocked {
             return true;
@@ -184,8 +200,9 @@ impl Tcb {
         right: Seq,
         now: u64,
         prior_fack: Seq,
-        sample: &mut Option<(u64, u64)>,
+        acked: &mut Acked,
     ) -> u32 {
+        acked.sacked = true;
         let mut delivered = 0;
         let first = self.sent.partition_point(|s| s.start.lt(left));
         let mut updates = Vec::new();
@@ -209,7 +226,7 @@ impl Tcb {
             updates.push(*seg);
         }
         for seg in updates {
-            self.on_delivered(&seg, now, prior_fack, sample);
+            self.on_delivered(&seg, now, prior_fack, acked);
         }
         if right.gt(self.high_sacked) {
             self.high_sacked = right;
@@ -217,13 +234,7 @@ impl Tcb {
         delivered
     }
 
-    fn cumulative_ack(
-        &mut self,
-        ack: Seq,
-        now: u64,
-        prior_fack: Seq,
-        sample: &mut Option<(u64, u64)>,
-    ) -> u32 {
+    fn cumulative_ack(&mut self, ack: Seq, now: u64, prior_fack: Seq, acked: &mut Acked) -> u32 {
         let mut delivered = 0;
         while let Some(seg) = self.sent.front().copied() {
             if seg.end.le(ack) {
@@ -239,7 +250,7 @@ impl Tcb {
                     if seg.retrans {
                         self.retrans_bytes -= len;
                     }
-                    self.on_delivered(&seg, now, prior_fack, sample);
+                    self.on_delivered(&seg, now, prior_fack, acked);
                 }
                 continue;
             }
@@ -265,16 +276,13 @@ impl Tcb {
         delivered
     }
 
-    fn on_delivered(
-        &mut self,
-        seg: &Sent,
-        now: u64,
-        prior_fack: Seq,
-        sample: &mut Option<(u64, u64)>,
-    ) {
+    fn on_delivered(&mut self, seg: &Sent, now: u64, prior_fack: Seq, acked: &mut Acked) {
         let rtt = now.saturating_sub(seg.sent_at);
-        if !seg.retrans && sample.is_none_or(|(_, at)| seg.sent_at > at) {
-            *sample = Some((rtt, seg.sent_at));
+        if !seg.retrans && acked.rtt.is_none_or(|(_, at)| seg.sent_at > at) {
+            acked.rtt = Some((rtt, seg.sent_at));
+        }
+        if self.cc.paced() {
+            self.rate_delivered(seg, acked);
         }
         if seg.end.lt(prior_fack) && !seg.retrans {
             self.rack.reordering = true;
@@ -351,6 +359,9 @@ impl Tcb {
         if !seg.lost {
             seg.lost = true;
             self.lost_bytes += len;
+            if self.cc.paced() {
+                self.count_lost(len);
+            }
         }
     }
 
@@ -414,6 +425,9 @@ impl Tcb {
     }
 
     pub(super) fn prr_update(&mut self, delivered: u32) {
+        if self.cc.paced() {
+            return;
+        }
         self.prr_delivered += delivered;
         let pipe = self.inflight();
         let ssthresh = self.cc.ssthresh;

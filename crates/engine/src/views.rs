@@ -218,7 +218,7 @@ mod tests {
     fn an_unavailable_tun_congestion_control_is_reported() {
         let mut tun = TunConfig {
             enable: true,
-            congestion_controller: "bbr".into(),
+            congestion_controller: "bbr3".into(),
             ..TunConfig::default()
         };
         let warning = tun_congestion_warning(&tun, false).unwrap();
@@ -227,7 +227,7 @@ mod tests {
             ("not_applied", "tun.congestion-controller")
         );
         assert!(tun_congestion_warning(&tun, true).is_none());
-        for name in ["", "cubic", "Reno"] {
+        for name in ["", "cubic", "Reno", "bbr"] {
             tun.congestion_controller = name.into();
             assert!(tun_congestion_warning(&tun, false).is_none(), "{name}");
         }

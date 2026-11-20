@@ -265,6 +265,9 @@ impl Tcb {
                 self.cwnd_blocked = true;
                 break;
             }
+            if self.pace_blocked(now) {
+                break;
+            }
             let mut flags = FLAG_ACK;
             if seg.fin {
                 flags |= FLAG_FIN;
@@ -272,9 +275,12 @@ impl Tcb {
             if !self.emit(egress, state, seg.start, seg.payload(), flags, now) {
                 return false;
             }
+            self.advance_pacing(now, len, 1);
+            let stamp = self.stamp(now);
             if let Some(stored) = self.sent.get_mut(index - 1) {
                 stored.retrans = true;
                 stored.sent_at = now;
+                stored.stamp = stamp;
             }
             self.retrans_bytes += len;
             if self.phase == Phase::Recovery {
@@ -293,12 +299,16 @@ impl Tcb {
         room: u32,
     ) -> bool {
         let frame = (egress.segment_limit() as u32 / room).max(1) * room;
+        let frame = self.frame_cap(frame, room);
         loop {
             let queued_end = self.send_base + state.send.len() as u32;
             let unsent = queued_end.since(self.snd_nxt);
             let can_fin = matches!(self.state, State::Established | State::CloseWait);
             let fin_ready = state.write_closed && self.fin_seq.is_none() && can_fin;
             if unsent == 0 && !fin_ready {
+                if self.cc.paced() {
+                    self.check_app_limited();
+                }
                 break;
             }
             let window_end = self.snd_una + self.snd_wnd;
@@ -329,12 +339,17 @@ impl Tcb {
             if fin {
                 flags |= FLAG_FIN;
             }
-            if self.snd_una == self.snd_nxt && now.saturating_sub(self.last_send) > self.rto() {
-                self.cc.on_idle();
+            if len > 0 && self.pace_blocked(now) {
+                break;
+            }
+            if self.snd_una == self.snd_nxt {
+                self.tx_start(now);
             }
             if !self.emit_frame(egress, state, self.snd_nxt, len as usize, flags, now, room) {
                 return false;
             }
+            self.advance_pacing(now, len, u64::from(len.div_ceil(room).max(1)));
+            let stamp = self.stamp(now);
             let start = self.snd_nxt;
             let end = start + len + u32::from(fin);
             let mut from = start;
@@ -349,6 +364,7 @@ impl Tcb {
                     sacked: false,
                     lost: false,
                     retrans: false,
+                    stamp,
                 });
                 if last {
                     break;

@@ -202,6 +202,14 @@ async fn tcp_echoes_through_the_tunnel() {
 }
 
 #[tokio::test]
+async fn tcp_echoes_through_the_tunnel_under_bbr() {
+    let (_server, outbound) = setup(json!({"ip-stack": {"congestion-controller": "bbr"}})).await;
+    let target = Address::new(&SERVER_TUNNEL_IP.to_string(), 7);
+    echo(&*outbound, target.clone(), 5).await;
+    echo(&*outbound, target.clone(), 4 << 20).await;
+}
+
+#[tokio::test]
 async fn concurrent_connections_share_one_tunnel() {
     let (_server, outbound) = setup(json!({})).await;
     let target = Address::new(&SERVER_TUNNEL_IP.to_string(), 7);
