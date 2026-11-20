@@ -153,6 +153,8 @@ each segment, Concord's upload at MTU 1500 was 17% below SFA's at 29% more CPU p
   delay or loss.
 - On Android: proxy protocols and new connections, and a link that loads the core on a phone rather than in the
   emulator.
+- MITM, which mihomo does not have: the bench's MITM cases compare Concord's own tiers (off, passed through,
+  decrypted, with rules, scripts or modules) with one another, and no Go reference runs them.
 
 ## Reproducing
 
