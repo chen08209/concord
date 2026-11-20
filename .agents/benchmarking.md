@@ -67,6 +67,15 @@ trial. With `--fresh-cores`, the other workloads also start every core afresh fo
 process, so an interval covers process starts rather than only connections. Concord is stopped by closing its control connection, as a host does when it quits; mihomo by SIGTERM, and on
 Windows by terminating it, so `stop_ms` only compares on Unix.
 
+Without `--tun`, all cores of a case (with `--fresh-cores`, of a round) run at the same time, from the first warmup
+to the last trial, so they share the kernel. A change whose effect lives in kernel-global state (a static key, a
+sysctl, a socket or other object held for the process) applies to every arm while the candidate is up, and its A/B in
+one call reads close to zero. Holding one UDP_GRO socket per process keeps the kernel's UDP encapsulation keys from
+flipping on each per-connection QUIC socket: run against `main` in one call, `main` stopped flipping as well and
+stream-one `tcp-crr` read flat, while separate calls showed -22% CPU per connection. Measure such a change with each
+Concord arm in its own call, every call with the Go reference, the calls alternating order from round to round, and
+check that `main` still shows the gap against Go of its own calls before reading candidate against `main`.
+
 The control connection is a Unix socket on macOS and Linux and a named pipe on Windows. On Android it is a loopback TCP
 port, because SELinux does not let the shell user create socket files.
 
