@@ -326,7 +326,10 @@ impl GeoUpdater {
         let outcome = self.update_inner(file, fetcher).await;
         drop(claim);
         match &outcome {
-            Ok(Refresh::Updated) => self.route.moved(),
+            Ok(Refresh::Updated) => {
+                self.route.moved();
+                let _ = tokio::task::spawn_blocking(concord_platform::release_free_memory).await;
+            }
             Ok(Refresh::Unchanged) => {}
             Err(err) => tracing::error!("updateGeoData({kind}) error: {err}"),
         }

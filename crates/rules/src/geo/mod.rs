@@ -304,7 +304,8 @@ impl GeoStore {
         let bytes = dat::find_entry(&path, list).map_err(|err| decode_error(&path, &err))?;
         let entry = dat::GeoSiteEntry::decode(bytes.as_slice())
             .map_err(|err| decode_error(&path, &err.to_string()))?;
-        dat::SiteMatcher::from_entry(&entry, &attrs, negate).map_err(GeoError::Load)
+        drop(bytes);
+        dat::SiteMatcher::from_entry(entry, &attrs, negate).map_err(GeoError::Load)
     }
 }
 

@@ -139,7 +139,7 @@ pub struct SiteMatcher {
 
 impl SiteMatcher {
     pub(super) fn from_entry(
-        entry: &GeoSiteEntry,
+        entry: GeoSiteEntry,
         attrs: &[String],
         negate: bool,
     ) -> Result<SiteMatcher, String> {
@@ -147,7 +147,7 @@ impl SiteMatcher {
         let mut plain: Vec<Box<str>> = Vec::new();
         let mut regexes = Vec::new();
         let mut count = 0usize;
-        for domain in &entry.domain {
+        for domain in entry.domain {
             if !attrs.iter().all(|want| {
                 domain
                     .attribute
@@ -158,7 +158,7 @@ impl SiteMatcher {
             }
             count += 1;
             match domain.kind {
-                KIND_PLAIN => plain.push(domain.value.clone().into_boxed_str()),
+                KIND_PLAIN => plain.push(domain.value.into_boxed_str()),
                 KIND_REGEX => regexes.push(Regex::new(&domain.value).map_err(|err| {
                     format!("failed to create domain matcher, base error: {err}")
                 })?),
@@ -271,13 +271,13 @@ mod tests {
             .unwrap(),
         )
         .unwrap();
-        let matcher = SiteMatcher::from_entry(&entry, &[], false).unwrap();
+        let matcher = SiteMatcher::from_entry(entry.clone(), &[], false).unwrap();
         assert!(matcher.matches("baidu.com") && matcher.matches("www.baidu.com"));
         assert!(matcher.matches("exact.example") && !matcher.matches("a.exact.example"));
         assert!(matcher.matches("my-adservice-1.org"));
         assert!(matcher.matches("ad42.net") && !matcher.matches("bad42.net"));
         assert!(!matcher.matches("") && !matcher.matches("google.com"));
-        let negated = SiteMatcher::from_entry(&entry, &[], true).unwrap();
+        let negated = SiteMatcher::from_entry(entry, &[], true).unwrap();
         assert!(negated.matches("google.com") && !negated.matches("baidu.com"));
         assert!(!negated.matches(""));
     }
@@ -294,7 +294,7 @@ mod tests {
         );
         let entry = GeoSiteEntry::decode(bytes.get(2..).unwrap()).unwrap();
         let matcher =
-            SiteMatcher::from_entry(&entry, &["ads".to_string(), "cn".to_string()], false).unwrap();
+            SiteMatcher::from_entry(entry, &["ads".to_string(), "cn".to_string()], false).unwrap();
         assert!(matcher.matches("c.com") && !matcher.matches("a.com") && !matcher.matches("b.com"));
         assert_eq!(matcher.count(), 1);
     }

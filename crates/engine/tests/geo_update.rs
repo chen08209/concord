@@ -345,7 +345,8 @@ fn memory() -> Option<(f64, f64)> {
 }
 
 /// The memory an update takes above the core's resident set before it, for a download equal
-/// to the file on disk and for one that differs by a byte.
+/// to the file on disk and for one that differs by a letter; then what stays once it has
+/// settled, and once free memory is handed back.
 async fn update_peak(kind: &str, key: &str, name: &str, rule: &str, body: &'static [u8]) {
     let server = serve(Some(body)).await;
     for changed in [false, true] {
@@ -357,7 +358,7 @@ async fn update_peak(kind: &str, key: &str, name: &str, rule: &str, body: &'stat
                 .unwrap();
             old[letter] += 1;
         }
-        std::fs::write(rig.home.path().join(name), old).unwrap();
+        std::fs::write(rig.home.path().join(name), &old).unwrap();
         rig.apply(&format!(
             "geox-url:\n  {key}: http://{server}/f\nrules:\n  - {rule}\n  - MATCH,DIRECT\n"
         ))
@@ -377,12 +378,42 @@ async fn update_peak(kind: &str, key: &str, name: &str, rule: &str, body: &'stat
             rig.geo_events(kind)
         );
         let (peak, after) = memory().unwrap();
+        tokio::time::sleep(Duration::from_millis(500)).await;
+        let (_, settled) = memory().unwrap();
+        rig.engine.release_memory();
+        let (_, released) = memory().unwrap();
         println!(
             "MM-GEO {kind} file_mib {:.1} changed {changed} before_mib {before:.1} peak_mib {peak:.1} \
-             peak_over_mib {:.1} after_mib {after:.1}",
+             peak_over_mib {:.1} after_mib {after:.1} settled_over_mib {:.1} released_over_mib {:.1}",
             body.len() as f64 / 1048576.0,
-            peak - before
+            peak - before,
+            settled - before,
+            released - before
         );
+        if changed && kind == "GEOSITE" {
+            let mut residue = Vec::new();
+            for updates in 2..=5 {
+                let staged = rig.home.path().join("staged");
+                std::fs::write(&staged, &old).unwrap();
+                std::fs::rename(&staged, rig.home.path().join(name)).unwrap();
+                rig.engine.geo_update(kind).unwrap();
+                let updated = || {
+                    rig.geo_events(kind)
+                        .iter()
+                        .filter(|phase| **phase == ResourcePhase::Updated)
+                        .count()
+                        == updates
+                };
+                assert!(eventually(updated).await, "{:?}", rig.geo_events(kind));
+                tokio::time::sleep(Duration::from_millis(500)).await;
+                rig.engine.release_memory();
+                residue.push(format!("{:.1}", memory().unwrap().1 - before));
+            }
+            println!(
+                "MM-GEO {kind} repeated released_over_mib {}",
+                residue.join(" ")
+            );
+        }
         rig.engine.shutdown().await;
     }
 }
