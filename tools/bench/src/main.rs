@@ -185,7 +185,7 @@ struct RunArgs {
     #[arg(long)]
     background: Option<String>,
     #[arg(
-        help = "Linux: run an idle-priority busy loop on every CPU for the whole run, so no CPU sleeps between bursts of work. A control for a VM, where a lightly loaded run is charged for that sleep; report it beside the plain run."
+        help = "Linux and Windows: run an idle-priority busy loop on every CPU for the whole run, so no CPU sleeps between bursts of work. A control for a VM, where a lightly loaded run is charged for that sleep; report it beside the plain run."
     )]
     #[arg(long)]
     keep_awake: bool,

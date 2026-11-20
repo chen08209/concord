@@ -6,6 +6,7 @@ use std::io::{BufRead, BufReader};
 use std::process::{Child, Command, Stdio};
 
 const READY: &str = "spinning";
+const UNSUPPORTED: &str = "--keep-awake needs Linux or Windows";
 
 pub struct Awake {
     loops: Vec<Loop>,
@@ -18,8 +19,8 @@ struct Loop {
 
 impl Awake {
     pub fn start(cpus: &[usize]) -> Result<Awake, String> {
-        if !cfg!(target_os = "linux") {
-            return Err("--keep-awake needs Linux".into());
+        if !cfg!(any(target_os = "linux", windows)) {
+            return Err(UNSUPPORTED.into());
         }
         let exe = std::env::current_exe().map_err(|e| format!("--keep-awake: {e}"))?;
         let mut awake = Awake { loops: Vec::new() };
@@ -27,7 +28,11 @@ impl Awake {
             let mut child = Command::new(&exe)
                 .args(["spin", "--cpu", &cpu.to_string()])
                 .args(["--parent", &std::process::id().to_string()])
-                .stdin(Stdio::null())
+                .stdin(if cfg!(windows) {
+                    Stdio::piped()
+                } else {
+                    Stdio::null()
+                })
                 .stdout(Stdio::piped())
                 .spawn()
                 .map_err(|e| format!("--keep-awake: {e}"))?;
@@ -105,7 +110,42 @@ pub fn spin(cpu: usize, parent: u32) -> Result<(), String> {
     }
 }
 
-#[cfg(not(target_os = "linux"))]
+#[cfg(windows)]
+#[allow(
+    unsafe_code,
+    reason = "SetPriorityClass takes the current-process pseudo-handle and a constant"
+)]
+pub fn spin(cpu: usize, _parent: u32) -> Result<(), String> {
+    use std::io::{Read, Write};
+    use windows_sys::Win32::System::Threading::{
+        GetCurrentProcess, IDLE_PRIORITY_CLASS, SetPriorityClass,
+    };
+
+    crate::isolate::pin_self(&[cpu])?;
+    if unsafe { SetPriorityClass(GetCurrentProcess(), IDLE_PRIORITY_CLASS) } == 0 {
+        return Err(format!(
+            "SetPriorityClass: {}",
+            std::io::Error::last_os_error()
+        ));
+    }
+    // Windows has no parent-death signal. The harness holds the other end of stdin and never
+    // writes to it, so this read returns only once the harness is gone.
+    std::thread::spawn(|| {
+        let _ = std::io::stdin().read(&mut [0]);
+        std::process::exit(0);
+    });
+    let mut stdout = std::io::stdout();
+    writeln!(stdout, "{READY}")
+        .and_then(|()| stdout.flush())
+        .map_err(|e| e.to_string())?;
+    // A ready thread of a higher priority preempts this one at once, so the loop needs no system
+    // call to let it in.
+    loop {
+        std::hint::spin_loop();
+    }
+}
+
+#[cfg(not(any(target_os = "linux", windows)))]
 pub fn spin(_: usize, _: u32) -> Result<(), String> {
-    Err("--keep-awake needs Linux".into())
+    Err(UNSUPPORTED.into())
 }

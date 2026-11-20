@@ -172,16 +172,17 @@ macOS has no CPU affinity, so every process competes for the same CPUs. There, c
 throughput ceilings, and check `wait_share` and the `*_cores` columns. The harness warns when you are on battery or the
 load average is high.
 
-`--keep-awake` (Linux) runs an idle-priority busy loop on every CPU the harness may use, for the whole run: one
-`SCHED_IDLE` process per CPU that calls `sched_yield` in a loop, which gives way to anything runnable and only keeps the
-CPU from sleeping. It is a control for a lightly loaded run on a VM (a rate cap, a paced server). There a CPU that
-sleeps between short bursts charges the processes several times more for the same work, and the arm whose timing lets
-it sleep more looks the more expensive one, down to the origin and the client. On the Linux VM, `direct` over TUN at
+`--keep-awake` (Linux and Windows) runs an idle-priority busy loop on every CPU the harness may use, for the whole
+run. On Linux it is one `SCHED_IDLE` process per CPU that calls `sched_yield` in a loop, which gives way to anything
+runnable and only keeps the CPU from sleeping; on Windows it is one process per CPU in the idle priority class that
+spins without a system call. It is a control for a lightly loaded run on a VM (a rate cap, a paced server). There a CPU
+that sleeps between short bursts charges the processes several times more for the same work, and the arm whose timing
+lets it sleep more looks the more expensive one, down to the origin and the client. On the Linux VM, `direct` over TUN at
 1 Gbit/s read Concord 47% above sing-box in core CPU per GB without the loops; with them both arms fell about fourfold
 and Concord read 2% below downstream and 13% below upstream; downstream the origin's and the client's CPU, about twice
 apart between the arms without, came within 10% (loops started by hand). Run both and report both.
 
-A loop that never enters the kernel is not a control. The VM's kernel (7.0, `PREEMPT_LAZY`, HZ 1000) lets a woken task
+On Linux a loop that never enters the kernel is not a control. The VM's kernel (7.0, `PREEMPT_LAZY`, HZ 1000) lets a woken task
 preempt it only at the next tick, so the run is batched to the tick instead of kept awake: the core's context switches
 fall to exactly 1000 per second, `wait_share` rises above 10, the ACKs it sends per MB drop by up to two thirds and
 `udp-stream` RTT goes from 0.6 ms to 4 ms. Read a run with the loops only when its context switches per second,
@@ -425,6 +426,24 @@ One busy vCPU matters beyond timer-paced servers. With such a loop pinned to vCP
 `tcp-crr` did not move toward Go: ss-aes128 and trojan-tls tied without the loop and trailed by 13% with it, and tuic
 trailed by 22% either way.
 
+The peer server's CPU in a capped download is the same effect. At `--origin-rate 1000` the mihomo server, the same
+binary in both arms, read 20% (ss-aes128) and 28% (vmess) more CPU per GB under Concord than under Go, in pairs whose
+rates were within 1%. With the loop on vCPU 5 it read 2% less and 3% more, and cost 25-58% as much in both arms. With
+`--keep-awake`, a loop on each of the six vCPUs, it read 12% and 7% less, and every pair's rates were within 1%. A
+kernel trace of one pair without a loop showed the same work run more slowly: the server made the same system calls
+per MB in both arms (153 `NtDeviceIoControlFile` for ss-aes128), each took 38-50% longer under Concord, and its user
+time was a third longer. Concord's core and the load generator use less CPU than Go's, so the VM is idler in Concord's
+arm; what makes an idler VM slower was not found. In the one pair that carried it, a loop timing 15 000 register
+operations on the server's vCPU ran faster in Concord's arm, so it is not the speed of plain computation. Read a server
+CPU difference from a capped Windows run only in the pass with the loops, and report both passes. The harness has no
+context switch counts on Windows, so the pass with `--keep-awake` was checked only for both arms holding the cap, not
+for the batching the Linux loops can cause.
+
+A background process does what the loop does, to whichever arm it lands on: in windows where one used 0.2 to 1 vCPU,
+every role's CPU per GB fell to between a third and a half. The VM therefore has Defender's real-time protection,
+Windows Update, search indexing and telemetry switched off. In one pass before that 10 of 12 pairs missed the 1% rate
+match; in one after it 5 of 6 matched.
+
 Connection-rate cases exhaust the VM's ephemeral ports on Windows defaults: 16 384 dynamic ports from 49152, TIME_WAIT
 held 120 s, and no loopback reuse such as Linux's `tcp_tw_reuse=2` (the Linux VM has 28 232 ports, 32768-60999, and a
 fixed 60 s TIME_WAIT). A tcp-crr window opens about 3 300 connections, and the core's own leg to the server can leave a
@@ -441,6 +460,8 @@ range. The setting persists across reboots; `start=49152 num=16384` restores the
 
 The Windows VM runs with PMU virtualization on. Absolute numbers taken with it off are not comparable with these. CPU
 sampling still fails there (`PROFILE` kernel sessions return 0x32), so there are no CPU profiles from this VM.
+`xperf -pmcsources` lists only the timer, and a process's cycle count stays at 2.9 to 3.4 billion per CPU second
+whether a window is cheap or dear, so cycles per byte there is CPU time in another unit, not a second measurement.
 
 Windows updates itself in the VM, and a new build can move every arm: from build 10.0.26300.9818 to 10.0.26300.9974,
 `tcp-crr` fell to about 40% of its rate on both arms. Name the build in each report (`ver`, or the
